@@ -1,0 +1,109 @@
+if empty(glob('~/.vim/autoload/plug.vim'))
+	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
+
+" Add maktaba and codefmt to the runtimepath.
+" (The latter must be installed before it can be used.)
+Plug 'google/vim-maktaba'
+Plug 'google/vim-codefmt'
+" Also add Glaive, which is used to configure codefmt's maktaba flags. See
+" `:help :Glaive` for usage.
+Plug 'google/vim-glaive'
+""augroup autoformat_settings
+""  autocmd FileType bzl AutoFormatBuffer buildifier
+""  autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
+""  autocmd FileType dart AutoFormatBuffer dartfmt
+""  autocmd FileType go AutoFormatBuffer gofmt
+""  autocmd FileType gn AutoFormatBuffer gn
+""  autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
+""  autocmd FileType java AutoFormatBuffer google-java-format
+""  autocmd FileType python AutoFormatBuffer yapf
+""  " Alternative: autocmd FileType python AutoFormatBuffer autopep8
+""  autocmd FileType rust AutoFormatBuffer rustfmt
+""  autocmd FileType vue AutoFormatBuffer prettier
+""augroup END
+
+" code completion 
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+
+" automatic add headers 
+Plug 'alpertuna/vim-header'
+
+call plug#end()
+
+" for codefmt
+call glaive#Install()
+" set to google style 
+Glaive codefmt clang_format_style=google
+
+" for vim-header 
+" https://github.com/alpertuna/vim-header
+let g:header_field_author = 'Yibo Lin'
+let g:header_field_author_email = 'yibolin@pku.edu.cn'
+" toggle automatic add header 
+let g:header_auto_add_header = 0
+let g:header_field_timestamp_format = '%m.%d.%Y'
+" useful commands 
+" AddHeader, AddMinHeader, AddMITLicense, AddApacheLicense, 
+
+" show line numbers 
+set number 
+" 历史记录数
+set history=1000
+"禁止生成临时文件
+set nobackup
+set noswapfile
+"搜索忽略大小写
+set ignorecase
+" 打开状态栏标尺
+set ruler                   
+" 突出显示当前行
+set cursorline              
+hi CursorLine   cterm=NONE ctermbg=darkred ctermfg=white guibg=darkred guifg=white
+hi CursorLine   cterm=NONE ctermbg=darkgrey guibg=darkgrey
+" 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
+set mouse=a
+set selection=exclusive
+set selectmode=mouse,key
+" highlight all matches 搜索逐字符高亮
+set hlsearch
+set incsearch
+" match brackets 
+set showmatch
+" 匹配括号高亮的时间（单位是十分之一秒）
+set matchtime=1
+" complete chars 
+:inoremap .. ->
+:inoremap ( ()<ESC>i
+:inoremap ) <c-r>=ClosePair(')')<CR>
+:inoremap { {}<ESC>i
+":inoremap { {<CR>}<ESC>O
+:inoremap } <c-r>=ClosePair('}')<CR>
+:inoremap [ []<ESC>i
+:inoremap ] <c-r>=ClosePair(']')<CR>
+:inoremap " ""<ESC>i
+:inoremap ' ''<ESC>i
+function! ClosePair(char)
+    if getline('.')[col('.') - 1] == a:char
+        return "\<Right>"
+    else
+        return a:char
+    endif
+endfunction
+
+" maximum number of tabs 
+set tabpagemax=100
+" set tab and space options 
+set tabstop=2 shiftwidth=2 expandtab
+
+" 共享剪贴板  
+set clipboard+=unnamed 
+" 在处理未保存或只读文件的时候，弹出确认
+set confirm
+" always keep status bar on 
+set laststatus=2
