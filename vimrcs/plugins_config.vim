@@ -60,11 +60,6 @@ Plug 'scrooloose/syntastic'
 " easymotion
 Plug 'haya14busa/vim-easymotion'
 
-" incsearch
-Plug 'haya14busa/incsearch.vim'
-" argwrap
-Plug 'foosoft/vim-argwrap'
-
 " vim-markdown
 Plug 'plasticboy/vim-markdown'
 
@@ -98,6 +93,8 @@ Plug 'airblade/vim-gitgutter'
 " vim-clang-format
 Plug 'rhysd/vim-clang-format'
 
+" startuptime
+Plug 'tweekmonster/startuptime.vim'
 
 call plug#end()
 
@@ -166,11 +163,6 @@ nnoremap <Leader>m :SyntasticToggleMode<CR>
 
 " easymotion
 map <Space> <Plug>(easymotion-prefix)
-
-" incsearch
-map / <Plug>(incsearch-forward)
-map ? <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
 
 " argwrap
 nnoremap <Leader>w :ArgWrap<CR>
