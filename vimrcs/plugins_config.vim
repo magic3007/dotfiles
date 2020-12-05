@@ -121,8 +121,8 @@ let g:header_field_timestamp_format = '%m.%d.%Y'
 
 
 " nerdtree
-nnoremap <Leader>n :NERDTreeToggle<CR>
-nnoremap <Leader>f :NERDTreeFind<CR>
+nnoremap <Leader>N :NERDTreeToggle<CR>
+nnoremap <Leader>F :NERDTreeFind<CR>
 
 " buffergator
 let g:buffergator_suppress_keymaps = 1
