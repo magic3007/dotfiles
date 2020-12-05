@@ -9,6 +9,7 @@
     ~/.gitconfig: git/gitconfig
     ~/.vim: vim
     ~/.vimrc: vimrc
+    ~/vimrcs: vimrcs
 
 - create:
     - ~/downloads
