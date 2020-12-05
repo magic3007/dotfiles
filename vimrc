@@ -34,7 +34,7 @@ augroup END
 " but it can be set to force 256 colors
 " set t_Co=256
 if has('gui_running')
-    colorscheme solarized
+    colorscheme solarized8_flat 
     let g:lightline = {'colorscheme': 'solarized'}
 elseif &t_Co < 256
     colorscheme default
@@ -42,7 +42,7 @@ elseif &t_Co < 256
 else
     set background=dark
     let g:solarized_termcolors=256 " instead of 16 color with mapping in terminal
-    colorscheme solarized
+    colorscheme  solarized8_flat
     " customized colors
     highlight SignColumn ctermbg=234
     highlight StatusLine cterm=bold ctermfg=245 ctermbg=235
@@ -57,7 +57,6 @@ endif
 filetype plugin indent on 
 
 set autoindent
-
 
 "---------------------
 " Basic editing config
@@ -103,7 +102,8 @@ set incsearch
 " Highlight search
 set hls
 
-set listchars=tab:>>,nbsp:~ " set list to see tabs and non-breakable spaces
+" set list to see tabs and non-breakable spaces
+set listchars=tab:>>,nbsp:~ 
 
 set lbr " line break
 
@@ -263,7 +263,9 @@ nnoremap <C-n> :set rnu!<CR>
 command -nargs=0 Sudow w !sudo tee % >/dev/null
 
 
-" ==================== [Plugins] =======================
+"---------------------
+" Plugin Memagement
+"---------------------
 
 if empty(glob('~/.vim/autoload/plug.vim'))
 	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
@@ -304,12 +306,17 @@ Plug 'alpertuna/vim-header'
 call plug#end()
 
 
-" for codefmt
+"---------------------
+" Plugin configuration
+"---------------------
+
+
+" codefmt
 call glaive#Install()
 " set to google style 
 Glaive codefmt clang_format_style=google
 
-" for vim-header 
+" vim-header 
 " https://github.com/alpertuna/vim-header
 let g:header_field_author = 'Jing Mai'
 let g:header_field_author_email = 'magic3007@pku.edu.cn'
@@ -319,10 +326,6 @@ let g:header_field_timestamp_format = '%m.%d.%Y'
 " useful commands 
 " AddHeader, AddMinHeader, AddMITLicense, AddApacheLicense, 
 
-
-"---------------------
-" Plugin configuration
-"---------------------
 
 " nerdtree
 nnoremap <Leader>n :NERDTreeToggle<CR>

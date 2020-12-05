@@ -6,8 +6,9 @@
 - clean: ['~']
 
 - link:
+    ~/.gitconfig: git/gitconfig
     ~/.vim: vim
-    ~/.vimrc: vim/vimrc
+    ~/.vimrc: vimrc
 
 - create:
     - ~/downloads
@@ -19,4 +20,4 @@
   - git update-submodules
   - >
     git cleanall -f
-    vim/pack/vendor/start/
+    vim/plugged
