@@ -20,7 +20,6 @@ apt-get update \
       cmake \
       rsync \
       tar \
-      python \
       vim \
       htop \
       tmux \
@@ -30,6 +29,7 @@ apt-get update \
       nano \
       curl \
       wget \
+      sshpass \
   && apt-get clean
 
 # install 'on-my-zsh'
@@ -46,3 +46,13 @@ cd
 git clone https://github.com/gpakosz/.tmux.git
 ln -s -f .tmux/.tmux.conf
 cp .tmux/.tmux.conf.local .
+
+
+
+# install 'proxychains-ng'. Credit to git clone https://github.com/rofl0r/proxychains-ng.git
+cd
+git clone https://github.com/rofl0r/proxychains-ng.git
+cd proxychains-ng
+./configure
+make && make install
+cp ./src/proxychains.conf /etc/proxychains.conf
