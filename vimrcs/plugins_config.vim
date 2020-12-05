@@ -62,10 +62,6 @@ Plug 'haya14busa/vim-easymotion'
 
 " incsearch
 Plug 'haya14busa/incsearch.vim'
-
-" incsearch-easymotion
-Plug 'haya14busa/incsearch-easymotion.vim'
-
 " argwrap
 Plug 'foosoft/vim-argwrap'
 
@@ -101,6 +97,7 @@ Plug 'airblade/vim-gitgutter'
 
 " vim-clang-format
 Plug 'rhysd/vim-clang-format'
+
 
 call plug#end()
 
@@ -174,11 +171,6 @@ map <Space> <Plug>(easymotion-prefix)
 map / <Plug>(incsearch-forward)
 map ? <Plug>(incsearch-backward)
 map g/ <Plug>(incsearch-stay)
-
-" incsearch-easymotion
-map z/ <Plug>(incsearch-easymotion-/)
-map z? <Plug>(incsearch-easymotion-?)
-map zg/ <Plug>(incsearch-easymotion-stay)
 
 " argwrap
 nnoremap <Leader>w :ArgWrap<CR>
