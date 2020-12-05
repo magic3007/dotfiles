@@ -7,9 +7,10 @@
 
 - link:
     ~/.gitconfig: git/gitconfig
-    ~/.vim: vim
+    ~/.space-vim: space-vim
     ~/.vimrc: vimrc
     ~/vimrcs: vimrcs
+    ~/.spacevim: spacevim
 
 - create:
     - ~/downloads

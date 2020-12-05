@@ -103,6 +103,7 @@ set number
 " jump up or down to a particular line, by {count}k to go up or {count}j to go
 " down.
 " set relativenumber
+set norelativenumber
 
 " Turn on the Wild menu
 set wildmenu
@@ -215,30 +216,30 @@ endif
 " but it can be set to force 256 colors
 " set t_Co=256
 
-if has('gui_running')
-    set guioptions-=T
-    set guioptions-=e
-    set t_Co=256
-    set guitablabel=%M\ %t
-    colorscheme solarized8 
-    let g:lightline = {'colorscheme': 'solarized'}
-elseif &t_Co < 256
-    colorscheme default
-    set nocursorline " looks bad in this mode
-else
-    set background=dark
-    let g:solarized_termcolors=256 " instead of 16 color with mapping in terminal
-    colorscheme  gruvbox
-    set guifont=Monaco:h17
-    " customized colors
-    highlight SignColumn ctermbg=234
-    highlight StatusLine cterm=bold ctermfg=245 ctermbg=235
-    highlight StatusLineNC cterm=bold ctermfg=245 ctermbg=235
-    let g:lightline = {'colorscheme': 'dark'}
-    highlight SpellBad cterm=underline
-    " patches
-    highlight CursorLineNr cterm=NONE
-endif
+" if has('gui_running')
+"     set guioptions-=T
+"     set guioptions-=e
+"     set t_Co=256
+"     set guitablabel=%M\ %t
+"     colorscheme solarized8 
+"     let g:lightline = {'colorscheme': 'solarized'}
+" elseif &t_Co < 256
+"     colorscheme default
+"     set nocursorline " looks bad in this mode
+" else
+"     set background=dark
+"     let g:solarized_termcolors=256 " instead of 16 color with mapping in terminal
+"     colorscheme  gruvbox
+"     set guifont=Monaco:h17
+"     " customized colors
+"     highlight SignColumn ctermbg=234
+"     highlight StatusLine cterm=bold ctermfg=245 ctermbg=235
+"     highlight StatusLineNC cterm=bold ctermfg=245 ctermbg=235
+"     let g:lightline = {'colorscheme': 'dark'}
+"     highlight SpellBad cterm=underline
+"     " patches
+"     highlight CursorLineNr cterm=NONE
+" endif
 
 
 " Set utf8 as standard encoding and en_US as the standard language

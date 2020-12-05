@@ -2,3 +2,6 @@
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot.git
 	ignore = dirty
+[submodule "space-vim"]
+	path = space-vim
+	url = https://github.com/liuchengxu/space-vim.git
