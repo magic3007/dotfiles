@@ -1,7 +1,5 @@
 " Comments in Vimscript start with a `"`.
 
-" ==================== [Setting] =======================
-
 " Vim is based on Vi. Setting `nocompatible` switches from the default
 " Vi-compatibility mode and enables useful Vim functionality. This
 " configuration option turns out not to be necessary for the file named
@@ -11,11 +9,36 @@
 " `vim -u foo`).
 set nocompatible
 
+" Disable the default Vim startup messages.
+set shortmess+=I
+
+" -------------------
+"  Syntax and indent
+" -------------------
+
 " Turn on syntax highlighting.
 syntax on
 
-" Disable the default Vim startup messages.
-set shortmess+=I
+" show matching braces when text indicator is over them
+set showmatch 
+
+" highlight current line, but only in active window
+augroup CursorLineOnlyInActiveWindow
+    autocmd!
+    autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
+    autocmd WinLeave * setlocal nocursorline
+augroup END
+
+
+" enable file type detection
+filetype plugin indent on 
+
+set autoindent
+
+
+"---------------------
+" Basic editing config
+"---------------------
 
 " Show line numbers
 set number
@@ -54,21 +77,56 @@ set smartcase
 " Enable searching as you type, rather than waiting till you press enter.
 set incsearch
 
+" Highlight search
+set hls
 
-" Enable mouse support. You should avoid relying on this too much, but it can
-" sometimes be convenient.
-" 可以在buffer的任何地方使用鼠标（类似office中在工作区双击鼠标定位）
-set mouse+=a
+set listchars=tab:>>,nbsp:~ " set list to see tabs and non-breakable spaces
+
+set lbr " line break
+
+set scrolloff=5 " show lines above and below cursor (when possible)
+
+" hide mode
+set noshowmode 
+
+" always keep status bar on 
+set laststatus=2
+
+set backspace=indent,eol,start " allow backspacing over everything
+
+set timeout timeoutlen=1000 ttimeoutlen=100 " fix slow O inserts
+
+set lazyredraw " skip redrawing screen in some cases
+
+set autochdir " automatically set current directory to directory of last opened file
+
+set hidden " allow auto-hiding of edited buffers
+
+set history=8192 " more history
+
+" suppress inserting two spaces between sentences
+" use 4 spaces instead of tabs during formatting
+" set nojoinspaces 
+
+" set tab and space options 
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+
+set mouse+=a " enable mouse mode (scrolling, selection, etc)
 set selection=exclusive
 set selectmode=mouse,key
+if &term =~ '^screen'
+    " tmux knows the extended mouse mode
+    set ttymouse=xterm2
+endif
+set nofoldenable " disable folding by default
 
 " Open new windows to right and bottom, which feels
 " more natural than Vim's defualt.
 set splitbelow
 set splitright
-
-" 历史记录数
-set history=1000
 
 "禁止生成临时文件
 set nobackup
@@ -82,22 +140,11 @@ set cursorline
 hi CursorLine   cterm=NONE ctermbg=darkred ctermfg=white guibg=darkred guifg=white
 hi CursorLine   cterm=NONE ctermbg=darkgrey guibg=darkgrey
 
-" highlight all matches 搜索逐字符高亮
-set hlsearch
-set incsearch
-
-" match brackets 
-set showmatch
-
 " 匹配括号高亮的时间（单位是十分之一秒）
 set matchtime=1
 
-
 " maximum number of tabs 
 set tabpagemax=100
-
-" set tab and space options 
-set tabstop=2 shiftwidth=2 expandtab
 
 " 共享剪贴板  
 set clipboard+=unnamed 
@@ -105,13 +152,21 @@ set clipboard+=unnamed
 " 在处理未保存或只读文件的时候，弹出确认
 set confirm
 
-" always keep status bar on 
-set laststatus=2
-" ==================== [Keymap] =======================
+
+" disable audible bell
+set noerrorbells visualbell t_vb=
+
+" -------------------
+"   Keymap
+" -------------------
   
 " Unbind some useless/annoying default key bindings.
 " 'Q' in normal mode enters Ex mode. You almost never want this.
 nmap Q <Nop> 
+
+nmap <C-a> <Nop>
+
+nmap <C-x> <Nop>
 
 " Try to prevent bad habits like using the arrow keys for movement. This is
 " not the only possible bad habit. For example, holding down the h/j/k/l keys
@@ -147,6 +202,43 @@ function! ClosePair(char)
         return a:char
     endif
 endfunction
+
+" quicker window movement
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+
+" movement relative to display lines
+nnoremap <silent> <Leader>d :call ToggleMovementByDisplayLines()<CR>
+function SetMovementByDisplayLines()
+    noremap <buffer> <silent> <expr> k v:count ? 'k' : 'gk'
+    noremap <buffer> <silent> <expr> j v:count ? 'j' : 'gj'
+    noremap <buffer> <silent> 0 g0
+    noremap <buffer> <silent> $ g$
+endfunction
+function ToggleMovementByDisplayLines()
+    if !exists('b:movement_by_display_lines')
+        let b:movement_by_display_lines = 0
+    endif
+    if b:movement_by_display_lines
+        let b:movement_by_display_lines = 0
+        silent! nunmap <buffer> k
+        silent! nunmap <buffer> j
+        silent! nunmap <buffer> 0
+        silent! nunmap <buffer> $
+    else
+        let b:movement_by_display_lines = 1
+        call SetMovementByDisplayLines()
+    endif
+endfunction
+
+" toggle relative numbering
+nnoremap <C-n> :set rnu!<CR>
+
+" save read-only files
+command -nargs=0 Sudow w !sudo tee % >/dev/null
+
 
 " ==================== [Plugins] =======================
 
@@ -187,6 +279,7 @@ Plug 'google/vim-glaive'
 Plug 'alpertuna/vim-header'
 
 call plug#end()
+
 
 " for codefmt
 call glaive#Install()
