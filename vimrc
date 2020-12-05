@@ -34,7 +34,7 @@ augroup END
 " but it can be set to force 256 colors
 " set t_Co=256
 if has('gui_running')
-    colorscheme solarized8_flat 
+    colorscheme solarized8 
     let g:lightline = {'colorscheme': 'solarized'}
 elseif &t_Co < 256
     colorscheme default
@@ -42,7 +42,8 @@ elseif &t_Co < 256
 else
     set background=dark
     let g:solarized_termcolors=256 " instead of 16 color with mapping in terminal
-    colorscheme  solarized8_flat
+    colorscheme  gruvbox
+    set guifont=Monaco:h17
     " customized colors
     highlight SignColumn ctermbg=234
     highlight StatusLine cterm=bold ctermfg=245 ctermbg=235
@@ -216,8 +217,8 @@ inoremap <Down>  <ESC>:echoe "Use j"<CR>
 :inoremap } <c-r>=ClosePair('}')<CR>
 :inoremap [ []<ESC>i
 :inoremap ] <c-r>=ClosePair(']')<CR>
-:inoremap " ""<ESC>i
-:inoremap ' ''<ESC>i
+":inoremap " ""<ESC>i
+":inoremap ' ''<ESC>i
 function! ClosePair(char)
     if getline('.')[col('.') - 1] == a:char
         return "\<Right>"
@@ -272,6 +273,7 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+" Useful command: ':PlugInstall'
 
 call plug#begin('~/.vim/plugged')
 
@@ -303,6 +305,69 @@ Plug 'google/vim-glaive'
 " automatic add headers 
 Plug 'alpertuna/vim-header'
 
+" nerdtree
+Plug 'preservim/nerdtree'
+
+" buffergetor
+Plug 'https://github.com/jeetsukumaran/vim-buffergator.git'
+
+" gundo
+Plug 'sjl/gundo.vim'
+
+" ctrlp
+Plug 'ctrlpvim/ctrlp.vim'
+
+" ack.vim
+Plug 'mileszs/ack.vim'
+
+" syntastic
+Plug 'scrooloose/syntastic'
+
+" easymotion
+Plug 'haya14busa/vim-easymotion'
+
+" incsearch
+Plug 'haya14busa/incsearch.vim'
+
+" incsearch-easymotion
+Plug 'haya14busa/incsearch-easymotion.vim'
+
+" argwrap
+Plug 'foosoft/vim-argwrap'
+
+" vim-markdown
+Plug 'plasticboy/vim-markdown'
+
+" fugitive
+Plug 'tpope/vim-fugitive'
+
+" youcompleteme
+Plug 'valloric/youcompleteme'
+
+" vim-snippets
+Plug 'honza/vim-snippets'
+
+" grubbox
+Plug 'morhetz/gruvbox'
+
+" vim-airline
+Plug 'vim-airline/vim-airline'
+
+" vim-airline-themes
+Plug 'vim-airline/vim-airline-themes'
+
+" surround
+Plug 'tpope/vim-surround'
+
+" tagbar
+Plug 'majutsushi/tagbar'
+
+" gitgutter
+Plug 'airblade/vim-gitgutter'
+
+" vim-clang-format
+Plug 'rhysd/vim-clang-format'
+
 call plug#end()
 
 
@@ -319,7 +384,7 @@ Glaive codefmt clang_format_style=google
 " vim-header 
 " https://github.com/alpertuna/vim-header
 let g:header_field_author = 'Jing Mai'
-let g:header_field_author_email = 'magic3007@pku.edu.cn'
+let g:header_field_author_email = 'jingmai@pku.edu.cn'
 " toggle automatic add header 
 let g:header_auto_add_header = 0
 let g:header_field_timestamp_format = '%m.%d.%Y'
@@ -346,7 +411,7 @@ nnoremap ; :CtrlPBuffer<CR>
 let g:ctrlp_switch_buffer = 0
 let g:ctrlp_show_hidden = 1
 
-" ag / ack.vim
+" ack.vim
 command -nargs=+ Gag Gcd | Ack! <args>
 nnoremap K :Gag "\b<C-R><C-W>\b"<CR>:cw<CR>
 if executable('ag')
@@ -387,7 +452,7 @@ nnoremap <Leader>w :ArgWrap<CR>
 noremap <Leader>x :OverCommandLine<CR>
 
 " markdown
-let g:markdown_fenced_languages = [
+let g:vim_markdown_fenced_languages = [
     \ 'bash=sh',
     \ 'c',
     \ 'coffee',
@@ -401,8 +466,8 @@ let g:markdown_fenced_languages = [
     \ 'go',
     \ 'racket',
 \]
-let g:markdown_syntax_conceal = 0
-let g:markdown_folding = 1
+let g:vim_markdown_syntax_conceal = 0
+let g:vim_markdown_folding = 1
 
 " fugitive
 set tags^=.git/tags;~

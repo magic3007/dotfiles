@@ -18,6 +18,7 @@
   - git submodule sync --recursive
   # the following have to run after linking ~/.gitconfig
   - git update-submodules
+  - rm vim/autoload/plug.vim
   - >
     git cleanall -f
     vim/plugged
