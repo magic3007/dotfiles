@@ -5,7 +5,6 @@ if empty(glob('~/.vim/autoload/plug.vim'))
       autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-source ~/vimrcs/plugins_init.vim
 source ~/.space-vim/init.vim
 
 source ~/vimrcs/basic.vim

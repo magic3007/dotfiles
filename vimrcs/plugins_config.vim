@@ -101,4 +101,8 @@ nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>
 " <C-I> jump forward
 " <C-O> jump back to where you were before invoking the command
 " :h jumplist for details
+let g:ycm_error_symbol = '>>'
+let g:ycm_warning_symbol = '>*'
+nnoremap <leader>jd :YcmCompleter GoTo<CR>
+
 

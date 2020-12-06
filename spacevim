@@ -32,6 +32,8 @@ function! UserInit()
   " Add your own plugin via Plug command.
   Plug 'junegunn/seoul256.vim'
 
+  source ~/vimrcs/plugins_init.vim
+
 endfunction
 
 " Override the default settings from space-vim as well as adding extras

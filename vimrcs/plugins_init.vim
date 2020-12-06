@@ -2,7 +2,7 @@
 " Plugin Memagement
 "---------------------
 
-call plug#begin('~/.vim/plugged')
+" call plug#begin('~/.vim/plugged')
 
 " Add maktaba and codefmt to the runtimepath.
 " (The latter must be installed before it can be used.)
@@ -89,4 +89,4 @@ Plug 'rhysd/vim-clang-format'
 " startuptime
 Plug 'tweekmonster/startuptime.vim'
 
-call plug#end()
+" call plug#end()

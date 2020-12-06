@@ -8,5 +8,5 @@ Dotfiles use [Dotbot](https://github.com/anishathalye/dotbot) for installation. 
 You can make local customizations for some programs by editing these files:
 
 - `vim`: `~/.vimrc_local`
-- 'git`: `~/.gitconfig_local`
+- `git`: `~/.gitconfig_local`
 
