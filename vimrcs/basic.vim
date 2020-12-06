@@ -90,8 +90,6 @@ set confirm
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => VIM user interface
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Set 7 lines to the cursor - when moving vertically using j/k
-set so=7
 
 " Show line numbers
 set number
@@ -108,8 +106,11 @@ set norelativenumber
 " Turn on the Wild menu
 set wildmenu
 
+set scroll=1
+
 " show lines above and below cursor (when possible)
-set scrolloff=5 
+set scrolloff=3
+set scrolljump=0
 
 " hide mode
 set noshowmode 
@@ -274,7 +275,7 @@ set softtabstop=4
 
 " Linebreak on 500 characters
 set lbr
-set tw=500
+set tw=100
 
 set autoindent "Auto indent
 set smartindent "Smart indent

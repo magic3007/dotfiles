@@ -87,3 +87,18 @@ let g:vim_markdown_folding = 1
 
 " fugitive
 set tags^=.git/tags;~
+
+" youcompleteme
+
+" force YCM to immediately recompile your file and display any new diagnostics it encounters.
+nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>
+
+" This will print out various debug information for the current file. Useful to see what compile commands will be used for the file if you're using the semantic completion engine.
+" :YcmDebugInfo
+
+" GoTo Commands
+" When moving the cursor, the subcommands add entries to Vim's jumplist,
+" <C-I> jump forward
+" <C-O> jump back to where you were before invoking the command
+" :h jumplist for details
+
