@@ -92,4 +92,7 @@ Plug 'tweekmonster/startuptime.vim'
 " vim-rooter
 Plug 'airblade/vim-rooter'
 
+" tagbar
+Plug 'majutsushi/tagbar'
+
 " call plug#end()

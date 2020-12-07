@@ -104,6 +104,16 @@ nnoremap <F5> :YcmForceCompileAndDiagnostics<CR>
 let g:ycm_error_symbol = '>>'
 let g:ycm_warning_symbol = '>*'
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
+" 触发补全快捷键 
+let g:ycm_key_list_select_completion = ['<TAB>', '<c-n>', '<Down>'] 
+let g:ycm_key_list_previous_completion = ['<S-TAB>', '<c-p>', '<Up>'] 
+let g:ycm_auto_trigger = 1 
+" 最小自动触发补全的字符大小设置为 3 
+let g:ycm_min_num_of_chars_for_completion = 3 
 
 " vim-rooter
 let g:rooter_patterns = ['.git', '=src', 'Makefile', '*.sln', 'build/env.sh']
+
+" tagbar
+nmap <F8> :TagbarToggle<CR>
+
