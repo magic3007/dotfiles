@@ -105,4 +105,5 @@ let g:ycm_error_symbol = '>>'
 let g:ycm_warning_symbol = '>*'
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
 
-
+" vim-rooter
+let g:rooter_patterns = ['.git', '=src', 'Makefile', '*.sln', 'build/env.sh']

@@ -89,4 +89,7 @@ Plug 'rhysd/vim-clang-format'
 " startuptime
 Plug 'tweekmonster/startuptime.vim'
 
+" vim-rooter
+Plug 'airblade/vim-rooter'
+
 " call plug#end()
