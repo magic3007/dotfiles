@@ -11,6 +11,7 @@
     ~/.vimrc: vimrc
     ~/vimrcs: vimrcs
     ~/.spacevim: spacevim
+    ~/.ideavimrc: ideavimrc
 
 - create:
     - ~/downloads
