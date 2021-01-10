@@ -164,6 +164,14 @@ set hlsearch
 " Enable searching as you type, rather than waiting till you press enter.
 set incsearch 
 
+" To search for visually selected text
+" To use the mapping, visually select the characters that are wanted in the search, 
+" then type // to search for the next occurrence of the selected text. 
+" Then press n to search for the next occurrence.
+" Credit to https://vim.fandom.com/wiki/Search_for_visually_selected_text
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
+
+
 " automatically set current directory to directory of last opened file
 set autochdir 
 
