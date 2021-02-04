@@ -1,50 +1,162 @@
-let mapleader=' '
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Sets how many lines of history VIM has to remember
+set history=8192
 
-set hlsearch
-set incsearch
+" With a map leader it's possible to do extra key combinations
+" like <leader>w saves the current file
+let mapleader = ","
+
+set mouse+=a " enable mouse mode (scrolling, selection, etc)
+set selectmode=mouse,key
+
+" disable folding by default
+set nofoldenable
+
+" Open new windows to right and bottom, which feels
+" more natural than Vim's defualt.
+set splitbelow
+set splitright
+
+" 突出显示当前行
+set cursorline
+hi CursorLine   cterm=NONE ctermbg=darkred ctermfg=white guibg=darkred guifg=white
+hi CursorLine   cterm=NONE ctermbg=darkgrey guibg=darkgrey
+
+" 匹配括号高亮的时间（单位是十分之一秒）
+set matchtime=1
+
+" maximum number of tabs
+set tabpagemax=100
+
+" 共享剪贴板
+set clipboard+=unnamed
+
+" 在处理未保存或只读文件的时候，弹出确认
+set confirm
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => VIM user interface
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Show line numbers
+set number
+
+" This enables relative line numbering mode. With both number and
+" relative number enabled, the current line shows the true line number, while
+" all other lines (above and below) are numbered relative to the current line.
+" This is useful because you can tell, at a glance, what count is needed to
+" jump up or down to a particular line, by {count}k to go up or {count}j to go
+" down.
+" set relativenumber
+set norelativenumber
+
+" toggle relative numbering
+nnoremap <C-n> :set rnu!<CR>
+
+" Turn on the Wild menu
+set wildmenu
+
+set scroll=1
+
+" show lines above and below cursor (when possible)
+set scrolloff=3
+set scrolljump=0
+
+" fix slow O inserts
+set timeout timeoutlen=1000 ttimeoutlen=100
+
+"Always show current position
+set ruler
+
+" Height of the command bar
+set cmdheight=1
+
+" By default, Vim doesn't let you hide a buffer (i.e. have a buffer that isn't
+" shown in any window) that has unsaved changes. This is to prevent you from "
+" forgetting about unsaved changes and then quitting e.g. via `:qa!`. We find
+" hidden buffers helpful enough to disable this protection. See `:help hidden`
+" for more information on this.
+set hidden
+
+" The backspace key has slightly unintuitive behavior by default. For example,
+" by default, you can't backspace before the insertion point set with 'i'.
+" This configuration makes backspace behave more reasonably, in that you can
+" backspace over anything.
+set backspace=indent,eol,start
+set whichwrap+=<,>,h,l
+
+" set list to see tabs and non-breakable spaces
+set listchars=tab:>>,nbsp:~
+
+set lbr " line break
+
+" This setting makes search case-insensitive when all characters in the string
+" being searched are lowercase. However, the search becomes case-sensitive if
+" it contains any capital letters. This makes searching more convenient.
 set ignorecase
 set smartcase
-set showmode
-set number
-" set relativenumber
-set scrolloff=3
-set history=100000
-set clipboard=unnamed
 
-" clear the highlighted search result
-nnoremap <Leader>sc :nohlsearch<CR>
+" Highlight search results
+set hlsearch
+" Disable highlight when <Esc> is pressed
+map <Esc> :noh<cr>
 
-nnoremap <Leader>fs :w<CR>
+" Makes search act like search in modern browsers
+" Enable searching as you type, rather than waiting till you press enter.
+set incsearch
 
-nnoremap <C-C> <Esc>
+" To search for visually selected text
+" To use the mapping, visually select the characters that are wanted in the search,
+" then type // to search for the next occurrence of the selected text.
+" Then press n to search for the next occurrence.
+" Credit to https://vim.fandom.com/wiki/Search_for_visually_selected_text
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
-nnoremap <Leader>? :action GotoAction<CR>
-nnoremap gd :action GotoDeclaration<CR>
-nnoremap gi :action GotoImplementation<CR>
 
-" project search
-nnoremap <Leader>ps :action SearchEverywhere<CR>
-nnoremap <Leader>pf :action GotoFile<CR>
+" automatically set current directory to directory of last opened file
+set autochdir
 
-nnoremap fu :action FindUsages<CR>
-nnoremap <Leader>fu :action FindUsages<CR>
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
 
-" Quit normal mode
-nnoremap <Leader>q  :q<CR>
-nnoremap <Leader>Q  :qa!<CR>
+" For regular expressions turn magic on
+set magic
 
-" Move half page faster
-nnoremap <Leader>d  <C-d>
-nnoremap <Leader>u  <C-u>
+" Show matching brackets when text indicator is over them
+set showmatch
+" How many tenths of a second to blink when matching brackets
+set mat=2
 
-" Insert mode shortcut
-inoremap <C-h> <Left>
-inoremap <C-j> <Down>
-inoremap <C-k> <Up>
-inoremap <C-l> <Right>
-inoremap <C-a> <Home>
-inoremap <C-e> <End>
-inoremap <C-d> <Delete>
+" No annoying sound on errors
+set noerrorbells
+set novisualbell
+set t_vb=
+set tm=500
+
+" Add a bit extra margin to the left
+" set foldcolumn=1
+
+" highlight yanked text
+set highlightedyank
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Colors and Fonts
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enable syntax highlighting
+syntax enable
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Moving around, tabs, windows and buffers
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Create newlines like O and o but stay in normal mode
+nmap zj o<Esc>k
+nmap zk O<Esc>j
+
+" Map <Space> to / (search) and Ctrl-<Space> to ? (backwards search)
+map <space> /
+map <C-space> ?
 
 " Quit insert mode
 inoremap jj <Esc>
@@ -54,32 +166,18 @@ inoremap kk <Esc>
 " Quit visual mode
 vnoremap v <Esc>
 
+" Smart way to move between windows
+map <leader>j <C-W>j
+map <leader>k <C-W>k
+map <leader>h <C-W>h
+map <leader>l <C-W>l
+
 " Move to the start of line
 nnoremap H ^
-
 " Move to the end of line
 nnoremap L $
-
-" Redo
-nnoremap U <C-r>
-
 " Yank to the end of line
 nnoremap Y y$
-
-" quit ==> close current window
-nnoremap <Leader>q <C-W>w
-
-" Window operation
-nnoremap <Leader>ww <C-W>w
-nnoremap <Leader>wd <C-W>c
-nnoremap <Leader>wj <C-W>j
-nnoremap <Leader>wk <C-W>k
-nnoremap <Leader>wh <C-W>h
-nnoremap <Leader>wl <C-W>l
-nnoremap <Leader>ws <C-W>s
-nnoremap <Leader>w- <C-W>s
-nnoremap <Leader>wv <C-W>v
-nnoremap <Leader>w\| <C-W>v
 
 " Tab operation
 nnoremap tn gt
@@ -89,58 +187,55 @@ nnoremap tp gT
 " Show all the provided actions via `:actionlist`
 " ==================================================
 
-" built in search looks better
-nnoremap / :action Find<CR>
-" but preserve ideavim search
-nnoremap <Leader>/ /
+" closing tabs
+nmap <leader>q :action CloseContent<cr>
+nmap <leader>Q :action ReopenClosedTab<cr>
 
-nnoremap <Leader>;; :action CommentByLineComment<CR>
+" Tabs
+nnoremap [b :action PreviousTab<cr>
+nnoremap ]b :action NextTab<cr>
 
-nnoremap <Leader>bb :action ToggleLineBreakpoint<CR>
-nnoremap <Leader>br :action ViewBreakpoints<CR>
+" Moving lines
+nmap [e :action MoveLineUp<cr>
+nmap ]e :action MoveLineDown<cr>
 
-nnoremap <Leader>cv :action ChangeView<CR>
+" Moving statements
+nmap [s :action MoveStatementUp<cr>
+nmap ]s :action MoveStatementDown<cr>
 
-nnoremap <Leader>cd :action ChooseDebugConfiguration<CR>
+" Search
+nmap <leader>/ :action Find<cr>
+nmap <leader>\ :action FindInPath<cr>
 
-nnoremap ga :action GotoAction<CR>
-nnoremap gc :action GotoClass<CR>
+" project search
+nnoremap <Leader>ps :action SearchEverywhere<CR>
+
+" Go to the declaration or implementation
 nnoremap gd :action GotoDeclaration<CR>
-nnoremap gf :action GotoFile<CR>
 nnoremap gi :action GotoImplementation<CR>
-nnoremap gs :action GotoSymbol<CR>
 
-nnoremap <Leader>ga :action GotoAction<CR>
-nnoremap <Leader>gc :action GotoClass<CR>
-nnoremap <Leader>gd :action GotoDeclaration<CR>
-nnoremap <Leader>gf :action GotoFile<CR>
-nnoremap <Leader>gi :action GotoImplementation<CR>
-nnoremap <Leader>gs :action GotoSymbol<CR>
-nnoremap <Leader>gt :action GotoTest<CR>
+" Find usages
+nnoremap fu :action FindUsages<CR>
+nnoremap <Leader>fu :action FindUsages<CR>
 
-nnoremap <Leader>fp :action ShowFilePath<CR>
+" ==================================================
+" => Plugins
+" ==================================================
 
-nnoremap <Leader>ic :action InspectCode<CR>
+set surround
+set multiple-cursors
+set commentary
+set argtextobj
+set easymotion
+set textobj-entire
+set ReplaceWithRegister
 
-nnoremap <Leader>mv :action ActivateMavenProjectsToolWindow<CR>
+" ==================================================
+" => Idea specific settings
+" ==================================================
 
-nnoremap <Leader>oi :action OptimizeImports<CR>
+" use Idea to join lines smartly
+set ideajoin
 
-nnoremap <Leader>pm :action ShowPopupMenu<CR>
+" set idearefactormode=keep
 
-nnoremap <Leader>rc :action RunToCursor<CR>
-nnoremap <Leader>rC :action ChooseRunConfiguration<CR>
-nnoremap <Leader>re :action RenameElement<CR>
-nnoremap <Leader>rf :action RenameFile<CR>
-
-nnoremap <Leader>rr :action Rerun<CR>
-
-nnoremap <Leader>se :action SearchEverywhere<CR>
-nnoremap <Leader>su :action ShowUsages<CR>
-nnoremap <Leader>tc :action CloseActiveTab<CR>
-nnoremap <Leader>si :action StepInto<CR>
-
-nnoremap <Leader>tb :action ToggleLineBreakpoint<CR>
-
-nnoremap <Leader>tl Vy<CR>:action ActivateTerminalToolWindow<CR>
-vnoremap <Leader>tl y<CR>:action ActivateTerminalToolWindow<CR>
