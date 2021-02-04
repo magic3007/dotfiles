@@ -1,3 +1,4 @@
 priv/
 vim/plugged
 vim/undo-history
+.DS_Store
