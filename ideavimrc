@@ -53,7 +53,7 @@ set number
 set norelativenumber
 
 " toggle relative numbering
-nnoremap <C-n> :set rnu!<CR>
+map <leader>n :set rnu!<CR>
 
 " Turn on the Wild menu
 set wildmenu
@@ -223,7 +223,24 @@ nnoremap <Leader>fu :action FindUsages<CR>
 " ==================================================
 
 set surround
+
 set multiple-cursors
+" Remap multiple-cursors shortcuts to match terryma/vim-multiple-cursors
+nmap <C-n> <Plug>NextWholeOccurrence
+xmap <C-n> <Plug>NextWholeOccurrence
+nmap g<C-n> <Plug>NextOccurrence
+xmap g<C-n> <Plug>NextOccurrence
+nmap <C-x> <Plug>SkipOccurrence
+xmap <C-x> <Plug>SkipOccurrence
+nmap <C-p> <Plug>RemoveOccurrence
+xmap <C-p> <Plug>RemoveOccurrence
+" Note that the default <A-n> and g<A-n> shortcuts don't work on Mac due to dead keys.
+" <A-n> is used to enter accented text e.g. ñ
+nmap <S-C-n> <Plug>AllWholeOccurrences
+xmap <S-C-n> <Plug>AllWholeOccurrences
+nmap g<S-C-n> <Plug>AllOccurrences
+xmap g<S-C-n> <Plug>AllOccurrences
+
 set commentary
 set argtextobj
 set easymotion

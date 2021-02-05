@@ -12,6 +12,7 @@
     ~/vimrcs: vimrcs
     ~/.spacevim: spacevim
     ~/.ideavimrc: ideavimrc
+    ~/.tmux.conf: tmux.conf
 
 - create:
     - ~/downloads
