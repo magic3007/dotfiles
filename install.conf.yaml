@@ -13,6 +13,7 @@
     ~/.spacevim: spacevim
     ~/.ideavimrc: ideavimrc
     ~/.tmux.conf: tmux.conf
+    ~/.gdbinit: gdb/gdbinit
 
 - create:
     - ~/downloads
