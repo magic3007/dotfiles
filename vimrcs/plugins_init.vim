@@ -95,4 +95,10 @@ Plug 'airblade/vim-rooter'
 " tagbar
 Plug 'majutsushi/tagbar'
 
+" vim-clang-format
+Plug 'rhysd/vim-clang-format'
+
+" vim-operator-user
+Plug 'kana/vim-operator-user'
+
 " call plug#end()
