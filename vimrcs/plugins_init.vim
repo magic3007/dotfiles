@@ -101,4 +101,7 @@ Plug 'rhysd/vim-clang-format'
 " vim-operator-user
 Plug 'kana/vim-operator-user'
 
+" vim-highlightedyank
+Plug 'machakann/vim-highlightedyank'
+
 " call plug#end()
