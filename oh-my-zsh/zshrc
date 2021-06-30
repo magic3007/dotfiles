@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/jingmai/.oh-my-zsh"
+export ZSH="${HOME}/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -106,10 +106,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-source ~/proxyrc
-source ~/serverrc
-source ~/init_gurobi
+#
 
-export PATH=/usr/local/cuda-11.3/bin:${PATH:+:${PATH}}
-export LD_LIBRARY_PATH=/usr/local/cuda-11.3/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+# local customizations in ~/.zshrc_local
+[ -f ~/.zshrc_local ] && source ~/.zshrc_local

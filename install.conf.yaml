@@ -14,7 +14,7 @@
     ~/.ideavimrc: ideavimrc
     ~/.tmux.conf: tmux.conf
     ~/.gdbinit: gdb/gdbinit
-    ~/.zshrc: oh-my-zsh/.zshrc
+    ~/.zshrc: oh-my-zsh/zshrc
 
 - create:
     - ~/downloads
