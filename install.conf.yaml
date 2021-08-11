@@ -10,6 +10,7 @@
     ~/.space-vim: space-vim
     ~/.vimrc: vimrc
     ~/vimrcs: vimrcs
+    ~/.vim: vim
     ~/.spacevim: spacevim
     ~/.ideavimrc: ideavimrc
     ~/.tmux.conf: tmux.conf

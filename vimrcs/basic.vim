@@ -3,14 +3,15 @@
 "    -> General
 "    -> VIM user interface
 "    -> Colors and Fonts
+"    -> Status line
 "    -> Files and backups
 "    -> Text, tab and indent related
 "    -> Visual mode related
 "    -> Moving around, tabs and buffers
-"    -> Status line
 "    -> Editing mappings
 "    -> vimgrep searching and cope displaying
 "    -> Spell checking
+"    -> symbol reference
 "    -> Misc
 "    -> Helper functions
 "
@@ -164,13 +165,6 @@ set hlsearch
 " Enable searching as you type, rather than waiting till you press enter.
 set incsearch 
 
-" To search for visually selected text
-" To use the mapping, visually select the characters that are wanted in the search, 
-" then type // to search for the next occurrence of the selected text. 
-" Then press n to search for the next occurrence.
-" Credit to https://vim.fandom.com/wiki/Search_for_visually_selected_text
-vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
-
 
 " automatically set current directory to directory of last opened file
 set autochdir 
@@ -207,6 +201,11 @@ set foldcolumn=1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable syntax highlighting
 syntax enable 
+
+" hightlight cursorline
+set cursorline
+autocmd ColorScheme * highlight! Cursorline cterm=bold ctermbg=236 guibg=Grey90
+autocmd ColorScheme * highlight! CursorLineNr cterm=bold ctermfg=159 ctermbg=236 guibg=Grey90
 
 " highlight current line, but only in active window
 augroup CursorLineOnlyInActiveWindow
@@ -299,6 +298,13 @@ set wrap "Wrap lines
 vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
 vnoremap <silent> # :<C-u>call VisualSelection('', '')<CR>?<C-R>=@/<CR><CR>
 
+
+" To search for visually selected text
+" To use the mapping, visually select the characters that are wanted in the search, 
+" then type // to search for the next occurrence of the selected text. 
+" Then press n to search for the next occurrence.
+" Credit to https://vim.fandom.com/wiki/Search_for_visually_selected_text
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Moving around, tabs, windows and buffers
@@ -486,6 +492,48 @@ map <leader>sp [s
 map <leader>sa zg
 map <leader>s? z=
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Symbol Reference
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+""""""""""
+" cscope "
+""""""""""
+" Generate symbol files
+" An alternative manual way is to run `cscope -bqR` under the code source directory.
+" if has(“cscope")
+"     "设置cscope二进制可执行文件的绝对路径
+"     "优先搜索cscope的符号文件
+"     set csto=0
+"     "使用:cstag命令代替:tag/ctrl - ]/vim -t等命令，如果vim加载了cscope的数据库
+"     ":cstag命令实际执行的是”cs find g”
+"     set cst 
+"     "不打印cscope所产生的额外信息，也就是在加载cscope数据库时不打印冗余的log
+"     set nocsverb
+"     "加载当前路径的cscope数据库文件
+"     if filereadable("cscope.out")
+"         cs add cscope.out
+"     "如果cscope.out不存在于当前路径，加载环境变量CSCOPE_DB指定路径的cscope符号数
+"     "据库
+"     elseif $CSCOPE_DB != ""
+"         cs add $CSCOPE_DB
+"     endif
+"     "恢复csverb的初始值
+"     set csverb
+" endif
+
+set cscopequickfix=s-,c-,d-,i-,t-,e-
+
+nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-\>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>S :cs find t struct <C-R>=expand("<cword>")<CR> {<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Misc
