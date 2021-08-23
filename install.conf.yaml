@@ -16,13 +16,16 @@
     ~/.tmux.conf: tmux.conf
     ~/.gdbinit: gdb/gdbinit
     ~/.zshrc: oh-my-zsh/zshrc
+    ~/.condarc: condarc
 
 - create:
     - ~/downloads
     - ~/.vim/undo-history
 
 - shell:
-  - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
+  # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
   - git submodule sync --recursive
   # the following have to run after linking ~/.gitconfig
   - git update-submodules
+  - ./scripts/coc.sh
+

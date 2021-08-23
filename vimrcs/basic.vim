@@ -634,7 +634,6 @@ if has("cscope")
     nmap <C-@><C-@>i :vert scs find i ^<C-R>=expand("<cfile>")<CR>$<CR>	
     nmap <C-@><C-@>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
 
-
     """"""""""""" key map timeouts
     "
     " By default Vim will only wait 1 second for each keystroke in a mapping.
@@ -662,7 +661,19 @@ if has("cscope")
     " timeoutlent (default: 1000 = 1 second, which is sluggish) is used.
     "
     "set ttimeoutlen=100
-
+    
+    """"""""""""""" update setting """"""""""""""""""
+    " 关闭数据库连接
+    nmap <C-@>k :cs kill cscope.out <CR>
+    " 打开数据库连接
+    nmap <C-@>o :cs add cscope.out <CR>
+    " 保存文件并且更新数据库
+    nmap <C-@>w :w<CR>:!cscope -bqR<CR><CR>
+    " 保存文件并且更新ctags
+    nmap <C-@>u :w<CR>:!ctags -R<CR><CR>
+    " 保存文件更新全部
+    nmap <C-@>a <C-@>w <C-@>u
+     
 endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Misc

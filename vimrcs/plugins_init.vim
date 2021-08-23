@@ -104,4 +104,7 @@ Plug 'kana/vim-operator-user'
 " vim-highlightedyank
 Plug 'machakann/vim-highlightedyank'
 
+" coc.vim
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
 " call plug#end()
