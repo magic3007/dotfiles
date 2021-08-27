@@ -17,6 +17,7 @@
     ~/.gdbinit: gdb/gdbinit
     ~/.zshrc: oh-my-zsh/zshrc
     ~/.condarc: condarc
+    ~/.gdbinit: gdbinit
 
 - create:
     - ~/downloads
