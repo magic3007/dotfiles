@@ -14,10 +14,9 @@
     ~/.spacevim: spacevim
     ~/.ideavimrc: ideavimrc
     ~/.tmux.conf: tmux.conf
-    ~/.gdbinit: gdb/gdbinit
+    ~/.gdbinit: gdb/gdbinit_dashboard
     ~/.zshrc: oh-my-zsh/zshrc
     ~/.condarc: condarc
-    ~/.gdbinit: gdbinit
 
 - create:
     - ~/downloads
