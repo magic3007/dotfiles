@@ -1,5 +1,5 @@
 # dotfiles
-🤗 A collection of vim, zsh, git, and tmux configuration files and setup script under various OS.
+🤗 A collection of vim, neovim, zsh, git, and tmux configuration files and setup script under various OS.
 
 Dotfiles use [Dotbot](https://github.com/anishathalye/dotbot) for installation. After cloning this repo, run `install` to automatically set up the development environment. Note that the install script is idempotent: it can safely be run multiple times.
 
