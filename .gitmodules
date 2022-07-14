@@ -5,3 +5,6 @@
 [submodule "space-vim"]
 	path = space-vim
 	url = https://github.com/liuchengxu/space-vim.git
+[submodule "NvChad"]
+	path = NvChad
+	url = https://github.com/magic3007/NvChad.git
