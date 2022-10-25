@@ -161,7 +161,7 @@ docker-slave(){
 }
 
 # Golang Proxy
-if ! command -v go &> /dev/null; then
+if command -v go &> /dev/null; then
   go env -w GO111MODULE=on
   go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 fi
