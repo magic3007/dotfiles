@@ -11,13 +11,18 @@ fn + lalt - 3 : "${HOME}"/.skhd/scripts/show_bat.sh
 fn + lalt - 4 : "${HOME}"/.skhd/scripts/show_disk.sh
 fn + lalt - 5 : "${HOME}"/.skhd/scripts/show_song.sh
 
+
+# === Space ===================================
+
+shift + alt - s: yabai -m space --layout $(yabai -m query --spaces --space | jq -r 'if .type == "bsp" then "float" else "bsp" end')
+
 # === Windows ===================================
 
 # Navigation
-alt - h : yabai -m window --focus west
-alt - j : yabai -m window --focus south
-alt - k : yabai -m window --focus north
-alt - l : yabai -m window --focus east
+# alt - h : yabai -m window --focus west
+# alt - j : yabai -m window --focus south
+# alt - k : yabai -m window --focus north
+# alt - l : yabai -m window --focus east
 
 # Moving windows
 shift + alt - h : yabai -m window --warp west
