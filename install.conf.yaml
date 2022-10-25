@@ -17,6 +17,7 @@
     ~/.gdbinit: gdb/gdbinit_dashboard
     ~/.zshrc: oh-my-zsh/zshrc
     ~/.condarc: condarc
+    ~/.config/nvim: NvChad
 
 - create:
     - ~/downloads

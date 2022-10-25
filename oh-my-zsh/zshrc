@@ -119,10 +119,7 @@ source $ZSH/oh-my-zsh.sh
 transfer(){ if [ $# -eq 0 ];then echo "No arguments specified.\nUsage:\n transfer <file|directory>\n ... | transfer <file_name>">&2;return 1;fi;if tty -s;then file="$1";file_name=$(basename "$file");if [ ! -e "$file" ];then echo "$file: No such file or directory">&2;return 1;fi;if [ -d "$file" ];then file_name="$file_name.zip" ,;(cd "$file"&&zip -r -q - .)|curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null,;else cat "$file"|curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null;fi;else file_name=$1;curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null;fi;}
 
 # ranger
-alias ra=ranger
-
-# local customizations in ~/.zshrc_local
-[ -f ~/.zshrc_local ] && source ~/.zshrc_local
+alias ra="EDITOR=nvim ranger"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -131,3 +128,38 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 # exa
 alias els="exa -l"
+
+
+# rootless docker
+# export PATH=/usr/bin:$PATH
+export DOCKER_HOST=unix:///run/user/1001/docker.sock
+docker-run(){
+  local volume_dir="$HOME/docker-volumes"
+  if [ $# -ne 2 ]; then
+    echo "No Arguments specified.\nUsage:\n docker-run <image name> <container name>\n">&2;
+      return 1;
+  fi;
+  local container_name=$2
+  local mounted_home=$volume_dir/$container_name
+  mkdir -p $mounted_home
+  docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
+    -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
+    $1 /bin/bash;
+}
+docker-slave(){
+  if [ $# -ne 1 ]; then
+      echo "No Arguments specified.\nUsage:\n docker-slave <container name>\n">&2;
+      return 1;
+  fi;
+  docker exec -it $1 /bin/bash;
+}
+
+# Golang Proxy
+if ! command -v go &> /dev/null; then
+  go env -w GO111MODULE=on
+  go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
+fi
+
+# local customizations in ~/.zshrc_local
+[ -f ~/.zshrc_local ] && source ~/.zshrc_local
+
