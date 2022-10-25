@@ -1,0 +1,119 @@
+# !/usr/bin/env sh
+
+set -x
+
+# ====== Variables =============================
+
+declare -A gaps
+declare -A color
+
+gaps["top"]="0"
+gaps["bottom"]="0"
+gaps["left"]="0"
+gaps["right"]="0"
+gaps["inner"]="5"
+
+color["focused"]="0xE0808080"
+color["normal"]="0x00010101"
+color["preselect"]="0xE02d74da"
+
+# ===== Loading Scripting Additions ============
+
+# See: https://github.com/koekeishiya/yabai/wiki/Installing-yabai-(latest-release)#macos-big-sur---automatically-load-scripting-addition-on-startup
+sudo yabai --load-sa
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
+# ===== Tiling setting =========================
+
+# *** layout
+yabai -m config layout                       bsp 
+
+# New window spawns to the right if vertical split, or bottom if horizontal split
+yabai -m config window_placement             second_child
+
+# *** padding and gaps
+yabai -m config top_padding                 "${gaps["top"]}"
+yabai -m config bottom_padding              "${gaps["bottom"]}"
+yabai -m config left_padding                "${gaps["left"]}"
+yabai -m config right_padding               "${gaps["right"]}"
+yabai -m config window_gap                  "${gaps["inner"]}"
+
+# *** split ratios
+yabai -m config auto_balance                 off
+yabai -m config split_ratio                  0.50
+
+# *** window opacity (default: off)
+# example: render all unfocused windows with 90% opacity
+yabai -m config window_opacity on
+yabai -m config active_window_opacity 1.0
+yabai -m config normal_window_opacity 0.9
+
+# floating windows are always on top (default: off)
+yabai -m config window_topmost on
+
+# modify window shadows (default: on, options: on, off, float)
+# example: show shadows only for floating windows
+yabai -m config window_shadow float
+
+# window border
+yabai -m config window_border               off
+yabai -m config window_border_width         2
+yabai -m config active_window_border_color  "${color["focused"]}"
+yabai -m config normal_window_border_color  "${color["normal"]}"
+yabai -m config insert_feedback_color       "${color["preselect"]}"
+
+# ===== Mouse ================================
+
+# 鼠标修饰键 意思就是按着这个键就可以使用鼠标单独修改窗口大小了
+# set mouse interaction modifier key (default: fn)
+# set modifier + left-click drag to move window (default: move)
+# set modifier + right-click drag to resize window (default: resize)
+yabai -m config mouse_modifier               fn
+yabai -m config mouse_action1                move
+yabai -m config mouse_action2                resize
+
+# With focus follows mouse, you can also focus windows without having to click on them. 
+# This can be set to either autofocus (window gets focused, but not raised) or 
+# autoraise (window gets raised as if it was clicked on). 
+# Focus follows mouse is disabled while holding the mouse modifier key 
+# so that you can access the menu bar easily.
+# Mouse follows focus makes it so that when yabai focuses another window (e.g. through a focus command), 
+# the mouse cursor gets moved to the center of the focused window.
+yabai -m config mouse_follows_focus          autofocus
+# set focus follows mouse mode (default: off, options: off, autoraise, autofocus)
+yabai -m config focus_follows_mouse          on
+
+# ===== Rules ==================================
+
+yabai -m rule --add app="^System Preferences$" manage=off
+yabai -m rule --add app="^Archive Utility$" manage=off
+yabai -m rule --add app="^Logi Options+$" manage=off
+yabai -m rule --add app="^Alfred Preferences$" manage=off
+yabai -m rule --add app="^WeChat$" manage=off
+yabai -m rule --add app="^Chrome$" manage=off
+yabai -m rule --add app="^Contexts$" manage=off
+yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
+yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
+yabai -m rule --add label="macfeh" app="^macfeh$" manage=off
+yabai -m rule --add label="System Preferences" app="^System Preferences$" title=".*" manage=off
+yabai -m rule --add label="App Store" app="^App Store$" manage=off
+yabai -m rule --add label="Activity Monitor" app="^Activity Monitor$" manage=off
+yabai -m rule --add label="KeePassXC" app="^KeePassXC$" manage=off
+yabai -m rule --add label="Calculator" app="^Calculator$" manage=off
+yabai -m rule --add label="Dictionary" app="^Dictionary$" manage=off
+yabai -m rule --add label="mpv" app="^mpv$" manage=off
+yabai -m rule --add label="Software Update" title="Software Update" manage=off
+yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
+
+# ===== Signals ================================
+
+yabai -m signal --add event=application_front_switched action="${ubersicht_spaces_refresh_command}"
+yabai -m signal --add event=display_changed action="${ubersicht_spaces_refresh_command}"
+yabai -m signal --add event=space_changed action="${ubersicht_spaces_refresh_command}"
+yabai -m signal --add event=window_created action="${ubersicht_spaces_refresh_command}"
+yabai -m signal --add event=window_destroyed action="${ubersicht_spaces_refresh_command}"
+yabai -m signal --add event=window_focused action="${ubersicht_spaces_refresh_command}"
+yabai -m signal --add event=window_title_changed action="${ubersicht_spaces_refresh_command}"
+
+set +x
+printf "yabai: configuration loaded...\\n"

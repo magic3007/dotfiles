@@ -16,6 +16,9 @@
     ~/.tmux.conf: tmux.conf
     ~/.gdbinit: gdb/gdbinit_dashboard
     ~/.zshrc: oh-my-zsh/zshrc
+    ~/.yabairc: yabairc
+    ~/.skhdrc: skhdrc 
+    ~/.skhd: skhd
     ~/.condarc: condarc
     ~/.config/nvim: NvChad
 
