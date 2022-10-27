@@ -166,5 +166,7 @@ if command -v go &> /dev/null; then
   go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 fi
 
+[ -f ~/.nvmrc ] && source ~/.nvmrc
+
 # local customizations in ~/.zshrc_local
 [ -f ~/.zshrc_local ] && source ~/.zshrc_local
