@@ -20,7 +20,8 @@
     ~/.skhdrc: skhdrc 
     ~/.skhd: skhd
     ~/.condarc: condarc
-    ~/.config/nvim: NvChad
+    ~/.config/nvim: neovim/nvim-basic-ide 
+    # ~/.config/nvim: neovim/NvChad
 
 - create:
     - ~/downloads
