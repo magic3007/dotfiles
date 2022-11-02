@@ -85,6 +85,7 @@ plugins=(git
     zsh-autosuggestions
     colored-man-pages
     sudo
+    zsh-wakatime
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -165,6 +166,9 @@ if command -v go &> /dev/null; then
   go env -w GO111MODULE=on
   go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
 fi
+
+# nvm: manager for multiple versions of node.js
+[ -f ~/.nvmrc ] && source ~/.nvmrc
 
 # local customizations in ~/.zshrc_local
 [ -f ~/.zshrc_local ] && source ~/.zshrc_local
