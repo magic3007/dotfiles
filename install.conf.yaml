@@ -20,6 +20,7 @@
     ~/.skhdrc: skhdrc 
     ~/.skhd: skhd
     ~/.condarc: condarc
+    ~/.config/ranger: ranger 
     ~/.config/nvim: neovim/nvim-basic-ide 
     # ~/.config/nvim: neovim/NvChad
 
