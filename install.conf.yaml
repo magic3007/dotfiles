@@ -15,6 +15,7 @@
     ~/.skhd: skhd
     ~/.condarc: condarc
     ~/.config/ranger: ranger 
+    ~/.vimrc: vim/vimrc/vimrc
     ~/.vim_runtime: vim/vimrc
     ~/.ideavimrc: ideavimrc
     ~/.config/nvim: neovim/nvim-basic-ide 
