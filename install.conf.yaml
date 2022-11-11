@@ -7,12 +7,6 @@
 
 - link:
     ~/.gitconfig: git/gitconfig
-    ~/.space-vim: space-vim
-    ~/.vimrc: vimrc
-    ~/vimrcs: vimrcs
-    ~/.vim: vim
-    ~/.spacevim: spacevim
-    ~/.ideavimrc: ideavimrc
     ~/.tmux.conf: tmux.conf
     ~/.gdbinit: gdb/gdbinit_dashboard
     ~/.zshrc: oh-my-zsh/zshrc
@@ -21,6 +15,8 @@
     ~/.skhd: skhd
     ~/.condarc: condarc
     ~/.config/ranger: ranger 
+    ~/.vim_runtime: vim/vimrc
+    ~/.ideavimrc: ideavimrc
     ~/.config/nvim: neovim/nvim-basic-ide 
     # ~/.config/nvim: neovim/NvChad
 
@@ -30,8 +26,7 @@
 
 - shell:
   # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
-  - git submodule sync --recursive
+  - [git submodule update --init --recursive, Installing submodules]
   # the following have to run after linking ~/.gitconfig
-  - git update-submodules
-  - ./scripts/coc.sh
+  # - ./scripts/coc.sh
 

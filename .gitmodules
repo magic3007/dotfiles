@@ -12,3 +12,7 @@
 	path = vim/vimrc
 	url = git@github.com:magic3007/vimrc.git
 	branch = custom
+[submodule "dotbot"]
+	path = dotbot
+	url = https://github.com/anishathalye/dotbot
+	ignore = dirty
