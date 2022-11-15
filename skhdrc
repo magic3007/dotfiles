@@ -1,8 +1,8 @@
 # opens iTerm2
-alt - return: "${HOME}"/.skhd/scripts/open_iterm2.sh
+# alt - return: "${HOME}"/.skhd/scripts/open_iterm2.sh
 
 # open Chrome
-shift + alt - return:"${HOME}"/.skhd/scripts/open_chrome.sh 
+# shift + alt - return:"${HOME}"/.skhd/scripts/open_chrome.sh 
 
 # Show system statistics
 fn + lalt - 1 : "${HOME}"/.skhd/scripts/show_cpu.sh
