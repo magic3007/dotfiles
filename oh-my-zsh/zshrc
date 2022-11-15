@@ -151,7 +151,7 @@ docker-run(){
   mkdir -p $mounted_home
   docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
     -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
-    --prvileged
+    --privileged \
     $1 /bin/bash;
 }
 docker-slave(){
