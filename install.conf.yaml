@@ -19,6 +19,7 @@
     ~/.vimrc: vim/vimrc/vimrc
     ~/.vim_runtime: vim/vimrc
     ~/.ideavimrc: ideavimrc
+    ~/.Rprofile: Rprofile
     ~/.config/pip/pip.conf: pip.conf
     ~/.config/nvim: neovim/nvim-basic-ide 
     # ~/.config/nvim: neovim/NvChad
