@@ -138,28 +138,48 @@ alias els="exa -l"
 alias rsy="rsync -avzP"
 
 # rootless docker
-# export PATH=/usr/bin:$PATH
-export DOCKER_HOST=unix:///run/user/1001/docker.sock
 docker-run(){
   local volume_dir="$HOME/docker-volumes"
-  if [ $# -ne 2 ]; then
-    echo "No Arguments specified.\nUsage:\n docker-run <image name> <container name>\n">&2;
-      return 1;
+  if [ $# -ne 2 ] && [ $# -ne 3 ]; then
+    echo "No Arguments specified.\nUsage:\n docker-run <image name> <container name> [number of gpus (1|2|all)]\n">&2;
+    return 1;
   fi;
   local container_name=$2
   local mounted_home=$volume_dir/$container_name
   mkdir -p $mounted_home
-  docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
-    -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
-    --privileged \
-    $1 /bin/bash;
+  if [ $# -eq 2 ]; then
+    set -x 
+    docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
+      -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
+      --privileged \
+      $1 /bin/bash;
+    set +x 
+  else
+    local gpus=$3
+    set -x 
+    sudo docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
+      -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
+      --privileged \
+      --gpus $gpus \
+      $1 /bin/bash;
+    set +x
+  fi;
 }
+
 docker-slave(){
   if [ $# -ne 1 ]; then
       echo "No Arguments specified.\nUsage:\n docker-slave <container name>\n">&2;
       return 1;
   fi;
   docker exec -it $1 /bin/bash;
+}
+
+sudo-docker-slave(){
+  if [ $# -ne 1 ]; then
+      echo "No Arguments specified.\nUsage:\n docker-slave <container name>\n">&2;
+      return 1;
+  fi;
+  sudo docker exec -it $1 /bin/bash;
 }
 
 # Golang Proxy
@@ -182,3 +202,4 @@ if command -v nvim &> /dev/null; then
 else
   export EDITOR='vim'
 fi
+
