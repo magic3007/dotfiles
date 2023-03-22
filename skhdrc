@@ -20,10 +20,10 @@ shift + alt - s: yabai -m space --layout $(yabai -m query --spaces --space | jq 
 # === Windows ===================================
 
 # Navigation
-# alt - h : yabai -m window --focus west
-# alt - j : yabai -m window --focus south
-# alt - k : yabai -m window --focus north
-# alt - l : yabai -m window --focus east
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east
 
 # Equalize size of windows (平铺当前界面所有窗口)
 ctrl + alt - 0 : yabai -m space --balance
