@@ -11,6 +11,7 @@ Dotfiles use [Dotbot](https://github.com/anishathalye/dotbot) for installation. 
 - `ranger` as file manager
 - `nvim` as code editor
 - `tmux` as terminal multiplexer
+- `nb` as the terminal note manager
 
 ## Making Local Customizations
 

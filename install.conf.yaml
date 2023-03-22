@@ -23,6 +23,7 @@
     ~/.Rprofile: Rprofile
     ~/.config/pip/pip.conf: pip.conf
     ~/.config/nvim: neovim/nvim-basic-ide 
+    ~/.nb: nb
     # ~/.config/nvim: neovim/NvChad
 
 - create:
