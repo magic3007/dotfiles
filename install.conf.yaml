@@ -8,7 +8,8 @@
 - link:
     ~/.gitconfig: git/gitconfig
     ~/.tmux.conf: tmux.conf
-    ~/.gdbinit: gdb/gdbinit_dashboard
+    ~/.gdb: gdb
+    ~/.gdbinit: gdb/gdbinit
     ~/.zshrc: oh-my-zsh/zshrc
     ~/.yabairc: yabairc
     ~/.skhdrc: skhdrc 

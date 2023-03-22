@@ -1,0 +1,14 @@
+source ~/.gdb/gdbinit_dashboard
+source ~/.gdb/gdbinit_dbinit_stl_views
+
+
+# GDB Dashboard Config
+# refer to https://github.com/cyrus-and/gdb-dashboard/wiki
+define my-source-profile
+  dashboard -layout stack expressions variables source
+  dashboard source -style height 20
+end
+
+define my-assembly-profile
+  dashboard -layout registers assembly memory stack
+end
