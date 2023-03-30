@@ -27,7 +27,7 @@
     # ~/.config/nvim: neovim/NvChad
 
 - create:
-    - ~/downloads
+    - ~/Downloads
     - ~/.vim/undo-history
 
 - shell:
