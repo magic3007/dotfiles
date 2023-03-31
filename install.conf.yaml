@@ -29,6 +29,7 @@
 - create:
     - ~/Downloads
     - ~/.vim/undo-history
+    - ~/.wastebasket
 
 - shell:
   # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;

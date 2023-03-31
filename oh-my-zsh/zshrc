@@ -209,6 +209,8 @@ export NVM_DIR="$HOME/.nvm"
 # julia
 export JULIA_PKG_SERVER=https://mirrors.tuna.tsinghua.edu.cn/julia
 
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # local customizations in ~/.zshrc_local
 [ -f ~/.zshrc_local ] && source ~/.zshrc_local
 
@@ -219,5 +221,25 @@ else
   export EDITOR='vim'
 fi
 
+# Use a safe deletion command instead of rm
+# Credit to https://web.physics.wustl.edu/alford/linux/precautions.html
+alias rm='echo -e "Use rem for reversible delete, \\\\rm for regular delete, wipe or srm for secure delete"'
+
+rem () {
+  setopt sh_word_split  # handle filenames with properly escaped spaces
+  echo "Removing $*"
+  read "rem_resp?OK?(y/n) "
+  if [[ ${rem_resp} == "y" ]]; then
+    mv --backup=numbered -t ~/.wastebasket $*
+  else
+    echo "No action taken"
+  fi
+}
+
+# Make mv and cp safer
+alias mv='mv -i -b'
+alias cp='cp -i -b'
+
 # unsetopt XTRACE
 # exec 2>&3 3>&-
+
