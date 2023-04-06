@@ -8,6 +8,7 @@
 # make a note of whether the script was invoked with the -interactive option
 # this will change later behavior: we will add in a dry run and an option to abort
 
+exclude_dotfiles=true # if false, exclude all `$dir_to_be_backed_up/.*` directories and files.
 interactive="false"
 if [[ $1 == "-interactive" || $1 == "-i" ]]
 then 
@@ -20,6 +21,7 @@ log_file=${HOME}/NAS_backups.log
 # list of subdirectories that we do NOT want to include in the backup:
 exclusions=(/.anaconda /.conda /.eclipse /.gnupg /.keras /.nv /.slocdata /.cache /.config /.kde /.local 
   /.mozilla /.wine /.wine-pipelight /shared /.Xauthority /.bash_history /.zsh_history /docker-volumes 
+  /.mambaforge
   /.wastebasket)
 
 rsync_exclusions_file=`mktemp`
@@ -32,6 +34,14 @@ done
 remote_storage_mountpoint=${HOME}/shared
 
 dir_to_be_backed_up=${HOME}
+
+if $exclude_dotfiles; then
+  echo "excluding dotfiles under ${dir_to_be_backed_up}"
+  shopt -s globstar
+  for file in $(find $dir_to_be_backed_up -maxdepth 1 -name ".*" -printf "/%f\n"); do
+    echo $file >> ${rsync_exclusions_file}
+  done
+fi
 
 # Check that remote_storage_mountpoint is mounted:
 
