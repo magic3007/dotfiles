@@ -236,9 +236,17 @@ rem () {
   fi
 }
 
+OS=$(uname -s)
+
 # Make mv and cp safer
-alias mv='mv -i -b'
-alias cp='cp -i -b'
+if [[ $OS == "Darwin" ]]; then
+  alias mv='mv -i'
+  alias cp='cp -i'
+elif [[ $OS == "Linux" ]]; then
+  alias mv='mv -i -b'
+  alias cp='cp -i -b'
+fi
+
 
 # unsetopt XTRACE
 # exec 2>&3 3>&-
