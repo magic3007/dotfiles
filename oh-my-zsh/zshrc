@@ -222,22 +222,38 @@ else
   export EDITOR='vim'
 fi
 
-# Use a safe deletion command instead of rm
-# Credit to https://web.physics.wustl.edu/alford/linux/precautions.html
-alias rm='echo -e "Use rem for reversible delete, \\\\rm for regular delete, wipe or srm for secure delete"'
-
-rem () {
-  setopt sh_word_split  # handle filenames with properly escaped spaces
-  echo "Removing $*"
-  read "rem_resp?OK?(y/n) "
-  if [[ ${rem_resp} == "y" ]]; then
-    mv --backup=numbered -t ~/.wastebasket $*
-  else
-    echo "No action taken"
-  fi
-}
 
 OS=$(uname -s)
+
+if [[ $OS == "Darwin" ]]; then
+  # Modified from https://apple.stackexchange.com/questions/17622/how-can-i-make-rm-move-files-to-the-trash-can
+  # - Correcting bad habits
+  alias rm='echo -e "Use rem for reversible delete, \\\\rm for regular delete"'
+  rem () {
+    setopt sh_word_split  # handle filenames with properly escaped spaces
+    echo "Removing $*"
+    read "rem_resp?OK?(y/n) "
+    if [[ ${rem_resp} == "y" ]]; then
+      trash $*
+    else
+      echo "No action taken"
+    fi
+  }
+elif [[ $OS == "Linux" ]]; then
+  # Use a safe deletion command instead of rm
+  # Credit to https://web.physics.wustl.edu/alford/linux/precautions.html
+  alias rm='echo -e "Use rem for reversible delete, \\\\rm for regular delete, wipe or srm for secure delete"'
+  rem () {
+    setopt sh_word_split  # handle filenames with properly escaped spaces
+    echo "Removing $*"
+    read "rem_resp?OK?(y/n) "
+    if [[ ${rem_resp} == "y" ]]; then
+      mv --backup=numbered -t ~/.wastebasket $*
+    else
+      echo "No action taken"
+    fi
+  }
+fi
 
 # Make mv and cp safer
 if [[ $OS == "Darwin" ]]; then
