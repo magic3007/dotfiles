@@ -152,6 +152,8 @@ alias els="exa -l"
 alias rsy="rsync -avzP"
 
 # rootless docker
+# Reference
+# - See NVIDIA CUDA container from https://hub.docker.com/r/nvidia/cuda/tags
 docker-run(){
   local volume_dir="$HOME/docker-volumes"
   if [ $# -ne 2 ] && [ $# -ne 3 ]; then
@@ -162,15 +164,15 @@ docker-run(){
   local mounted_home=$volume_dir/$container_name
   mkdir -p $mounted_home
   if [ $# -eq 2 ]; then
-    set -x 
+    set -x
     docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
       -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
       --privileged \
       $1 /bin/bash;
-    set +x 
+    set +x
   else
     local gpus=$3
-    set -x 
+    set -x
     sudo docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
       -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
       --privileged \
@@ -210,6 +212,8 @@ export NVM_DIR="$HOME/.nvm"
 # julia
 export JULIA_PKG_SERVER=https://mirrors.tuna.tsinghua.edu.cn/julia
 
+# git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+# ~/.fzf/install
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # local customizations in ~/.zshrc_local
@@ -264,6 +268,75 @@ elif [[ $OS == "Linux" ]]; then
   alias cp='cp -i -b'
 fi
 
+
+# Elapsed and execution time display for commands in ZSH
+# https://gist.github.com/knadh/123bca5cfdae8645db750bfb49cb44b0
+
+function preexec() {
+  timer=$(($(print -P %D{%s%6.})/1000))
+}
+
+function precmd() {
+  # add a newline after each command
+  print ""
+  if [ $timer ]; then
+    local now=$(($(print -P %D{%s%6.})/1000))
+    local d_ms=$(($now-$timer))
+    local d_s=$((d_ms / 1000))
+    local ms=$((d_ms % 1000))
+    local s=$((d_s % 60))
+    local m=$(((d_s / 60) % 60))
+    local h=$((d_s / 3600))
+    if ((h > 0)); then elapsed=${h}h${m}m
+    elif ((m > 0)); then elapsed=${m}m${s}s
+    elif ((s >= 10)); then elapsed=${s}.$((ms / 100))s
+    elif ((s > 0)); then elapsed=${s}.$((ms / 10))s
+    else elapsed=${ms}ms
+    fi
+
+    unset timer
+  else
+    unset elapsed
+  fi
+}
+
+RPROMPT='%F{cyan}$(if [ $elapsed ]; then echo "$elapsed "; fi)$(date "+%m-%d %T")%F{none}'
+
+# Go up directory tree X number of directories
+# http://orangesplotch.com/bash-going-up/
+function up() {
+	COUNTER="$@";
+	# default $COUNTER to 1 if it isn't already set
+	if [[ -z $COUNTER ]]; then
+		COUNTER=1
+	fi
+	# make sure $COUNTER is a number
+	if [ $COUNTER -eq $COUNTER 2> /dev/null ]; then
+		nwd=`pwd` # Set new working directory (nwd) to current directory
+		# Loop $nwd up directory tree one at a time
+		until [[ $COUNTER -lt 1 ]]; do
+			nwd=`dirname $nwd`
+			let COUNTER-=1
+		done
+		cd $nwd # change directories to the new working directory
+	else
+		# print usage and return error
+		echo "usage: up [NUMBER]"
+		return 1
+	fi
+}
+
+function proxy() {
+	https_proxy=http://127.0.0.1:7890 \
+		http_proxy=http://127.0.0.1:7890 \
+		"$@"
+}
+
+alias dirs="dirs -v"
+
+
+# The fuck
+command -v thefuck >/dev/null 2>&1 && eval $(thefuck --alias)
 
 # unsetopt XTRACE
 # exec 2>&3 3>&-
