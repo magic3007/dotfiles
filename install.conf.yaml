@@ -53,6 +53,6 @@
       #         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
       #         Installing oh-my-zsh,
       #     ]
-      #   - [~/.fzf/install --all, Installing fzf]
+      - [~/.fzf/install --all, Installing fzf]
       #   - [chsh -s $(which zsh), Making zsh the default shell]
       # - ./scripts/coc.sh
