@@ -332,8 +332,7 @@ function up() {
 # 		http_proxy=http://127.0.0.1:7890 \
 # 		"$@"
 # }
-alias pc="https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890"
-
+alias pc="https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7891"
 alias dirs="dirs -v"
 
 
@@ -343,6 +342,14 @@ alias dirs="dirs -v"
 # unsetopt XTRACE
 # exec 2>&3 3>&-
 
+# cargo
+export RUSTUP_DIST_SERVER="https://rsproxy.cn"
+export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"
 
+# hugo Proxy
+export HUGO_MODULE_PROXY=https://goproxy.cn/,direct
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[ -f ~/.cargo/env ] && source ~/.cargo/env
+

@@ -24,6 +24,7 @@
       ~/.Rprofile: Rprofile
       ~/.config/pip/pip.conf: pip.conf
       ~/.config/nvim: neovim/nvim-basic-ide
+      ~/.cargo/config.toml: cargo/config.toml
       # ~/.config/nvim: neovim/NvChad
 
 - create:
