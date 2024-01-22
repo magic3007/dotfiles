@@ -116,7 +116,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-[ -f ~/.bashrc_local ] && source ~/.bashrc_local
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
@@ -128,3 +127,82 @@ fi
 # }
 alias pc="https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7891"
 alias dirs="dirs -v"
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# cargo
+export RUSTUP_DIST_SERVER="https://rsproxy.cn"
+export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"
+[ -f ~/.cargo/env ] && source ~/.cargo/env
+
+# hugo Proxy
+export HUGO_MODULE_PROXY=https://goproxy.cn/,direct
+
+alias els="exa -l"
+
+# rsync
+alias rsy="rsync -avzP"
+
+# cheat.sh
+cheat(){curl cheat.sh/$1;}
+
+# ranger
+alias ra='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+
+# transfer.sh
+transfer(){ if [ $# -eq 0 ];then echo "No arguments specified.\nUsage:\n transfer <file|directory>\n ... | transfer <file_name>">&2;return 1;fi;if tty -s;then file="$1";file_name=$(basename "$file");if [ ! -e "$file" ];then echo "$file: No such file or directory">&2;return 1;fi;if [ -d "$file" ];then file_name="$file_name.zip" ,;(cd "$file"&&zip -r -q - .)|curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null,;else cat "$file"|curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null;fi;else file_name=$1;curl --progress-bar --upload-file "-" "https://transfer.sh/$file_name"|tee /dev/null;fi;}
+
+# rootless docker
+# Reference
+# - See NVIDIA CUDA container from https://hub.docker.com/r/nvidia/cuda/tags
+docker-run(){
+  local volume_dir="$HOME/docker-volumes"
+  if [ $# -ne 2 ] && [ $# -ne 3 ]; then
+    echo "No Arguments specified.\nUsage:\n docker-run <image name> <container name> [number of gpus (1|2|all)]\n">&2;
+    return 1;
+  fi;
+  local container_name=$2
+  local mounted_home=$volume_dir/$container_name
+  mkdir -p $mounted_home
+  if [ $# -eq 2 ]; then
+    set -x
+    docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
+      -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
+      --privileged \
+      $1 /bin/bash;
+    set +x
+  else
+    local gpus=$3
+    set -x
+    sudo docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
+      -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
+      --privileged \
+      --gpus $gpus \
+      $1 /bin/bash;
+    set +x
+  fi;
+}
+
+docker-slave(){
+  if [ $# -ne 1 ]; then
+      echo "No Arguments specified.\nUsage:\n docker-slave <container name>\n">&2;
+      return 1;
+  fi;
+  docker exec -it $1 /bin/bash;
+}
+
+sudo-docker-slave(){
+  if [ $# -ne 1 ]; then
+      echo "No Arguments specified.\nUsage:\n docker-slave <container name>\n">&2;
+      return 1;
+  fi;
+  sudo docker exec -it $1 /bin/bash;
+}
+
+# Golang Proxy
+if command -v go &> /dev/null; then
+  go env -w GO111MODULE=on
+  go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct
+fi
+
+[-f ~/.bashrc_local] && source ~/.bashrc_local
