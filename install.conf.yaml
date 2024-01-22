@@ -46,6 +46,9 @@
       "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
           url: "https://github.com/wbinglee/zsh-wakatime.git"
           description: "zsh plugin: zsh-wakatime"
+      "~/.oh-my-zsh/custom/plugins/autojump":
+          url: "https://github.com/wting/autojump.git"
+          description: "zsh plugin: autojump"
 
 - shell:
       # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
@@ -56,5 +59,6 @@
       #         Installing oh-my-zsh,
       #     ]
       - [~/.fzf/install --all, Installing fzf]
+      - [cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py, Installing autojump]
       #   - [chsh -s $(which zsh), Making zsh the default shell]
       # - ./scripts/coc.sh
