@@ -354,3 +354,4 @@ export HUGO_MODULE_PROXY=https://goproxy.cn/,direct
 
 [ -f ~/.cargo/env ] && source ~/.cargo/env
 
+[ -f ~/.vscoderc ] && source ~/.vscoderc
