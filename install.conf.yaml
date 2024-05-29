@@ -26,6 +26,7 @@
       ~/.config/pip/pip.conf: pip.conf
       ~/.config/nvim: neovim/nvim-basic-ide
       ~/.cargo/config.toml: cargo/config.toml
+      ~/.vscoderc: vscode/vscoderc
       # ~/.config/nvim: neovim/NvChad
 
 - create:
