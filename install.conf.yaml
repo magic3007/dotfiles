@@ -58,10 +58,10 @@
       # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
       - [git submodule update --init --recursive, Installing submodules]
       # the following have to run after linking ~/.gitconfig
-      #   - [
-      #         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
-      #         Installing oh-my-zsh,
-      #     ]
+        - [
+              sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
+              Installing oh-my-zsh,
+          ]
       - [~/.fzf/install --all, Installing fzf]
       - [cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py, Installing autojump]
       #   - [chsh -s $(which zsh), Making zsh the default shell]
