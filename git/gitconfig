@@ -108,6 +108,7 @@
 
 [http]
 	cookieFile = ~/.gitcookies
+	postBuffer = 5242880000
 
 [core]
 	excludesfile = ~/.gitignore_global

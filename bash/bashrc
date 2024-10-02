@@ -215,3 +215,6 @@ if [ -n "$PATH" ]; then
   PATH=${PATH#:}
   unset old_PATH x
 fi
+
+export PATH=$HOME/.local/bin:$PATH
+. "$HOME/.cargo/env"
