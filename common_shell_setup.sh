@@ -30,8 +30,11 @@ if command -v nvim &> /dev/null; then
 else
   export EDITOR='vim'
 fi
+
 # cheat.sh
-cheat(){curl cheat.sh/$1;}
+cheat(){
+	curl cheat.sh/$1;
+}
 
 # ranger
 alias ra='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
