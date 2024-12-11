@@ -11,6 +11,7 @@
       ~/.gdb: gdb
       ~/.gdbinit: gdb/gdbinit
       ~/.zshrc: oh-my-zsh/zshrc
+      ~/.common_shell_setup.sh: common_shell_setup.sh
       ~/.bashrc: bash/bashrc
       ~/.yabairc: yabairc
       ~/.skhdrc: skhdrc
