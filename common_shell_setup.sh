@@ -153,11 +153,13 @@ fi
 export PATH=$HOME/.local/bin:$PATH
 
 # add all private keys to ssh agent
-for possiblekey in ${HOME}/.ssh/id_*; do
-    if grep -q PRIVATE "$possiblekey" 2>/dev/null; then
-        ssh-add "$possiblekey" 2>/dev/null
-    fi
-done
+if compgen -G "${HOME}/.ssh/id_*" > /dev/null; then
+    for possiblekey in ${HOME}/.ssh/id_*; do
+        if grep -q PRIVATE "$possiblekey" 2>/dev/null; then
+            ssh-add "$possiblekey" 2>/dev/null
+        fi
+    done
+fi
 
 
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
