@@ -5,6 +5,54 @@
 
 - clean: ["~"]
 
+- create:
+  #    - ~/Downloads
+  #    - ~/scratch
+  #    - ~/projects
+  #    - ~/mounted
+      - ~/.vim/undo-history
+      - ~/.wastebasket
+
+- git:
+      "~/.fzf":
+          url: "https://github.com/junegunn/fzf.git"
+          description: "fzf for both zsh and bash"
+
+- shell:
+      # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
+      - [git submodule update --init --recursive, Installing submodules]
+      # the following have to run after linking ~/.gitconfig
+      - [   sudo apt-get install -y zsh tmux vim htop,
+            Installing zsh tmux vim, and htop,
+        ]
+      - [
+            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
+            Installing oh-my-zsh,
+        ]
+      - [~/.fzf/install --all, Installing fzf]
+      #   - [chsh -s $(which zsh), Making zsh the default shell]
+      # - ./scripts/coc.sh
+  
+- git:
+      "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
+          url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+          description: "zsh plugin: zsh-syntax-highlighting"
+      "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
+          url: "https://github.com/zsh-users/zsh-autosuggestions"
+          description: "zsh plugin: zsh-autosuggestions"
+      "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
+          url: "https://github.com/wbinglee/zsh-wakatime.git"
+          description: "zsh plugin: zsh-wakatime"
+      "~/.oh-my-zsh/custom/plugins/autojump":
+          url: "https://github.com/wting/autojump.git"
+          description: "zsh plugin: autojump"
+
+- shell:
+      - [
+            cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
+            Installing autojump,
+        ]
+
 - link:
       ~/.gitconfig: git/gitconfig
       ~/.tmux.conf: tmux.conf
@@ -31,43 +79,3 @@
       # ~/.config/nvim: neovim/NvChad
       ~/.chatgpt: chatgpt
 
-- create:
-      - ~/Downloads
-      - ~/scratch
-      - ~/projects
-      - ~/mounted
-      - ~/.vim/undo-history
-      - ~/.wastebasket
-
-- git:
-      "~/.fzf":
-          url: "https://github.com/junegunn/fzf.git"
-          description: "fzf for both zsh and bash"
-      "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
-          url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
-          description: "zsh plugin: zsh-syntax-highlighting"
-      "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
-          url: "https://github.com/zsh-users/zsh-autosuggestions"
-          description: "zsh plugin: zsh-autosuggestions"
-      "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
-          url: "https://github.com/wbinglee/zsh-wakatime.git"
-          description: "zsh plugin: zsh-wakatime"
-      "~/.oh-my-zsh/custom/plugins/autojump":
-          url: "https://github.com/wting/autojump.git"
-          description: "zsh plugin: autojump"
-
-- shell:
-      # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
-      - [git submodule update --init --recursive, Installing submodules]
-      # the following have to run after linking ~/.gitconfig
-      - [
-            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
-            Installing oh-my-zsh,
-        ]
-      - [~/.fzf/install --all, Installing fzf]
-      - [
-            cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
-            Installing autojump,
-        ]
-      #   - [chsh -s $(which zsh), Making zsh the default shell]
-      # - ./scripts/coc.sh
