@@ -12,6 +12,7 @@
   #    - ~/mounted
       - ~/.vim/undo-history
       - ~/.wastebasket
+      - ~/.config/karabiner
 
 - git:
       "~/.fzf":
