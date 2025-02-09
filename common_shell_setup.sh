@@ -166,3 +166,9 @@ export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
 # chatgpt.sh
 export PATH="$PATH:$HOME/.chatgpt"
+
+# lazygit
+alias lg='lazygit'
+
+# zellij
+alias zj="zellij"

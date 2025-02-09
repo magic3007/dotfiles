@@ -358,5 +358,3 @@ if [ -n "$PATH" ]; then
   PATH=${PATH#:}
   unset old_PATH x
 fi
-
-alias zj="zellij"
