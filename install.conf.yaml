@@ -23,17 +23,20 @@
       # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
       - [git submodule update --init --recursive, Installing submodules]
       # the following have to run after linking ~/.gitconfig
-      - [   sudo apt-get install -y zsh tmux vim htop,
+      - [   test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop || true,
             Installing zsh tmux vim, and htop on Linux,
         ]
+      - [   test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
+            Installing lazygit and zellij on MacOS
+        ]
       - [
-            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
+            test ! -d ~/.oh-my-zsh && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true,
             Installing oh-my-zsh,
         ]
       - [~/.fzf/install --all, Installing fzf]
       #   - [chsh -s $(which zsh), Making zsh the default shell]
       # - ./scripts/coc.sh
-  
+
 - git:
       "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
           url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
