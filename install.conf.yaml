@@ -24,7 +24,7 @@
       - [git submodule update --init --recursive, Installing submodules]
       # the following have to run after linking ~/.gitconfig
       - [   sudo apt-get install -y zsh tmux vim htop,
-            Installing zsh tmux vim, and htop,
+            Installing zsh tmux vim, and htop on Linux,
         ]
       - [
             sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)",
@@ -47,6 +47,9 @@
       "~/.oh-my-zsh/custom/plugins/autojump":
           url: "https://github.com/wting/autojump.git"
           description: "zsh plugin: autojump"
+      "~/.oh-my-zsh/custom/plugins/zsh-vi-mode":
+          url: "https://github.com/jeffreytse/zsh-vi-mode.git"
+          description: "zsh plugin: zsh-vi-mode"
 
 - shell:
       - [

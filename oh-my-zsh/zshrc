@@ -101,6 +101,7 @@ plugins=(git
     colored-man-pages
     sudo
     zsh-wakatime
+    zsh-vi-mode
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -357,3 +358,5 @@ if [ -n "$PATH" ]; then
   PATH=${PATH#:}
   unset old_PATH x
 fi
+
+alias zj="zellij"
