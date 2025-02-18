@@ -33,7 +33,6 @@
             test ! -d ~/.oh-my-zsh && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true,
             Installing oh-my-zsh,
         ]
-      - [~/.fzf/install --all, Installing fzf]
       #   - [chsh -s $(which zsh), Making zsh the default shell]
       # - ./scripts/coc.sh
 
@@ -88,3 +87,5 @@
       ~/.config/karabiner/karabiner.json: karabiner/karabiner.json
       ~/.config/karabiner/assets: karabiner/assets
 
+- shell:
+      - [~/.fzf/install --all, Installing fzf]
