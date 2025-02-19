@@ -23,7 +23,7 @@
       # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
       - [git submodule update --init --recursive, Installing submodules]
       # the following have to run after linking ~/.gitconfig
-      - [   test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop || true,
+      - [   test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
             Installing zsh tmux vim, and htop on Linux,
         ]
       - [   test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
@@ -57,6 +57,10 @@
       - [
             cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
             Installing autojump,
+        ]
+      - [
+            test -e ~/.gitconfig && mv ~/.gitconfig ~/.gitconfig_local || true; test -e ~/.bashrc && mv ~/.bashrc ~/.bashrc_local || true; test -e ~/.zshrc && mv ~/.zshrc ~/.zshrc_local || true,
+            Backing up existing config files
         ]
 
 - link:
