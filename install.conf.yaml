@@ -58,10 +58,6 @@
             cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
             Installing autojump,
         ]
-      - [
-            test -e ~/.gitconfig && mv ~/.gitconfig ~/.gitconfig_local || true; test -e ~/.bashrc && mv ~/.bashrc ~/.bashrc_local || true; test -e ~/.zshrc && mv ~/.zshrc ~/.zshrc_local || true,
-            Backing up existing config files
-        ]
 
 - link:
       ~/.gitconfig: git/gitconfig
