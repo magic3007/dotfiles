@@ -19,10 +19,7 @@ fi
 log_file=${HOME}/NAS_backups.log
 
 # list of subdirectories that we do NOT want to include in the backup:
-exclusions=(/.anaconda /.conda /.eclipse /.gnupg /.keras /.nv /.slocdata /.cache /.config /.kde /.local 
-  /.mozilla /.wine /.wine-pipelight /shared /.Xauthority /.bash_history /.zsh_history /docker-volumes 
-  /.mambaforge
-  /.wastebasket)
+exclusions=(/.anaconda /.conda /.eclipse /.gnupg /.keras /.nv /.slocdata /.cache /.config /.kde /.local /.mozilla /.wine /.wine-pipelight /shared /.Xauthority /.bash_history /.zsh_history /docker-volumes /.mambaforge /.wastebasket /dotfiles /downloads /Downloads /NVIDIA_CUDA-11.0_Samples /softwares /snap /tools)
 
 rsync_exclusions_file=`mktemp`
 for pattern in "${exclusions[@]}"
