@@ -336,7 +336,7 @@ else
     if [ -f "$conda_path/etc/profile.d/conda.sh" ]; then
         . "$conda_path/etc/profile.d/conda.sh"
     else
-        export path="$conda_path/bin:$path"
+        export PATH="$conda_path/bin:$PATH"
     fi
 fi
 unset __conda_setup
