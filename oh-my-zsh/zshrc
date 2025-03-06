@@ -318,29 +318,34 @@ export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
 FZF_PREVIEW_COMMAND="(bat --color=always {} || highlight -O ansi {} || cat {}) 2>/dev/null | head -100"
 export FZF_DEFAULT_OPTS="--height=40% --layout=reverse --ansi --preview='${FZF_PREVIEW_COMMAND}'"
 
+# common shell setup for bash and zsh
+[ -f ~/.common_shell_setup.sh ] && source ~/.common_shell_setup.sh
+
+# you can set the environment variable conda_path in .common_shell_setup_local.sh
+# 如果没有设置 conda_path 环境变量，那么用这个默认值
+if [ -z "$conda_path" ]; then
+    conda_path="$home/.miniforge3"
+fi
+
 # >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('$HOME/.miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+# !! contents within this block are managed by 'conda init' !!
+__conda_setup="$('$conda_path/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "$HOME/.miniforge3/etc/profile.d/conda.sh" ]; then
-        . "$HOME/.miniforge3/etc/profile.d/conda.sh"
+    if [ -f "$conda_path/etc/profile.d/conda.sh" ]; then
+        . "$conda_path/etc/profile.d/conda.sh"
     else
-        export PATH="$HOME/.miniforge3/bin:$PATH"
+        export path="$conda_path/bin:$path"
     fi
 fi
 unset __conda_setup
 
-if [ -f "$HOME/.miniforge3/etc/profile.d/mamba.sh" ]; then
-    . "$HOME/.miniforge3/etc/profile.d/mamba.sh"
+if [ -f "$conda_path/etc/profile.d/mamba.sh" ]; then
+    . "$conda_path/etc/profile.d/mamba.sh"
 fi
+
 # <<< conda initialize <<<
-
-# ================ DO NOT EDIT BELOW THIS LINE ================
-
-# common shell setup for bash and zsh
-[ -f ~/.common_shell_setup.sh ] && source ~/.common_shell_setup.sh
 
 # local customizations in ~/.zshrc_local
 [ -f ~/.zshrc_local ] && source ~/.zshrc_local
