@@ -101,7 +101,8 @@ plugins=(git
     colored-man-pages
     sudo
     zsh-wakatime
-    zsh-vi-mode
+    # zsh-vi-mode
+    # we prefer emacs mode
 )
 
 source $ZSH/oh-my-zsh.sh
