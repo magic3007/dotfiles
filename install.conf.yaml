@@ -83,7 +83,7 @@
       ~/.cargo/config.toml: cargo/config.toml
       ~/.vscoderc: vscode/vscoderc
       # ~/.config/nvim: neovim/NvChad
-      ~/.chatgpt: chatgpt
+      ~/.chatgpt.sh: chatgpt
       ~/.config/karabiner/karabiner.json: karabiner/karabiner.json
       ~/.config/karabiner/assets: karabiner/assets
 
