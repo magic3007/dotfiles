@@ -35,6 +35,10 @@
         ]
       #   - [chsh -s $(which zsh), Making zsh the default shell]
       # - ./scripts/coc.sh
+      - [
+            test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
+            Creating Cursor config directory on macOS
+        ]
 
 - git:
       "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
@@ -86,6 +90,8 @@
       ~/.chatgpt.sh: chatgpt
       ~/.config/karabiner/karabiner.json: karabiner/karabiner.json
       ~/.config/karabiner/assets: karabiner/assets
+      ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
+      ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
 
 - shell:
       - [~/.fzf/install --all, Installing fzf]
