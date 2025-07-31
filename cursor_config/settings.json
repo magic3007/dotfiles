@@ -28,7 +28,7 @@
         "editor.defaultFormatter": "James-Yu.latex-workshop"
     },
     "[markdown]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "darkriszty.markdown-table-prettify"
     },
     "[proto3]": {
         "editor.defaultFormatter": "xaver.clang-format"
@@ -177,13 +177,13 @@
         "utility": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "*.metal": "cpp"
     },
     "files.autoSave": "onFocusChange",
     "files.exclude": {
         "**/.trunk/*out": true
     },
-    "files.trimTrailingWhitespace": true,
     "files.watcherExclude": {
         "**/.trunk/*out": true
     },
@@ -506,7 +506,11 @@
     ],
     "redhat.telemetry.enabled": true,
     "remote.SSH.remotePlatform": {
-        "wxeda": "linux"
+        "wxeda": "linux",
+        "vnc": "linux",
+        "lab-server": "linux",
+        "lab": "linux",
+        "mj_pub": "linux"
     },
     "security.workspace.trust.untrustedFiles": "open",
     "settingsSync.ignoredExtensions": [
@@ -1582,7 +1586,6 @@
     "editor.inlayHints.enabled": "off",
     "clangd.detectExtensionConflicts": true,
     "terminal.integrated.inheritEnv": false,
-    "workbench.sideBar.location": "right",
     "scm.experimental.showHistoryGraph": true,
     "accessibility.underlineLinks": true,
     "marscode.chatLanguage": "cn",
@@ -1595,9 +1598,8 @@
         "info"
     ],
     "makefile.configureOnOpen": true,
-    "workbench.activityBar.location": "hidden",
     "testExplorer.useNativeTesting": true,
-    "editor.cursorSurroundingLines": 8,
+    "editor.cursorSurroundingLines": 10,
     "vspacecode.bindings": [
         {
             "key": " ",
@@ -11178,13 +11180,25 @@
             ]
         }
     ],
-    "cursor.cpp.disabledLanguages": [
-        "scminput"
-    ],
-    "workbench.colorCustomizations": {},
+    "workbench.colorCustomizations": {
+        "editor.lineHighlightBackground": "#1073cf2d",  // 当前行背景色
+        "editor.lineHighlightBorder": "#9fced11f"       // 当前行边框色
+    },
     "workbench.settings.applyToAllProfiles": [
 
-
-
-    ]
+    ],
+    "cursor.cpp.enablePartialAccepts": true,
+    "editor.mouseWheelScrollSensitivity": 3,
+    "workbench.list.mouseWheelScrollSensitivity": 3,
+    "terminal.integrated.mouseWheelScrollSensitivity": 3,
+    "editor.renderLineHighlight": "all",
+    "editor.smoothScrolling": true,
+    "editor.fontFamily": "'Monaspace Neon', Menlo, Monaco, 'Courier New', monospace",
+    "workbench.sideBar.location": "right",
+    "workbench.colorTheme": "Atom One Light",
+    "workbench.layoutControl.enabled": false,
+    "remote.autoForwardPortsSource": "hybrid",
+    "git.blame.statusBarItem.enabled": true,
+    "git.blame.editorDecoration.enabled": false,
+    "diffEditor.ignoreTrimWhitespace": false,
 }
