@@ -35,7 +35,8 @@
     },
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter",
-        "editor.formatOnType": true
+        "editor.formatOnType": true,
+        "diffEditor.ignoreTrimWhitespace": true
     },
     "[xml]": {
         "editor.defaultFormatter": "redhat.vscode-xml"
@@ -11195,10 +11196,11 @@
     "editor.smoothScrolling": true,
     "editor.fontFamily": "'Monaspace Neon', Menlo, Monaco, 'Courier New', monospace",
     "workbench.sideBar.location": "right",
-    "workbench.colorTheme": "Atom One Light",
+    "workbench.colorTheme": "Runic Minimal",
     "workbench.layoutControl.enabled": false,
     "remote.autoForwardPortsSource": "hybrid",
     "git.blame.statusBarItem.enabled": true,
     "git.blame.editorDecoration.enabled": false,
     "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.hideUnchangedRegions.enabled": true,
 }

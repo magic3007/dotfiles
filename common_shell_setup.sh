@@ -129,8 +129,8 @@ docker-run-gui(){
       -e DISPLAY=$DISPLAY \
       -e XAUTHORITY=$XAUTH \
       -v $HOME:/host_data -v $mounted_home:/root -v /etc/localtime:/etc/localtime:ro \
-      -v $XSOCK:$XSOCK \
-      -v $XAUTH:$XAUTH \
+      -v $XSOCK:$XSOCK:ro \
+      -v $XAUTH:$XAUTH:ro \
       --privileged \
       $1 /bin/bash;
     set +x

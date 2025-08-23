@@ -321,5 +321,9 @@
 	"key": "ctrl+l",
 	"command": "file-browser.stepIn",
 	"when": "inFileBrowser"
+},
+{
+  "key": "cmd+e",
+  "command": "composerMode.background"
 }
 ]
