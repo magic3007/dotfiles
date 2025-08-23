@@ -37,7 +37,7 @@ cheat(){
 }
 
 # ranger
-alias ra='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+alias rr='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
 
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -112,17 +112,17 @@ docker-run-gui(){
     echo "No Arguments specified.\nUsage:\n docker-run-gui <image name> <container name> [number of gpus (1|2|all)]\n">&2;
     return 1;
   fi;
-  
+
   local container_name=$2
   local mounted_home=$volume_dir/$container_name
   mkdir -p $mounted_home
-  
+
   # Setup X11 forwarding
   local XSOCK=/tmp/.X11-unix
   local XAUTH=/tmp/.docker.xauth
   xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
   chmod 777 $XAUTH
-  
+
   if [ $# -eq 2 ]; then
     set -x
     docker run -itd --restart=always --name $2 --network host -e TERM=$TERM \
@@ -222,5 +222,8 @@ alias zj="zellij"
 # flutter
 export PUB_HOSTED_URL=https://pub.flutter-io.cn
 export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
+
+# cursor
+alias cs='cursor'
 
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
