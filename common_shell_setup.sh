@@ -226,4 +226,13 @@ export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
 # cursor
 alias cs='cursor'
 
+# claude code
+CLAUDE_CODE_ENV=(
+ ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
+ ANTHROPIC_AUTH_TOKEN="{DEEPSEEK_API_KEY}"
+ ANTHROPIC_MODEL=deepseek-chat
+ ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat
+)
+alias dscc='${CLAUDE_CODE_ENY[*]} claude'
+
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh

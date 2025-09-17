@@ -325,5 +325,13 @@
 {
   "key": "cmd+e",
   "command": "composerMode.background"
+},
+{
+  "key": "cmd+n",
+  "command": "-workbench.action.files.newUntitledFile"
+},
+{
+  "key": "cmd+n",
+  "command": "workbench.action.createTerminalEditor"
 }
 ]
