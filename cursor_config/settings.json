@@ -11185,7 +11185,7 @@
     "workbench.colorCustomizations": {
         "editor.lineHighlightBackground": "#1073cf2d",  // 当前行背景色
         "editor.lineHighlightBorder": "#9fced11f"       // 当前行边框色
-    } 
+    },
     "cursor.cpp.enablePartialAccepts": true,
     "editor.mouseWheelScrollSensitivity": 3,
     "workbench.list.mouseWheelScrollSensitivity": 3,
@@ -11199,5 +11199,6 @@
     "remote.autoForwardPortsSource": "hybrid",
     "git.blame.statusBarItem.enabled": true,
     "git.blame.editorDecoration.enabled": false,
-    "diffEditor.ignoreTrimWhitespace": true
+    "diffEditor.ignoreTrimWhitespace": true,
+    "diffEditor.hideUnchangedRegions.enabled": true
 }
