@@ -227,6 +227,9 @@ export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
 alias cs='cursor'
 
 # claude code
+alias cc='claude'
+
+# claude code with deepseek API
 CLAUDE_CODE_ENV=(
  ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
  ANTHROPIC_AUTH_TOKEN="{DEEPSEEK_API_KEY}"

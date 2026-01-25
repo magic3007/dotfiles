@@ -3,7 +3,7 @@
         "editor.defaultFormatter": "cheshirekow.cmake-format"
     },
     "[cpp]": {
-        "editor.defaultFormatter": "ms-vscode.cpptools"
+        "editor.defaultFormatter": "xaver.clang-format"
     },
     "[css]": {
         "editor.defaultFormatter": "vscode.css-language-features"
@@ -36,7 +36,7 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnType": true,
-        "diffEditor.ignoreTrimWhitespace": true
+        "diffEditor.ignoreTrimWhitespace": false
     },
     "[xml]": {
         "editor.defaultFormatter": "redhat.vscode-xml"
@@ -73,9 +73,6 @@
     "editor.wordWrap": "on",
     "errorLens.enabled": false,
     "explorer.confirmDelete": false,
-    "extensions.experimental.affinity": {
-        "vscodevim.vim": 1
-    },
     "files.associations": {
         "*.cu": "cpp",
         "*.cuh": "cpp",
@@ -512,7 +509,19 @@
         "lab-server": "linux",
         "lab": "linux",
         "mj_pub": "linux",
-        "lab2": "linux"
+        "lab2": "linux",
+        "pkucpu": "linux",
+        "pku140": "linux",
+        "xhscpu": "linux",
+        "xhsgpu": "linux",
+        "qs_b200": "linux",
+        "qs_b200_v2": "linux",
+        "qs_b200_1x4": "linux",
+        "pkucpu_edu": "linux",
+        "pku140_edu": "linux",
+        "pku140_pub": "linux",
+        "qs_b200_1x4_v2": "linux",
+        "qs_b200_16x4": "linux"
     },
     "security.workspace.trust.untrustedFiles": "open",
     "settingsSync.ignoredExtensions": [
@@ -1562,7 +1571,7 @@
     "editor.pasteAs.enabled": false,
     "remoteHub.experimental.syncRecentList": true,
     "extensions.experimental.deferredStartupFinishedActivation": true,
-    "git-graph.maxDepthOfRepoSearch": 1,
+    "git-graph.maxDepthOfRepoSearch": 3,
     "explorer.confirmDragAndDrop": false,
     "github.copilot.editor.enableAutoCompletions": true,
     "cmake.pinnedCommands": [
@@ -11197,8 +11206,12 @@
     "workbench.colorTheme": "Runic Minimal",
     "workbench.layoutControl.enabled": false,
     "remote.autoForwardPortsSource": "hybrid",
-    "git.blame.statusBarItem.enabled": true,
+    "git.blame.statusBarItem.enabled": false,
     "git.blame.editorDecoration.enabled": false,
     "diffEditor.ignoreTrimWhitespace": true,
-    "diffEditor.hideUnchangedRegions.enabled": true
+    "terminal.integrated.altClickMovesCursor": false,
+    "cursor.cpp.disabledLanguages": [
+        "markdown"
+    ],
+    "cursor.terminal.usePreviewBox": true
 }
