@@ -11213,5 +11213,6 @@
     "cursor.cpp.disabledLanguages": [
         "markdown"
     ],
-    "cursor.terminal.usePreviewBox": true
+    "cursor.terminal.usePreviewBox": true,
+    "claudeCode.preferredLocation": "sidebar"
 }

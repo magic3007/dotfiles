@@ -1,0 +1,13 @@
+{
+"env": {
+"ANTHROPIC_API_KEY": "<YOUR API KEY>",
+"ANTHROPIC_BASE_URL": "https://api.yixia.ai/",
+"CLAUDE_CODE_MAX_OUTPUT_TOKENS":64000,
+"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC":1,
+"CLAUDE_MODEL": "claude-4-5-opus"
+},
+"permissions": {
+"allow": [],
+"deny": []
+}
+}
