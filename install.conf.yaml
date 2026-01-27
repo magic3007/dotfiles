@@ -94,7 +94,8 @@
       ~/.chatgpt.sh: chatgpt
       ~/.config/karabiner/karabiner.json: karabiner/karabiner.json
       ~/.config/karabiner/assets: karabiner/assets
-      ~/.claude/setting.json: claude/setting.json
+      ~/.claude/settings.json: claude/settings.json
+      ~/.claude/config.json: claude/config.json
       ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
       ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
 
