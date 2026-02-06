@@ -1,103 +1,183 @@
-- defaults:
-      link:
-          create: true
-          relink: true
+# =============================================================================
+# Dotbot Configuration - Dotfiles Installation
+# =============================================================================
+# Usage: ./install
+# Dotbot docs: https://github.com/anishathalye/dotbot
+# =============================================================================
 
+# ---------------------------------------------------------------------------
+# Defaults
+# ---------------------------------------------------------------------------
+- defaults:
+    link:
+        create: true
+        relink: true
+
+# ---------------------------------------------------------------------------
+# Clean broken symlinks
+# ---------------------------------------------------------------------------
 - clean: ["~"]
 
+# ---------------------------------------------------------------------------
+# Create directories
+# ---------------------------------------------------------------------------
 - create:
-  #    - ~/Downloads
-  #    - ~/scratch
-  #    - ~/projects
-  #    - ~/mounted
-      - ~/.vim/undo-history
-      - ~/.wastebasket
-      - ~/.config/karabiner
+    - ~/.vim/undo-history
+    - ~/.wastebasket
+    - ~/.config/karabiner
 
+# ---------------------------------------------------------------------------
+# Git repositories (Phase 1: standalone tools, before oh-my-zsh)
+# ---------------------------------------------------------------------------
 - git:
-      "~/.fzf":
-          url: "https://github.com/junegunn/fzf.git"
-          description: "fzf for both zsh and bash"
+    "~/.fzf":
+        url: "https://github.com/junegunn/fzf.git"
+        description: "fzf - fuzzy finder for zsh and bash"
 
+# ---------------------------------------------------------------------------
+# System packages & prerequisites
+# ---------------------------------------------------------------------------
 - shell:
-      # - if [ -e ~/.vim/autoload/plug.vim ]; then rm ~/.vim/autoload/plug.vim; fi;
-      - [git submodule update --init --recursive, Installing submodules]
-      # the following have to run after linking ~/.gitconfig
-      - [   test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
-            Installing zsh tmux vim, and htop on Linux,
-        ]
-      - [   test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
-            Installing lazygit and zellij on MacOS
-        ]
-      - [
-            test ! -d ~/.oh-my-zsh && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true,
-            Installing oh-my-zsh,
-        ]
-      #   - [chsh -s $(which zsh), Making zsh the default shell]
-      # - ./scripts/coc.sh
-      - [
-            test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
-            Creating Cursor config directory on macOS
-        ]
-      - [
-            command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash,
-            Installing Claude Code CLI
-        ]
+    # Submodules
+    - [git submodule update --init --recursive, Installing submodules]
 
+    # ---- Platform-specific packages ----
+    - [
+          test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
+          Installing zsh tmux vim htop and ranger on Linux,
+      ]
+    - [
+          test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
+          Installing lazygit and zellij on macOS,
+      ]
+
+    # ---- oh-my-zsh ----
+    - [
+          test ! -d ~/.oh-my-zsh && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true,
+          Installing oh-my-zsh,
+      ]
+
+    # ---- macOS: Cursor config directory ----
+    - [
+          test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
+          Creating Cursor config directory on macOS,
+      ]
+
+    # ---- Node.js (prerequisite for AI coding tools) ----
+    - [
+          "command -v node >/dev/null || (export NVM_DIR=\"$HOME/.nvm\" && (test -d \"$NVM_DIR\" || curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . \"$NVM_DIR/nvm.sh\" && nvm install --lts)",
+          Installing nvm and Node.js LTS,
+      ]
+
+    # ---- AI Coding Tools ----
+    - [
+          "command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash",
+          Installing Claude Code CLI,
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex",
+          Installing OpenAI Codex CLI,
+      ]
+
+# ---------------------------------------------------------------------------
+# Git repositories (Phase 2: oh-my-zsh plugins, after oh-my-zsh install)
+# ---------------------------------------------------------------------------
 - git:
-      "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
-          url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
-          description: "zsh plugin: zsh-syntax-highlighting"
-      "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
-          url: "https://github.com/zsh-users/zsh-autosuggestions"
-          description: "zsh plugin: zsh-autosuggestions"
-      "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
-          url: "https://github.com/wbinglee/zsh-wakatime.git"
-          description: "zsh plugin: zsh-wakatime"
-      "~/.oh-my-zsh/custom/plugins/autojump":
-          url: "https://github.com/wting/autojump.git"
-          description: "zsh plugin: autojump"
-      "~/.oh-my-zsh/custom/plugins/zsh-vi-mode":
-          url: "https://github.com/jeffreytse/zsh-vi-mode.git"
-          description: "zsh plugin: zsh-vi-mode"
+    "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
+        url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+        description: "zsh plugin: zsh-syntax-highlighting"
+    "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
+        url: "https://github.com/zsh-users/zsh-autosuggestions"
+        description: "zsh plugin: zsh-autosuggestions"
+    "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
+        url: "https://github.com/wbinglee/zsh-wakatime.git"
+        description: "zsh plugin: zsh-wakatime"
+    "~/.oh-my-zsh/custom/plugins/autojump":
+        url: "https://github.com/wting/autojump.git"
+        description: "zsh plugin: autojump"
+    "~/.oh-my-zsh/custom/plugins/zsh-vi-mode":
+        url: "https://github.com/jeffreytse/zsh-vi-mode.git"
+        description: "zsh plugin: zsh-vi-mode"
 
+# ---------------------------------------------------------------------------
+# Post-clone plugin setup
+# ---------------------------------------------------------------------------
 - shell:
-      - [
-            cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
-            Installing autojump,
-        ]
+    - [
+          cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
+          Installing autojump,
+      ]
 
+# ---------------------------------------------------------------------------
+# Backup existing configs before symlinking (preserve as *_local)
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "test -f ~/.bashrc && ! test -L ~/.bashrc && ! test -f ~/.bashrc_bk && mv ~/.bashrc ~/.bashrc_bk && echo 'Moved existing ~/.bashrc to ~/.bashrc_bk' || true",
+          Backing up existing ~/.bashrc to ~/.bashrc_bk,
+      ]
+    - [
+          "test -f ~/.zshrc && ! test -L ~/.zshrc && ! test -f ~/.zshrc_bk && mv ~/.zshrc ~/.zshrc_bk && echo 'Moved existing ~/.zshrc to ~/.zshrc_bk' || true",
+          Backing up existing ~/.zshrc to ~/.zshrc_bk,
+      ]
+
+# ---------------------------------------------------------------------------
+# Symlinks
+# ---------------------------------------------------------------------------
 - link:
-      ~/.gitconfig: git/gitconfig
-      ~/.tmux.conf: tmux.conf
-      ~/.gdb: gdb
-      ~/.gdbinit: gdb/gdbinit
-      ~/.zshrc: oh-my-zsh/zshrc
-      ~/.common_shell_setup.sh: common_shell_setup.sh
-      ~/.bashrc: bash/bashrc
-      ~/.yabairc: yabairc
-      ~/.skhdrc: skhdrc
-      ~/.skhd: skhd
-      ~/.condarc: condarc
-      ~/.mambarc: mambarc
-      ~/.config/ranger: ranger
-      ~/.npmrc: npmrc
-      ~/.vimrc: vim/vimrc/vimrc
-      ~/.vim_runtime: vim/vimrc
-      ~/.ideavimrc: ideavimrc
-      ~/.Rprofile: Rprofile
-      ~/.config/pip/pip.conf: pip.conf
-      ~/.config/nvim: neovim/nvim-basic-ide
-      ~/.cargo/config.toml: cargo/config.toml
-      ~/.vscoderc: vscode/vscoderc
-      # ~/.config/nvim: neovim/NvChad
-      ~/.chatgpt.sh: chatgpt
-      ~/.config/karabiner/karabiner.json: karabiner/karabiner.json
-      ~/.config/karabiner/assets: karabiner/assets
-      ~/.claude/settings.json: claude/settings.json
-      ~/.claude/config.json: claude/config.json
-      ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
-      ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
+    # ---- Shell ----
+    ~/.zshrc: oh-my-zsh/zshrc
+    ~/.bashrc: bash/bashrc
+    ~/.common_shell_setup.sh: common_shell_setup.sh
 
+    # ---- Git ----
+    ~/.gitconfig: git/gitconfig
+
+    # ---- Terminal multiplexer ----
+    ~/.tmux.conf: tmux.conf
+
+    # ---- Editors ----
+    ~/.vimrc: vim/vimrc/vimrc
+    ~/.vim_runtime: vim/vimrc
+    ~/.ideavimrc: ideavimrc
+    ~/.config/nvim: neovim/nvim-basic-ide
+
+    # ---- File manager ----
+    ~/.config/ranger: ranger
+
+    # ---- Debugger ----
+    ~/.gdb: gdb
+    ~/.gdbinit: gdb/gdbinit
+
+    # ---- Package managers (with CN mirrors) ----
+    ~/.condarc: condarc
+    ~/.mambarc: mambarc
+    ~/.npmrc: npmrc
+    ~/.config/pip/pip.conf: pip.conf
+    ~/.cargo/config.toml: cargo/config.toml
+
+    # ---- Language config ----
+    ~/.Rprofile: Rprofile
+
+    # ---- macOS window management ----
+    ~/.yabairc: yabairc
+    ~/.skhdrc: skhdrc
+    ~/.skhd: skhd
+    ~/.config/karabiner/karabiner.json: karabiner/karabiner.json
+    ~/.config/karabiner/assets: karabiner/assets
+
+    # ---- IDE / Editor config ----
+    ~/.vscoderc: vscode/vscoderc
+    ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
+    ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
+
+    # ---- AI tools ----
+    ~/.claude/settings.json: claude/settings.json
+    ~/.claude/config.json: claude/config.json
+    ~/.chatgpt.sh: chatgpt
+
+# ---------------------------------------------------------------------------
+# Post-link setup
+# ---------------------------------------------------------------------------
 - shell:
-      - [~/.fzf/install --all, Installing fzf]
+    - [~/.fzf/install --all, Installing fzf]

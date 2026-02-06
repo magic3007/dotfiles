@@ -229,6 +229,9 @@ alias cs='cursor'
 # claude code
 alias cc='claude'
 
+# openai codex
+alias cx='codex'
+
 # claude code with deepseek API
 CLAUDE_CODE_ENV=(
  ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
@@ -236,6 +239,6 @@ CLAUDE_CODE_ENV=(
  ANTHROPIC_MODEL=deepseek-chat
  ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat
 )
-alias dscc='${CLAUDE_CODE_ENY[*]} claude'
+alias dscc='${CLAUDE_CODE_ENV[*]} claude'
 
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
