@@ -1,9 +1,6 @@
 ---
 name: commit-by-logic
-description: 分析当前的git diff，然后git commit，可以分多次，每次commit都是一个逻辑上独立的功能
-disable-model-invocation: true
-allowed-tools: Bash(git *), Read, Grep, Glob, AskUserQuestion
-argument-hint: [提交类型，如feat、fix等]
+description: 分析当前的git diff，然后git commit，可以分多次，每次commit都是一个逻辑上独立的功能。Use when the user wants to commit changes by logical grouping, or asks to split commits, or mentions commit-by-logic.
 ---
 
 # 智能分次提交工具
@@ -12,17 +9,14 @@ argument-hint: [提交类型，如feat、fix等]
 
 ## 使用方式
 
-运行 `/commit-by-logic` 或 `/commit-by-logic [type]`
-
-参数说明：
-- `type`: 可选的提交类型前缀，如`feat`、`fix`等。如果不提供，系统会为每个分组自动选择合适的类型。
+当用户要求按逻辑分组提交代码时触发。用户可以可选地指定提交类型前缀（如`feat`、`fix`等）。如果不提供，系统会为每个分组自动选择合适的类型。
 
 ## 工作流程
 
 1. **分析当前更改**：检查git status和git diff
 2. **识别逻辑分组**：根据文件类型、功能模块或更改类型将更改分组
 3. **生成提交消息**：为每个分组生成符合`<type>(<scope>): <description>`格式的提交消息
-4. **交互式确认**：向你展示每个分组并确认是否提交
+4. **交互式确认**：向用户展示每个分组并确认是否提交
 5. **分次提交**：为每个逻辑分组创建独立的提交
 
 ## 提交消息格式规范
@@ -49,10 +43,24 @@ argument-hint: [提交类型，如feat、fix等]
 ## 具体步骤
 
 ### 第一步：检查当前状态
-!`git status --porcelain`
+
+运行以下命令查看当前 git 状态：
+
+```bash
+git status --porcelain
+```
 
 ### 第二步：分析更改
-!`git diff --name-status`
+
+```bash
+git diff --name-status
+```
+
+如果有未暂存的新文件，也检查：
+
+```bash
+git diff --cached --name-status
+```
 
 ### 第三步：根据以下规则分组更改
 
@@ -90,20 +98,20 @@ argument-hint: [提交类型，如feat、fix等]
 
 ### 第五步：交互式确认
 
-在开始提交前，请向我展示：
+在开始提交前，请向用户展示：
 1. 你识别出的分组数量
 2. 每个分组包含的文件
 3. 每个分组的建议提交消息
 4. 询问是否需要调整分组或提交消息
 
-等待我的确认后再开始执行提交操作。
+等待用户的确认后再开始执行提交操作。
 
 ### 第六步：执行分次提交
 
 对于每个确认的分组：
 1. 使用 `git add [文件列表]` 添加该分组的文件
 2. 使用 `git commit -m "提交消息"` 提交
-3. 如果提供了参数 `$ARGUMENTS`，将其作为默认类型（用户可以覆盖）
+3. 如果用户指定了提交类型，将其作为默认类型（用户可以覆盖）
 
 ## 排除文件
 
@@ -116,7 +124,7 @@ argument-hint: [提交类型，如feat、fix等]
 - 确保每个提交都是逻辑上完整的
 - 提交消息应该清晰描述这个分组的功能
 - 遵循Conventional Commits规范
-- 如果有疑问，请先询问我
+- 如果有疑问，请先询问用户
 - 可以分多次执行，每次处理一个逻辑分组
 
 ## 错误处理
