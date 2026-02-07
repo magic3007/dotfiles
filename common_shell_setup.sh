@@ -227,7 +227,7 @@ export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
 alias cs='cursor'
 
 # claude code
-alias cc='claude'
+alias cc='claude --dangerously-skip-permissions'
 
 # openai codex
 alias cx='codex'
@@ -242,7 +242,10 @@ dscc() {
     ANTHROPIC_MODEL=deepseek-chat \
     ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    claude "$@"
+    claude --dangerously-skip-permissions "$@"
 }
+
+# codex environment setup
+[ -f ~/.codex/codex_env.sh ] && source ~/.codex/codex_env.sh
 
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
