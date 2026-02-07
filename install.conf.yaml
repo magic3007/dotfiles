@@ -10,8 +10,8 @@
 # ---------------------------------------------------------------------------
 - defaults:
     link:
-        create: true
-        relink: true
+      create: true
+      relink: true
 
 # ---------------------------------------------------------------------------
 # Clean broken symlinks
@@ -32,8 +32,8 @@
 # ---------------------------------------------------------------------------
 - git:
     "~/.fzf":
-        url: "https://github.com/junegunn/fzf.git"
-        description: "fzf - fuzzy finder for zsh and bash"
+      url: "https://github.com/junegunn/fzf.git"
+      description: "fzf - fuzzy finder for zsh and bash"
 
 # ---------------------------------------------------------------------------
 # System packages & prerequisites
@@ -44,30 +44,30 @@
 
     # ---- Platform-specific packages ----
     - [
-          test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
-          Installing zsh tmux vim htop and ranger on Linux,
+        test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
+        Installing zsh tmux vim htop and ranger on Linux,
       ]
     - [
-          test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
-          Installing lazygit and zellij on macOS,
+        test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
+        Installing lazygit and zellij on macOS,
       ]
 
     # ---- oh-my-zsh ----
     - [
-          test ! -d ~/.oh-my-zsh && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true,
-          Installing oh-my-zsh,
+        test ! -d ~/.oh-my-zsh && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true,
+        Installing oh-my-zsh,
       ]
 
     # ---- macOS: Cursor config directory ----
     - [
-          test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
-          Creating Cursor config directory on macOS,
+        test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
+        Creating Cursor config directory on macOS,
       ]
 
     # ---- Node.js (prerequisite for AI coding tools) ----
     - [
-          "command -v node >/dev/null || (export NVM_DIR=\"$HOME/.nvm\" && (test -d \"$NVM_DIR\" || curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . \"$NVM_DIR/nvm.sh\" && nvm install --lts)",
-          Installing nvm and Node.js LTS,
+        'command -v node >/dev/null || (export NVM_DIR="$HOME/.nvm" && (test -d "$NVM_DIR" || curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . "$NVM_DIR/nvm.sh" && nvm install --lts)',
+        Installing nvm and Node.js LTS,
       ]
 
     # ---- AI Coding Tools ----
@@ -85,28 +85,28 @@
 # ---------------------------------------------------------------------------
 - git:
     "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
-        url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
-        description: "zsh plugin: zsh-syntax-highlighting"
+      url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+      description: "zsh plugin: zsh-syntax-highlighting"
     "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
-        url: "https://github.com/zsh-users/zsh-autosuggestions"
-        description: "zsh plugin: zsh-autosuggestions"
+      url: "https://github.com/zsh-users/zsh-autosuggestions"
+      description: "zsh plugin: zsh-autosuggestions"
     "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
-        url: "https://github.com/wbinglee/zsh-wakatime.git"
-        description: "zsh plugin: zsh-wakatime"
+      url: "https://github.com/wbinglee/zsh-wakatime.git"
+      description: "zsh plugin: zsh-wakatime"
     "~/.oh-my-zsh/custom/plugins/autojump":
-        url: "https://github.com/wting/autojump.git"
-        description: "zsh plugin: autojump"
+      url: "https://github.com/wting/autojump.git"
+      description: "zsh plugin: autojump"
     "~/.oh-my-zsh/custom/plugins/zsh-vi-mode":
-        url: "https://github.com/jeffreytse/zsh-vi-mode.git"
-        description: "zsh plugin: zsh-vi-mode"
+      url: "https://github.com/jeffreytse/zsh-vi-mode.git"
+      description: "zsh plugin: zsh-vi-mode"
 
 # ---------------------------------------------------------------------------
 # Post-clone plugin setup
 # ---------------------------------------------------------------------------
 - shell:
     - [
-          cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
-          Installing autojump,
+        cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
+        Installing autojump,
       ]
 
 # ---------------------------------------------------------------------------
@@ -114,12 +114,12 @@
 # ---------------------------------------------------------------------------
 - shell:
     - [
-          "test -f ~/.bashrc && ! test -L ~/.bashrc && ! test -f ~/.bashrc_bk && mv ~/.bashrc ~/.bashrc_bk && echo 'Moved existing ~/.bashrc to ~/.bashrc_bk' || true",
-          Backing up existing ~/.bashrc to ~/.bashrc_bk,
+        "test -f ~/.bashrc && ! test -L ~/.bashrc && ! test -f ~/.bashrc_bk && mv ~/.bashrc ~/.bashrc_bk && echo 'Moved existing ~/.bashrc to ~/.bashrc_bk' || true",
+        Backing up existing ~/.bashrc to ~/.bashrc_bk,
       ]
     - [
-          "test -f ~/.zshrc && ! test -L ~/.zshrc && ! test -f ~/.zshrc_bk && mv ~/.zshrc ~/.zshrc_bk && echo 'Moved existing ~/.zshrc to ~/.zshrc_bk' || true",
-          Backing up existing ~/.zshrc to ~/.zshrc_bk,
+        "test -f ~/.zshrc && ! test -L ~/.zshrc && ! test -f ~/.zshrc_bk && mv ~/.zshrc ~/.zshrc_bk && echo 'Moved existing ~/.zshrc to ~/.zshrc_bk' || true",
+        Backing up existing ~/.zshrc to ~/.zshrc_bk,
       ]
 
 # ---------------------------------------------------------------------------
@@ -176,6 +176,7 @@
     ~/.claude/settings.json: claude/settings.json
     ~/.claude/config.json: claude/config.json
     ~/.claude/skills: claude/skills
+    ~/.claude/agents: claude/agents
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh
