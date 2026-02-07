@@ -44,5 +44,8 @@
     ]
   },
   "attribution": { "commit": "", "pr": "" },
-  "language": "Chinese"
+  "language": "Chinese",
+  "agents": {
+    "pr-implementation-analyzer": "./agents/pr-implementation-analyzer.json"
+  }
 }
