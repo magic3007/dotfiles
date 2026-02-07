@@ -5,9 +5,31 @@
     "CLAUDE_MODEL": "claude-4-5-opus"
   },
   "permissions": {
-    "allow": [],
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(command:*)",
+      "Bash(source:*)",
+      "Bash(curl:*)",
+      "Bash(bash:*)",
+      "Bash(export NVM_DIR=\"$HOME/.nvm\":*)",
+      "Bash([:*)",
+      "Bash(. \"$NVM_DIR/nvm.sh\":*)",
+      "Bash(nvm install:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(git commit:*)",
+      "Bash(codex:*)",
+      "Bash(echo:*)",
+      "Bash(export PATH:*)",
+      "Bash(~/.nvm/versions/node/v24.13.0/bin/codex:*)",
+      "Bash(./install:*)"
+    ],
     "deny": [],
     "defaultMode": "acceptEdits"
   },
+  "attribution": { "commit": "", "pr": "" },
   "language": "Chinese"
 }
