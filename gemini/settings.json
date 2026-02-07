@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json",
+  "general": {
+    "vimMode": true
+  },
+  "tools": {
+    "approvalMode": "auto_edit"
+  },
+  "privacy": {
+    "usageStatisticsEnabled": false
+  },
+  "hasSeenIdeIntegrationNudge": true,
+  "security": {
+    "auth": {
+      "selectedType": "oauth-personal"
+    }
+  }
+}

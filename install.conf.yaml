@@ -26,6 +26,7 @@
     - ~/.wastebasket
     - ~/.config/karabiner
     - ~/.codex
+    - ~/.gemini
 
 # ---------------------------------------------------------------------------
 # Git repositories (Phase 1: standalone tools, before oh-my-zsh)
@@ -79,6 +80,10 @@
     #       "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex",
     #       Installing OpenAI Codex CLI,
     #   ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v gemini >/dev/null || npm install -g @google/gemini-cli",
+          Installing Google Gemini CLI,
+      ]
 
 # ---------------------------------------------------------------------------
 # Git repositories (Phase 2: oh-my-zsh plugins, after oh-my-zsh install)
@@ -179,7 +184,11 @@
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh
+    ~/.gemini/settings.json: gemini/settings.json
     ~/.chatgpt.sh: chatgpt
+
+    # ---- Cursor skills ----
+    ~/.cursor/skills: cursor_config/skills
 
 # ---------------------------------------------------------------------------
 # Post-link setup

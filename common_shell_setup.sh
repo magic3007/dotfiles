@@ -232,6 +232,9 @@ alias cc='claude --dangerously-skip-permissions'
 # openai codex
 alias cx='codex'
 
+# google gemini cli (override oh-my-zsh git plugin's gm='git merge')
+unalias gm 2>/dev/null; alias gm='gemini'
+
 # claude code with deepseek API
 # Reference: https://api-docs.deepseek.com/guides/anthropic_api
 dscc() {
