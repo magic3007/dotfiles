@@ -30,22 +30,6 @@
     "deny": [],
     "defaultMode": "acceptEdits"
   },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|MultiEdit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "npx prettier --check ."
-          }
-        ]
-      }
-    ]
-  },
   "attribution": { "commit": "", "pr": "" },
-  "language": "Chinese",
-  "agents": {
-    "pr-implementation-analyzer": "./agents/pr-implementation-analyzer.json"
-  }
+  "language": "Chinese"
 }
