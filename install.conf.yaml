@@ -175,7 +175,7 @@
     # ---- AI tools ----
     ~/.claude/settings.json: claude/settings.json
     ~/.claude/config.json: claude/config.json
-    ~/.claude/skills: .claude/skills
+    ~/.claude/skills: claude/skills
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh
