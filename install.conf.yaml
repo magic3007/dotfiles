@@ -51,6 +51,14 @@
         test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
         Installing lazygit and zellij on macOS,
       ]
+    - [
+        test "$(uname)" = "Linux" && sudo apt-get install -y gh || true,
+        Installing GitHub CLI on Linux,
+      ]
+    - [
+        test "$(uname)" = "Darwin" && brew install gh || true,
+        Installing GitHub CLI on macOS,
+      ]
 
     # ---- oh-my-zsh ----
     - [
