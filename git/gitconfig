@@ -103,8 +103,8 @@
 
 [user]
 	useConfigOnly = true
-	email = jingmai@pku.edu.cn
-	name = Jing Mai
+	email = maijing3007@qq.com
+	name = Magic Mai
 
 [http]
 	cookieFile = ~/.gitcookies
@@ -116,3 +116,8 @@
 # Allow local customizations in the .gitconfig_local file
 [include]
   path = ~/.gitconfig_local
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f

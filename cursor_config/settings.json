@@ -11214,6 +11214,7 @@
         "markdown"
     ],
     "cursor.terminal.usePreviewBox": true,
-    "claudeCode.preferredLocation": "sidebar",
-    "claudeCode.selectedModel": "default"
+    "claudeCode.preferredLocation": "panel",
+    "claudeCode.selectedModel": "default",
+    "terminal.integrated.fontFamily": "monospace"
 }

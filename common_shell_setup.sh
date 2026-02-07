@@ -233,12 +233,16 @@ alias cc='claude'
 alias cx='codex'
 
 # claude code with deepseek API
-CLAUDE_CODE_ENV=(
- ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
- ANTHROPIC_AUTH_TOKEN="{DEEPSEEK_API_KEY}"
- ANTHROPIC_MODEL=deepseek-chat
- ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat
-)
-alias dscc='${CLAUDE_CODE_ENV[*]} claude'
+# Reference: https://api-docs.deepseek.com/guides/anthropic_api
+dscc() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
+    ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=deepseek-chat \
+    ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@"
+}
 
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
