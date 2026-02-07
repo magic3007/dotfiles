@@ -44,7 +44,7 @@ argument-hint: [提交类型，如feat、fix等]
 可选的模块或组件名称，如`auth`、`api`、`ui`、`config`等。
 
 ### 描述（description）：
-简短描述，使用现在时祈使句，首字母不大写，不加句号。
+简短描述，**必须使用英文**，使用现在时祈使句，首字母不大写，不加句号。
 
 ## 具体步骤
 
@@ -83,10 +83,10 @@ argument-hint: [提交类型，如feat、fix等]
 3. 生成完整的提交消息：`type(scope): description`
 
 示例：
-- `feat(auth): 添加用户登录功能`
-- `fix(api): 修复用户查询接口空指针异常`
-- `docs(readme): 更新安装说明`
-- `chore(deps): 升级react到v18`
+- `feat(auth): add user login functionality`
+- `fix(api): fix null pointer exception in user query endpoint`
+- `docs(readme): update installation instructions`
+- `chore(deps): upgrade react to v18`
 
 ### 第五步：交互式确认
 
@@ -108,6 +108,7 @@ argument-hint: [提交类型，如feat、fix等]
 ## 注意事项
 
 - 确保每个提交都是逻辑上完整的
+- **提交消息必须使用英文**
 - 提交消息应该清晰描述这个分组的功能
 - 遵循Conventional Commits规范
 - 如果有疑问，请先询问我
