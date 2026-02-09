@@ -245,7 +245,7 @@ dscc() {
     ANTHROPIC_MODEL=deepseek-chat \
     ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    claude "$@"
+    claude "$@" --dangerously-skip-permissions
 }
 
 
@@ -259,7 +259,7 @@ vecc() {
     ANTHROPIC_MODEL=kimi-k2.5 \
     ANTHROPIC_SMALL_FAST_MODEL=kimi-k2.5 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    claude "$@"
+    claude "$@" --dangerously-skip-permissions
 }
 
 # codex environment setup
