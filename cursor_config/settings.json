@@ -11216,5 +11216,6 @@
     "cursor.terminal.usePreviewBox": true,
     "claudeCode.preferredLocation": "panel",
     "claudeCode.selectedModel": "default",
-    "terminal.integrated.fontFamily": "monospace"
+    "terminal.integrated.fontFamily": "monospace",
+    "cursor.rpcFileLogger.enabled": true
 }

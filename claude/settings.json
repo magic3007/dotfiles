@@ -4,6 +4,10 @@
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_MODEL": "claude-4-5-opus"
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(ls:*)",
@@ -30,6 +34,19 @@
     "deny": [],
     "defaultMode": "acceptEdits"
   },
-  "attribution": { "commit": "", "pr": "" },
-  "language": "Chinese"
+  "language": "Chinese",
+  "model": "claude-opus-4-6",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude/hooks/check-expert-update.sh"
+          }
+        ]
+      }
+    ]
+  }
 }
