@@ -1,7 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json",
   "general": {
-    "vimMode": true
+    "vimMode": true,
+    "previewFeatures": true,
+    "debugKeystrokeLogging": true,
+    "enablePromptCompletion": true
   },
   "tools": {
     "approvalMode": "auto_edit"
@@ -14,5 +17,8 @@
     "auth": {
       "selectedType": "gemini-api-key"
     }
+  },
+  "ui": {
+    "hideFooter": true
   }
 }

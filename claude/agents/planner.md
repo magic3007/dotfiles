@@ -76,7 +76,7 @@ Search the codebase systematically:
 1. **Find similar implementations**
 
    - Search for classes/functions with similar patterns:
-     `grep "class.*Workflow" areal/workflow/`
+     `grep "class.*Workflow" src/workflow/`
    - Check files in the same directory as your target
 
 1. **Find callers/dependencies**
@@ -86,13 +86,13 @@ Search the codebase systematically:
 
 1. **Check tests**
 
-   - Does the target file have tests? `ls areal/tests/test_<module>.py`
+   - Does the target file have tests? `ls tests/test_<module>.py`
    - What test patterns are used? Read a test file for reference
 
 1. **Check configuration**
 
-   - Does this involve `areal/api/cli_args.py`?
-   - Are there config dataclasses in `areal/api/` to modify?
+   - Does this involve configuration files or CLI arguments?
+   - Are there config dataclasses or configuration files to modify?
 
 ### Phase 3: Plan Output
 
