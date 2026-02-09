@@ -29,7 +29,10 @@
       "Bash(echo:*)",
       "Bash(export PATH:*)",
       "Bash(~/.nvm/versions/node/v24.13.0/bin/codex:*)",
-      "Bash(./install:*)"
+      "Bash(./install:*)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
@@ -43,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claude/hooks/check-expert-update.sh"
+            "command": "~/.claude/hooks/check-expert-update.sh"
           }
         ]
       }
