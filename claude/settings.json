@@ -37,7 +37,6 @@
     "deny": [],
     "defaultMode": "acceptEdits"
   },
-  "language": "Chinese",
   "model": "claude-opus-4-6",
   "hooks": {
     "PostToolUse": [
@@ -51,5 +50,9 @@
         ]
       }
     ]
+  },
+  "language": "Chinese",
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true
   }
 }

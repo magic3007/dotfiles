@@ -20,5 +20,8 @@
   },
   "ui": {
     "hideFooter": true
+  },
+  "ide": {
+    "enabled": true
   }
 }
