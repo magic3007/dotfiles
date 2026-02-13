@@ -262,6 +262,8 @@ vecc() {
     claude "$@" --dangerously-skip-permissions
 }
 
+alias remind="ssh -t pkucpu \"export FEISHU_WEBHOOK_URL=\$FEISHU_WEBHOOK_URL; ~/.local/bin/wechat-reminder --title \$HOSTNAME\""
+
 # codex environment setup
 [ -f ~/.codex/codex_env.sh ] && source ~/.codex/codex_env.sh
 

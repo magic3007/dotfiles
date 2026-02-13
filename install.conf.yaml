@@ -95,6 +95,13 @@
           Installing Google Gemini CLI,
       ]
 
+    # ---------------------------------------------------------------------------
+    # ---- WeChat Reminder ----
+    - [
+          "echo y | bash <(curl -s https://gitee.com/magic3007/wechat-reminder/raw/master/install-gitee.sh)",
+          Installing wechat-reminder,
+      ]
+
 # ---------------------------------------------------------------------------
 # Git repositories (Phase 2: oh-my-zsh plugins, after oh-my-zsh install)
 # ---------------------------------------------------------------------------
