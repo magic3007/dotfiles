@@ -199,6 +199,7 @@
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh
     ~/.gemini/settings.json: gemini/settings.json
+    ~/.gemini/skills: gemini/skills
     ~/.chatgpt.sh: chatgpt
 
     # ---- Cursor skills ----
