@@ -193,6 +193,8 @@
     ~/.vscoderc: vscode/vscoderc
     ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
     ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
+    ~/Library/Application Support/Antigravity/User/keybindings.json: antigravity_config/keybindings.json
+    ~/Library/Application Support/Antigravity/User/settings.json: antigravity_config/settings.json
 
     # ---- AI tools ----
     ~/.claude/settings.json: claude/settings.json
