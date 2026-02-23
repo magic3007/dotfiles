@@ -4,7 +4,8 @@
     "vimMode": true,
     "previewFeatures": true,
     "debugKeystrokeLogging": true,
-    "enablePromptCompletion": true
+    "enablePromptCompletion": true,
+    "defaultApprovalMode": "auto_edit"
   },
   "tools": {
     "approvalMode": "auto_edit"

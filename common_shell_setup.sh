@@ -251,13 +251,25 @@ dscc() {
 
 # claude code with VolcEngine Coding Plan
 # Reference: https://www.volcengine.com/docs/82379/1928262?lang=zh
-vecc() {
+kmcc() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
     ANTHROPIC_AUTH_TOKEN="${VE_API_KEY}" \
     API_TIMEOUT_MS=600000 \
     ANTHROPIC_MODEL=kimi-k2.5 \
     ANTHROPIC_SMALL_FAST_MODEL=kimi-k2.5 \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
+# claude code with MiniMax 2.5
+mxcc() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://openrouter.ai/api \
+    ANTHROPIC_AUTH_TOKEN="${OPENROUTER_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=minimax/minimax-m2.5 \
+    ANTHROPIC_SMALL_FAST_MODEL=minimax/minimax-m2.5 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$@" --dangerously-skip-permissions
 }

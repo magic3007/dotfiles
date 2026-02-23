@@ -521,7 +521,9 @@
         "pku140_edu": "linux",
         "pku140_pub": "linux",
         "qs_b200_1x4_v2": "linux",
-        "qs_b200_16x4": "linux"
+        "qs_b200_16x4": "linux",
+        "magic_dev": "linux",
+        "magic_dev2": "linux"
     },
     "security.workspace.trust.untrustedFiles": "open",
     "settingsSync.ignoredExtensions": [
