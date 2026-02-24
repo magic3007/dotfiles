@@ -232,6 +232,10 @@ alias cc='claude --dangerously-skip-permissions'
 # openai codex
 alias cx='codex'
 
+# opencode
+alias oc='opencode'
+export PATH="$PATH:$HOME/.opencode/bin"
+
 # google gemini cli (override oh-my-zsh git plugin's gm='git merge')
 unalias gm 2>/dev/null; alias gm='gemini'
 

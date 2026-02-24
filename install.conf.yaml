@@ -77,25 +77,6 @@
           Installing nvm and Node.js LTS,
       ]
 
-    # ---- AI Coding Tools ----
-    # 手动安装时可执行以下 bash 命令:
-    #   Claude Code CLI:  curl -fsSL https://claude.ai/install.sh | bash
-    #   OpenAI Codex:     . ~/.nvm/nvm.sh; npm install -g @openai/codex
-    #   Google Gemini:    . ~/.nvm/nvm.sh; npm install -g @google/gemini-cli
-    - [
-          "command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash",
-          Installing Claude Code CLI,
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex",
-          Installing OpenAI Codex CLI,
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v gemini >/dev/null || npm install -g @google/gemini-cli",
-          Installing Google Gemini CLI,
-      ]
-
-    # ---------------------------------------------------------------------------
     # ---- WeChat Reminder ----
     - [
           "echo y | bash <(curl -s https://gitee.com/magic3007/wechat-reminder/raw/master/install-gitee.sh)",
@@ -210,6 +191,8 @@
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
     ~/.chatgpt.sh: chatgpt
+    ~/.config/opencode/opencode.json: opencode/opencode.json
+    ~/.config/opencode/package.json: opencode/package.json
 
     # ---- Cursor skills ----
     ~/.cursor/skills: cursor_config/skills
@@ -222,4 +205,27 @@
     - [
           chmod +x ~/.claude/hooks/check-expert-update.sh 2>/dev/null || true,
           Setting execute permission for Claude hooks
+      ]
+
+    # ---- AI Coding Tools ----
+    # 手动安装时可执行以下 bash 命令:
+    #   Claude Code CLI:  curl -fsSL https://claude.ai/install.sh | bash
+    #   OpenAI Codex:     . ~/.nvm/nvm.sh; npm install -g @openai/codex
+    #   Google Gemini:    . ~/.nvm/nvm.sh; npm install -g @google/gemini-cli
+    #   Opencode:         curl -fsSL https://opencode.ai/install | bash 
+    - [
+          "command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash",
+          Installing Claude Code CLI,
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex",
+          Installing OpenAI Codex CLI,
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v gemini >/dev/null || npm install -g @google/gemini-cli",
+          Installing Google Gemini CLI,
+      ]
+    - [
+          "command -v opencode >/dev/null || curl -fsSL https://opencode.ai/install | bash",
+          Installing Opencode CLI,
       ]
