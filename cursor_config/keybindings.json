@@ -378,5 +378,13 @@
   "key": "cmd+k",
   "command": "-editor.action.inlineDiffs.focusEditor",
   "when": "editorHasPromptBar && editorPromptBarFocused"
+},
+{
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+        "text": "\u001b\r"
+    },
+    "when": "terminalFocus"
 }
 ]

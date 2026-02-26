@@ -278,6 +278,19 @@ mxcc() {
     claude "$@" --dangerously-skip-permissions
 }
 
+
+# claude code with Qwen3.5
+qwcc() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://coding.dashscope.aliyuncs.com/apps/anthropic \
+    ANTHROPIC_AUTH_TOKEN="${ALIYUN_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=qwen3.5-plus \
+    ANTHROPIC_SMALL_FAST_MODEL=qwen3.5-plus \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
 alias remind="ssh -t pkucpu \"export FEISHU_WEBHOOK_URL=\$FEISHU_WEBHOOK_URL; ~/.local/bin/wechat-reminder --title \$HOSTNAME\""
 
 # codex environment setup
