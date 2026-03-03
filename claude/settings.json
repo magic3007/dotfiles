@@ -39,17 +39,17 @@
   },
   "model": "haiku",
   "hooks": {
-    // "PostToolUse": [
-    //   {
-    //     "matcher": "Write|Edit",
-    //     "hooks": [
-    //       {
-    //         "type": "command",
-    //         "command": "~/.claude/hooks/check-expert-update.sh"
-    //       }
-    //     ]
-    //   }
-    // ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-expert-update.sh"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
