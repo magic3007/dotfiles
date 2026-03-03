@@ -39,6 +39,16 @@
   },
   "model": "sonnet",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/claudeception-activator.sh"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
@@ -54,5 +64,7 @@
   "enabledPlugins": {
     "context7@claude-plugins-official": true
   },
-  "language": "Chinese"
+  "language": "Chinese",
+  "autoUpdatesChannel": "latest",
+  "skipDangerousModePermissionPrompt": true
 }
