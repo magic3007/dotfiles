@@ -37,25 +37,25 @@
     "deny": [],
     "defaultMode": "acceptEdits"
   },
-  "model": "sonnet",
+  "model": "haiku",
   "hooks": {
+    // "PostToolUse": [
+    //   {
+    //     "matcher": "Write|Edit",
+    //     "hooks": [
+    //       {
+    //         "type": "command",
+    //         "command": "~/.claude/hooks/check-expert-update.sh"
+    //       }
+    //     ]
+    //   }
+    // ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
             "type": "command",
             "command": "~/.claude/hooks/claudeception-activator.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/check-expert-update.sh"
           }
         ]
       }
