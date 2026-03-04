@@ -59,6 +59,16 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/claude-end-reminder.sh"
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
@@ -66,5 +76,9 @@
   },
   "language": "Chinese",
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh"
+  }
 }

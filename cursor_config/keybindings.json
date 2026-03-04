@@ -386,5 +386,10 @@
         "text": "\u001b\r"
     },
     "when": "terminalFocus"
+},
+{
+  "key": "alt+cmd+s",
+  "command": "workbench.action.toggleUnifiedSidebarFromKeyboard",
+  "when": "cursor.agentIdeUnification.enabled == true && !isAuxiliaryWindowFocusedContext"
 }
 ]
