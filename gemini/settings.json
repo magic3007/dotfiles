@@ -5,7 +5,12 @@
     "previewFeatures": true,
     "debugKeystrokeLogging": true,
     "enablePromptCompletion": true,
-    "defaultApprovalMode": "auto_edit"
+    "defaultApprovalMode": "auto_edit",
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "30d",
+      "warningAcknowledged": true
+    }
   },
   "tools": {
     "approvalMode": "auto_edit"
@@ -16,16 +21,21 @@
   "hasSeenIdeIntegrationNudge": true,
   "security": {
     "auth": {
-      "selectedType": "gemini-api-key"
+      "selectedType": "oauth-personal"
     }
   },
   "ui": {
     "hideFooter": true
   },
+  "hooksConfig": {
+          "enabled": true
+            
+  },
+  "context": {
+          "includeDirectories": ["~/.gemini/extensions/ralph"]
+            
+  },
   "ide": {
     "enabled": true
-  },
-  "model": {
-    "name": "gemini-2.5-flash"
   }
 }

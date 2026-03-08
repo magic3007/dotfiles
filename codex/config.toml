@@ -1,0 +1,25 @@
+model = "gpt-5.3-codex"
+model_reasoning_effort = "high"
+[projects."/Users/maijing1/projects/blog.workspace/blog"]
+trust_level = "trusted"
+
+[projects."/Users/maijing1/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/maijing1/projects/DATE2026_LATTE.workspace/DATE2026_LATTE"]
+trust_level = "trusted"
+
+[projects."/Users/maijing1/projects/life-os.workspace/life-os"]
+trust_level = "trusted"
+
+[projects."/Users/maijing1/Nutstore Files/sync_workspace/TCAD2026_FLEX3D"]
+trust_level = "trusted"
+
+[projects."/Users/maijing1/projects/2026PhDThesis.workspace/2026PhDThesis"]
+trust_level = "trusted"
+
+[notice.model_migrations]
+"gpt-5.2" = "gpt-5.3-codex"
+
+[features]
+multi_agent = true

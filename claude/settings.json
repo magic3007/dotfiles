@@ -2,7 +2,8 @@
   "env": {
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_MODEL": "claude-4-5-opus"
+    "CLAUDE_MODEL": "claude-4-5-opus",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS":"1"
   },
   "attribution": {
     "commit": "",
@@ -37,7 +38,6 @@
     "deny": [],
     "defaultMode": "acceptEdits"
   },
-  "model": "haiku",
   "hooks": {
     "PostToolUse": [
       {
@@ -59,26 +59,16 @@
           }
         ]
       }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/claude-end-reminder.sh"
-          }
-        ]
-      }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "context7@claude-plugins-official": true
   },
   "language": "Chinese",
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true,
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline-command.sh"
-  }
+  "skipDangerousModePermissionPrompt": true
 }

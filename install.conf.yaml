@@ -187,6 +187,7 @@
     ~/.claude/rules: claude/rules
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
+    ~/.codex/config.toml: codex/config.toml
     ~/.codex/codex_env.sh: codex/codex_env.sh
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
