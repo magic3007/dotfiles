@@ -1,5 +1,6 @@
 model = "gpt-5.3-codex"
 model_reasoning_effort = "high"
+service_tier = "fast"
 [projects."/Users/maijing1/projects/blog.workspace/blog"]
 trust_level = "trusted"
 
