@@ -3,7 +3,15 @@
 # =============================================================================
 # Usage: ./install
 # Dotbot docs: https://github.com/anishathalye/dotbot
+#
+# Structure:
+#   Phase 1 — Local operations (no network required, always succeeds)
+#   Phase 2 — Network-dependent operations (with timeouts, non-blocking)
 # =============================================================================
+
+# ===========================================================================
+# Phase 1: Local Operations (no network required)
+# ===========================================================================
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -29,91 +37,22 @@
     - ~/.gemini
 
 # ---------------------------------------------------------------------------
-# Git repositories (Phase 1: standalone tools, before oh-my-zsh)
-# ---------------------------------------------------------------------------
-- git:
-    "~/.fzf":
-        url: "https://github.com/junegunn/fzf.git"
-        description: "fzf - fuzzy finder for zsh and bash"
-
-# ---------------------------------------------------------------------------
-# System packages & prerequisites
+# Git submodules (local if already initialized)
 # ---------------------------------------------------------------------------
 - shell:
-    # Submodules
     - [git submodule update --init --recursive, Installing submodules]
 
-    # ---- Platform-specific packages ----
-    - [
-          test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
-          Installing zsh tmux vim htop and ranger on Linux,
-      ]
-    - [
-          test "$(uname)" = "Darwin" && brew install lazygit zellij || true,
-          Installing lazygit and zellij on macOS,
-      ]
-
-    # ---- GitHub CLI ----
-    - [
-          "command -v gh >/dev/null || { if [ \"$(uname)\" = \"Linux\" ]; then (type -p wget >/dev/null || sudo apt-get install -y wget) && sudo mkdir -p -m 755 /etc/apt/keyrings && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null && sudo apt-get update && sudo apt-get install -y gh; elif [ \"$(uname)\" = \"Darwin\" ]; then brew install gh; fi; }",
-          Installing GitHub CLI (gh),
-      ]
-
-    # ---- oh-my-zsh ----
-    - [
-          test ! -d ~/.oh-my-zsh && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true,
-          Installing oh-my-zsh,
-      ]
-
-    # ---- macOS: Cursor config directory ----
+# ---------------------------------------------------------------------------
+# Platform-specific directory setup
+# ---------------------------------------------------------------------------
+- shell:
     - [
           test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
           Creating Cursor config directory on macOS,
       ]
 
-    # ---- Node.js (prerequisite for AI coding tools) ----
-    - [
-          "command -v node >/dev/null || (export NVM_DIR=\"$HOME/.nvm\" && (test -d \"$NVM_DIR\" || curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . \"$NVM_DIR/nvm.sh\" && nvm install --lts)",
-          Installing nvm and Node.js LTS,
-      ]
-
-    # ---- WeChat Reminder ----
-    - [
-          "echo y | bash <(curl -s https://gitee.com/magic3007/wechat-reminder/raw/master/install-gitee.sh)",
-          Installing wechat-reminder,
-      ]
-
 # ---------------------------------------------------------------------------
-# Git repositories (Phase 2: oh-my-zsh plugins, after oh-my-zsh install)
-# ---------------------------------------------------------------------------
-- git:
-    "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
-        url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
-        description: "zsh plugin: zsh-syntax-highlighting"
-    "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
-        url: "https://github.com/zsh-users/zsh-autosuggestions"
-        description: "zsh plugin: zsh-autosuggestions"
-    "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
-        url: "https://github.com/wbinglee/zsh-wakatime.git"
-        description: "zsh plugin: zsh-wakatime"
-    "~/.oh-my-zsh/custom/plugins/autojump":
-        url: "https://github.com/wting/autojump.git"
-        description: "zsh plugin: autojump"
-    "~/.oh-my-zsh/custom/plugins/zsh-vi-mode":
-        url: "https://github.com/jeffreytse/zsh-vi-mode.git"
-        description: "zsh plugin: zsh-vi-mode"
-
-# ---------------------------------------------------------------------------
-# Post-clone plugin setup
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py,
-          Installing autojump,
-      ]
-
-# ---------------------------------------------------------------------------
-# Backup existing configs before symlinking (preserve as *_local)
+# Backup existing configs before symlinking
 # ---------------------------------------------------------------------------
 - shell:
     - [
@@ -199,34 +138,137 @@
     ~/.cursor/skills: cursor_config/skills
 
 # ---------------------------------------------------------------------------
-# Post-link setup
+# Local post-link setup
 # ---------------------------------------------------------------------------
 - shell:
-    - [~/.fzf/install --all, Installing fzf]
     - [
           chmod +x ~/.claude/hooks/check-expert-update.sh 2>/dev/null || true,
-          Setting execute permission for Claude hooks
+          Setting execute permission for Claude hooks,
       ]
 
-    # ---- AI Coding Tools ----
-    # 手动安装时可执行以下 bash 命令:
-    #   Claude Code CLI:  curl -fsSL https://claude.ai/install.sh | bash
-    #   OpenAI Codex:     . ~/.nvm/nvm.sh; npm install -g @openai/codex
-    #   Google Gemini:    . ~/.nvm/nvm.sh; npm install -g @google/gemini-cli
-    #   Opencode:         curl -fsSL https://opencode.ai/install | bash 
+# ===========================================================================
+# Phase 2: Network-Dependent Operations
+# ===========================================================================
+# All commands below use --connect-timeout / || true to avoid blocking
+# when network is unavailable.
+
+# ---------------------------------------------------------------------------
+# Homebrew (macOS, must be before brew install commands)
+# ---------------------------------------------------------------------------
+- shell:
     - [
-          "command -v claude >/dev/null || curl -fsSL https://claude.ai/install.sh | bash",
+          'if [ "$(uname)" = "Darwin" ] && ! command -v brew >/dev/null 2>&1; then /bin/bash -c "$(curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; fi || true',
+          Installing Homebrew on macOS if missing,
+      ]
+
+# ---------------------------------------------------------------------------
+# Platform-specific packages
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
+          Installing zsh tmux vim htop and ranger on Linux,
+      ]
+    - [
+          test "$(uname)" = "Darwin" && command -v brew >/dev/null && brew install lazygit zellij || true,
+          Installing lazygit and zellij on macOS,
+      ]
+
+# ---------------------------------------------------------------------------
+# oh-my-zsh
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "test ! -d ~/.oh-my-zsh && sh -c \"$(curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" || true",
+          Installing oh-my-zsh,
+      ]
+
+# ---------------------------------------------------------------------------
+# oh-my-zsh plugins
+# ---------------------------------------------------------------------------
+- git:
+    "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
+        url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+        description: "zsh plugin: zsh-syntax-highlighting"
+    "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
+        url: "https://github.com/zsh-users/zsh-autosuggestions"
+        description: "zsh plugin: zsh-autosuggestions"
+    "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
+        url: "https://github.com/wbinglee/zsh-wakatime.git"
+        description: "zsh plugin: zsh-wakatime"
+    "~/.oh-my-zsh/custom/plugins/autojump":
+        url: "https://github.com/wting/autojump.git"
+        description: "zsh plugin: autojump"
+    "~/.oh-my-zsh/custom/plugins/zsh-vi-mode":
+        url: "https://github.com/jeffreytse/zsh-vi-mode.git"
+        description: "zsh plugin: zsh-vi-mode"
+
+- shell:
+    - [
+          "test -d ~/.oh-my-zsh/custom/plugins/autojump && cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py || true",
+          Installing autojump,
+      ]
+
+# ---------------------------------------------------------------------------
+# fzf
+# ---------------------------------------------------------------------------
+- git:
+    "~/.fzf":
+        url: "https://github.com/junegunn/fzf.git"
+        description: "fzf - fuzzy finder"
+
+- shell:
+    - [test -d ~/.fzf && ~/.fzf/install --all || true, Installing fzf]
+
+# ---------------------------------------------------------------------------
+# Node.js (prerequisite for AI coding tools)
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "command -v node >/dev/null || (export NVM_DIR=\"$HOME/.nvm\" && (test -d \"$NVM_DIR\" || curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . \"$NVM_DIR/nvm.sh\" && nvm install --lts) || true",
+          Installing nvm and Node.js LTS,
+      ]
+
+# ---------------------------------------------------------------------------
+# GitHub CLI
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "command -v gh >/dev/null || { if [ \"$(uname)\" = \"Linux\" ]; then (type -p wget >/dev/null || sudo apt-get install -y wget) && sudo mkdir -p -m 755 /etc/apt/keyrings && wget --timeout=10 -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null && sudo apt-get update && sudo apt-get install -y gh; elif [ \"$(uname)\" = \"Darwin\" ]; then brew install gh; fi; } || true",
+          Installing GitHub CLI (gh),
+      ]
+
+# ---------------------------------------------------------------------------
+# AI Coding Tools
+# ---------------------------------------------------------------------------
+# Manual install:
+#   Claude Code:  curl -fsSL https://claude.ai/install.sh | bash
+#   OpenAI Codex: . ~/.nvm/nvm.sh; npm install -g @openai/codex
+#   Gemini CLI:   . ~/.nvm/nvm.sh; npm install -g @google/gemini-cli
+#   Opencode:     curl -fsSL https://opencode.ai/install | bash
+- shell:
+    - [
+          "command -v claude >/dev/null || curl --connect-timeout 10 -fsSL https://claude.ai/install.sh | bash || true",
           Installing Claude Code CLI,
       ]
     - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex",
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex || true",
           Installing OpenAI Codex CLI,
       ]
     - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v gemini >/dev/null || npm install -g @google/gemini-cli",
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v gemini >/dev/null || npm install -g @google/gemini-cli || true",
           Installing Google Gemini CLI,
       ]
     - [
-          "command -v opencode >/dev/null || curl -fsSL https://opencode.ai/install | bash",
+          "command -v opencode >/dev/null || curl --connect-timeout 10 -fsSL https://opencode.ai/install | bash || true",
           Installing Opencode CLI,
+      ]
+
+# ---------------------------------------------------------------------------
+# WeChat Reminder
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "echo y | bash <(curl --connect-timeout 10 -s https://gitee.com/magic3007/wechat-reminder/raw/master/install-gitee.sh) || true",
+          Installing wechat-reminder,
       ]
