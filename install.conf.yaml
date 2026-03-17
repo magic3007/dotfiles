@@ -170,8 +170,8 @@
           Installing zsh tmux vim htop and ranger on Linux,
       ]
     - [
-          test "$(uname)" = "Darwin" && command -v brew >/dev/null && brew install lazygit zellij || true,
-          Installing lazygit and zellij on macOS,
+          test "$(uname)" = "Darwin" && command -v brew >/dev/null && brew install rg lazygit zellij || true,
+          Installing rg, lazygit and zellij on macOS,
       ]
 
 # ---------------------------------------------------------------------------
