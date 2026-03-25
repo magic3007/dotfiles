@@ -4,122 +4,78 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a dotfiles repository containing configuration files for development tools and environments. It uses [Dotbot](https://github.com/anishathalye/dotbot) for installation and management.
+Dotfiles repository using [Dotbot](https://github.com/anishathalye/dotbot) for installation. Stores configuration files and symlinks them to their standard locations (`~/.zshrc`, `~/.gitconfig`, `~/.config/nvim`, etc.).
 
-## Installation and Setup
-
-The primary command to set up the development environment is:
+## Commands
 
 ```bash
-./install
+./install              # Full installation (idempotent, safe to re-run)
+./install -n           # Dry run — preview what would be installed
+git submodule update --init --recursive  # Update Vim plugins
 ```
 
-This script:
-1. Installs prerequisites (zsh, tmux, vim, etc.) based on the operating system
-2. Sets up oh-my-zsh with plugins
-3. Installs AI coding tools (Claude Code CLI, OpenAI Codex)
-4. Creates symlinks from repository files to appropriate locations in `~`
+## Architecture
 
-The installation is idempotent and can be run multiple times safely.
+### Two-Phase Installation (`install.conf.yaml`)
 
-## Repository Structure
+- **Phase 1 — Local**: Defaults, directory creation, submodules, backup existing configs, symlinks. No network required, always succeeds.
+- **Phase 2 — Network**: Homebrew, platform packages, oh-my-zsh + plugins, fzf, Node.js/nvm, GitHub CLI, AI coding tools. All commands use `--connect-timeout` / `|| true` to avoid blocking without network.
 
-### Core Configuration Directories
-- `oh-my-zsh/` - Zsh configuration and oh-my-zsh setup
-- `vim/vimrc/` - Vim configuration with plugin management
-- `neovim/` - Neovim configuration (including NvChad-based setup)
-- `git/` - Git configuration with local customization support
-- `cursor_config/` - Cursor editor settings and keybindings
-- `claude/` - Claude Code CLI configuration
-- `bash/` - Bash shell configuration
-- `ranger/` - Ranger file manager configuration
-- `skhd/` - macOS window management shortcuts
-- `karabiner/` - macOS keyboard remapping
+### Symlink Model
 
-### Tool-Specific Configurations
-- `docker/` - Docker setup and configuration
-- `gdb/` - GDB debugger configuration
-- `tmux.conf` - Terminal multiplexer configuration
-- `ideavimrc` - IntelliJ IDEA Vim emulation
-- Package manager configs: `.condarc`, `.mambarc`, `.npmrc`, `pip.conf`, `cargo/config.toml`
+All configs live in this repo and are symlinked to `~` via Dotbot. The `link` section in `install.conf.yaml` is the single source of truth for what gets symlinked where. When adding new configs: add files to the repo, then add symlink entries to `install.conf.yaml`.
 
-### Scripts and Utilities
-- `scripts/` - Utility scripts (backup, mounting, setup)
-- `common_shell_setup.sh` - Shared shell configuration sourced by both bash and zsh
-- `install.conf.yaml` - Dotbot configuration defining installation steps
+### Local Customization Pattern
 
-## Key Architecture Concepts
+Machine-specific overrides go in `*_local` files (not tracked by git):
+- `~/.gitconfig_local` — local git user/config (included via `[include]` in gitconfig)
+- `~/.zsh_local` — local zsh config
+- `~/.common_shell_setup_local.sh` — local shell setup
 
-### Symlink-Based Configuration
-Configuration files are stored in the repository and symlinked to their standard locations:
-- Shell configs: `~/.zshrc`, `~/.bashrc`
-- Editor configs: `~/.vimrc`, `~/.config/nvim`, `~/.ideavimrc`
-- Git: `~/.gitconfig`
-- Other tools: `~/.tmux.conf`, `~/.config/ranger`, etc.
+### Shell Setup
 
-### Local Customizations
-Users can create local customizations that won't be overwritten:
-- `~/.gitconfig_local` - Local Git configuration
-- `~/.zsh_local` - Local Zsh configuration
-- `~/.common_shell_setup_local.sh` - Local shell setup
+`common_shell_setup.sh` is sourced by both `.zshrc` and `.bashrc`. It contains:
+- Safe `rm` override: `rm` is aliased to a warning; use `rem` for reversible delete or `\rm` for real delete
+- Safe `mv`/`cp`: aliased with `-i` (interactive) flags
+- Docker helper functions: `docker-run`, `docker-slave`, `docker-run-gui`
+- AI tool shell aliases (see below)
 
 ### AI Tool Integration
-The repository includes configuration for:
-- **Claude Code CLI**: Configured in `claude/settings.json` with Chinese language setting
-- **OpenAI Codex**: Shell alias setup in `common_shell_setup.sh`
-- **DeepSeek API**: Integration via environment variables and shell function `dscc()`
 
-### Cross-Platform Support
-The installation script detects the operating system and installs appropriate packages:
-- **Linux**: Uses apt-get for zsh, tmux, vim, htop, ranger
-- **macOS**: Uses Homebrew for lazygit, zellij
+Shell aliases and wrapper functions in `common_shell_setup.sh`:
+- `cc` — Claude Code (`claude --dangerously-skip-permissions`)
+- `cx` — OpenAI Codex (`codex --full-auto`)
+- `gm` — Google Gemini CLI (`gemini --yolo`)
+- `oc` — Opencode
+- `dscc()` — Claude Code with DeepSeek API backend
+- `kmcc()` / `kmcc2()` — Claude Code with Kimi API (via OpenRouter / direct)
+- `mxcc()` — Claude Code with MiniMax via OpenRouter
+- `qwcc()` — Claude Code with Qwen3.5 via Aliyun
 
-### Proxy and Mirror Configuration
-Chinese mirrors are configured for faster package downloads:
-- Rust: rsproxy.cn
-- Go: mirrors.aliyun.com
-- npm: Custom registry in `.npmrc`
-- pip: Chinese mirror in `pip.conf`
-- Conda/Mamba: Configuration in `.condarc` and `.mambarc`
+### Claude Code Configuration (`claude/`)
 
-## Development Workflow
+Symlinked to `~/.claude/`. Contains:
+- `settings.json` — permissions, hooks, language (Chinese), plugins, env vars
+- `config.json` — API key config
+- `commands/` — slash commands (`create-pr`, `gen-commit-msg`, `pr-review`)
+- `hooks/` — PostToolUse and UserPromptSubmit hooks
+- `rules/` — global rules (e.g., `debug-experience.md`)
 
-### Adding New Configuration
-1. Add configuration files to the appropriate directory in the repository
-2. Update `install.conf.yaml` to add symlinks or installation steps
-3. Test with `./install` (dry run available with `-n` flag)
+### Chinese Mirrors
 
-### Updating Existing Configuration
-1. Modify files in the repository
-2. Run `./install` to update symlinks
-3. Local customizations in `*_local` files are preserved
+Package managers are configured with Chinese mirrors for faster downloads:
+- Rust (rsproxy.cn), Go (mirrors.aliyun.com), npm (`.npmrc`), pip (`pip.conf`), Conda/Mamba (`.condarc`/`.mambarc`), Julia (TUNA), Flutter (flutter-io.cn)
 
-### Plugin Management
-- Vim plugins are managed via git submodules in `vim/vimrc/sources_*`
-- oh-my-zsh plugins are cloned during installation
-- Neovim uses NvChad-based configuration
+### Git Configuration
 
-## Common Commands
+- `pull.ff = only` — fast-forward only pulls
+- `push.default = upstream` — push to upstream tracking branch
+- `user.useConfigOnly = true` — requires explicit user config
+- `core.hooksPath = ~/.git-hooks` — custom hooks directory
+- `safe.directory = *` — trusts all directories
+- Extensive aliases: `st` (status), `co` (checkout), `di` (diff), `dc` (diff cached), `gr` (graph log), etc.
 
-```bash
-# Full installation
-./install
+### Cross-Platform
 
-# Dry run (see what would be installed)
-./install -n
-
-# Update submodules (plugins)
-git submodule update --init --recursive
-
-# Install specific components (see install.conf.yaml for phases)
-./install --plugin-dir dotbot-git --only git
-```
-
-## Notes for Claude Code
-
-- This repository focuses on configuration files, not application code
-- Changes should maintain cross-platform compatibility
-- Sensitive information should be placed in `*_local` files (excluded from git)
-- The `claude/settings.json` is already configured for Chinese language output
-- Shell integration includes fzf, autojump, and syntax highlighting
-- Editor configurations follow consistent formatting rules across languages
+- **Linux**: apt-get for zsh, tmux, vim, htop, ranger
+- **macOS**: Homebrew for rg, lazygit, zellij; Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management
