@@ -10,7 +10,7 @@ TITLE="Claude Code 会话结束"
 DESP="Claude Code 运行于 $TIMESTAMP 结束。\n\n当前目录: $(pwd)\n用户: $(whoami)"
 
 # 调用 wechat-reminder 发送提醒
-/Users/maijing1/.local/bin/wechat-reminder --title "$TITLE" --desp "$DESP"
+$HOME/.local/bin/wechat-reminder --title "$TITLE" --desp "$DESP"
 
 # 记录日志（可选）
 LOG_FILE="$HOME/.claude/logs/claude-end.log"
