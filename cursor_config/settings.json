@@ -11221,5 +11221,6 @@
     "claudeCode.selectedModel": "default",
     "terminal.integrated.fontFamily": "monospace",
     "cursor.rpcFileLogger.enabled": true,
-    "window.commandCenter": true
+    "window.commandCenter": true,
+    "cursor.general.disableHttp2": true
 }
