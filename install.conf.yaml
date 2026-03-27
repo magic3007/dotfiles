@@ -50,6 +50,10 @@
           test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
           Creating Cursor config directory on macOS,
       ]
+    - [
+          test "$(uname)" = "Darwin" && mkdir -p ~/.config/iterm2 || true,
+          Creating iTerm2 config directory,
+      ]
 
 # ---------------------------------------------------------------------------
 # Backup existing configs before symlinking
@@ -137,6 +141,9 @@
 
     # ---- Cursor skills ----
     ~/.cursor/skills: cursor_config/skills
+
+    # ---- iTerm2 ----
+    ~/.config/iterm2/com.googlecode.iterm2.plist: iterm2/com.googlecode.iterm2.plist
 
 # ---------------------------------------------------------------------------
 # Local post-link setup
@@ -272,4 +279,13 @@
     - [
           "echo y | bash <(curl --connect-timeout 10 -s https://gitee.com/magic3007/wechat-reminder/raw/master/install-gitee.sh) || true",
           Installing wechat-reminder,
+      ]
+
+# ---------------------------------------------------------------------------
+# iTerm2 configuration
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          test "$(uname)" = "Darwin" && defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "~/.config/iterm2" && defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true || true,
+          Configuring iTerm2 to load preferences from ~/.config/iterm2,
       ]
