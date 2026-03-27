@@ -326,6 +326,18 @@ qwcc() {
     claude "$@" --dangerously-skip-permissions
 }
 
+# claude code with mimo-v2-pro
+mmcc() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://api.xiaomimimo.com/anthropic \
+    ANTHROPIC_AUTH_TOKEN="${MIMO_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=mimo-v2-pro \
+    ANTHROPIC_SMALL_FAST_MODEL=mimo-v2-pro \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
 alias remind="ssh -t pkucpu \"export FEISHU_WEBHOOK_URL=\$FEISHU_WEBHOOK_URL; ~/.local/bin/wechat-reminder --title \$HOSTNAME\""
 
 # codex environment setup
