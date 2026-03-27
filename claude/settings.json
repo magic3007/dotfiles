@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/minimax/.claude/scripts/check_dangerous_ops.sh"
+            "command": "bash ~/.claude/scripts/check_dangerous_ops.sh"
           }
         ]
       }
