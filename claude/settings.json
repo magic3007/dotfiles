@@ -86,14 +86,7 @@
     "type": "command",
     "command": "~/.claude/statusline-command.sh"
   },
-  "enabledPlugins": {
-    "context7@claude-plugins-official": true,
-    "chrome-debug@minimax-matrix-plugins": true,
-    "machine-onboarding@minimax-matrix-plugins": true,
-    "publish-mm-skills@minimax-matrix-plugins": true,
-    "search-fetch@minimax-matrix-plugins": true,
-    "example-skills@anthropic-agent-skills": true
-  },
+  "enabledPlugins": {},
   "extraKnownMarketplaces": {
     "minimax-matrix-plugins": {
       "source": {
