@@ -124,6 +124,7 @@
     ~/.claude/commands: claude/commands
     ~/.claude/hooks: claude/hooks
     ~/.claude/rules: claude/rules
+    ~/.claude/scripts: claude/scripts
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/config.toml: codex/config.toml

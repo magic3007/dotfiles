@@ -39,6 +39,17 @@
     "defaultMode": "acceptEdits"
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/minimax/.claude/scripts/check_dangerous_ops.sh"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
@@ -66,9 +77,29 @@
     "command": "~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "context7@claude-plugins-official": true
+    "context7@claude-plugins-official": true,
+    "chrome-debug@minimax-matrix-plugins": true,
+    "machine-onboarding@minimax-matrix-plugins": true,
+    "publish-mm-skills@minimax-matrix-plugins": true,
+    "search-fetch@minimax-matrix-plugins": true,
+    "example-skills@anthropic-agent-skills": true
+  },
+  "extraKnownMarketplaces": {
+    "minimax-matrix-plugins": {
+      "source": {
+        "source": "git",
+        "url": "https://gitlab.xaminim.com/common/plugins.git"
+      }
+    },
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/anthropics/skills.git"
+      }
+    }
   },
   "language": "Chinese",
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "skipWebFetchPreflight": true
 }
