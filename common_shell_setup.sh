@@ -258,6 +258,17 @@ dscc() {
 
 kmcc() {
   env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic \
+    ANTHROPIC_AUTH_TOKEN="${KIMI_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=kimi-k2.5 \
+    ANTHROPIC_SMALL_FAST_MODEL=kimi-k2.5 \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
+kmcc2() {
+  env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://openrouter.ai/api \
     ANTHROPIC_AUTH_TOKEN="${OPENROUTER_API_KEY}" \
     API_TIMEOUT_MS=600000 \
@@ -267,21 +278,10 @@ kmcc() {
     claude "$@" --dangerously-skip-permissions
 }
 
-ralph_km() {
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://openrouter.ai/api \
-    ANTHROPIC_AUTH_TOKEN="${OPENROUTER_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=kimi-for-coding \
-    ANTHROPIC_SMALL_FAST_MODEL=kimi-for-coding \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    ralph "$@" --agent claude-code --max-iterations 10
-}
-
-kmcc2() {
+kmccc() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.kimi.com/coding/ \
-    ANTHROPIC_AUTH_TOKEN="${KIMI_API_KEY}" \
+    ANTHROPIC_AUTH_TOKEN="${KIMI_CODE_API_KEY}" \
     API_TIMEOUT_MS=600000 \
     ANTHROPIC_MODEL=kimi-for-coding \
     ANTHROPIC_SMALL_FAST_MODEL=kimi-for-coding \
@@ -289,39 +289,14 @@ kmcc2() {
     claude "$@" --dangerously-skip-permissions
 }
 
-# ralph wiggum loop with Kimi API
-ralph_km2() {
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.kimi.com/coding/ \
-    ANTHROPIC_AUTH_TOKEN="${KIMI_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=kimi-for-coding \
-    ANTHROPIC_SMALL_FAST_MODEL=kimi-for-coding \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    ralph "$@" --agent claude-code --max-iterations 10
-}
-
-# claude code with MiniMax 2.5
-mxcc() {
+# claude code with MiniMax 2.7
+mxcc2() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://openrouter.ai/api \
     ANTHROPIC_AUTH_TOKEN="${OPENROUTER_API_KEY}" \
     API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=minimax/minimax-m2.5 \
-    ANTHROPIC_SMALL_FAST_MODEL=minimax/minimax-m2.5 \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-
-# claude code with Qwen3.5
-qwcc() {
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://coding.dashscope.aliyuncs.com/apps/anthropic \
-    ANTHROPIC_AUTH_TOKEN="${ALIYUN_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=qwen3.5-plus \
-    ANTHROPIC_SMALL_FAST_MODEL=qwen3.5-plus \
+    ANTHROPIC_MODEL=minimax/minimax-m2.7 \
+    ANTHROPIC_SMALL_FAST_MODEL=minimax/minimax-m2.7 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$@" --dangerously-skip-permissions
 }
