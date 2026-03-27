@@ -523,7 +523,8 @@
         "qs_b200_1x4_v2": "linux",
         "qs_b200_16x4": "linux",
         "magic_dev": "linux",
-        "magic_dev2": "linux"
+        "magic_dev2": "linux",
+        "lyqhd": "linux"
     },
     "security.workspace.trust.untrustedFiles": "open",
     "settingsSync.ignoredExtensions": [
@@ -11213,7 +11214,7 @@
     "diffEditor.ignoreTrimWhitespace": true,
     "terminal.integrated.altClickMovesCursor": false,
     "cursor.cpp.disabledLanguages": [
-        "markdown"
+        "scminput"
     ],
     "cursor.terminal.usePreviewBox": true,
     "claudeCode.preferredLocation": "panel",
