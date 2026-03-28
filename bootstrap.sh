@@ -215,7 +215,25 @@ warn "Running full dotfiles installation..."
 warn "  - This includes: Homebrew (macOS), oh-my-zsh, fzf, GitHub CLI, wechat-reminder, etc."
 warn "  - Depending on your network speed, this takes **3-10 minutes**"
 warn "  - Failed network operations won't block the installation\n"
-./install
+
+# Capture install output to file for later analysis
+INSTALL_LOG="/tmp/dotfiles_install_$$.log"
+info "Running install with output capture to $INSTALL_LOG"
+
+# Use script command to capture full output (works on both macOS and Linux)
+if command -v script &>/dev/null; then
+    if [ "$(uname)" = "Darwin" ]; then
+        # macOS: script -q /dev/null ./install
+        script -q "$INSTALL_LOG" ./install || true
+    else
+        # Linux: script -q -c ./install /dev/null
+        script -q -c "./install" /dev/null > "$INSTALL_LOG" 2>&1 || true
+    fi
+else
+    # Fallback to unbuffered tee
+    stdbuf -oL ./install > >(tee "$INSTALL_LOG") 2>&1 || true
+fi
+
 echo ""
 info "Dotfiles install completed (any failed steps can be manually retried later)"
 
@@ -235,21 +253,40 @@ fi
 # ===========================================================================
 info "\nLaunching Claude Code for final check...\n"
 
-SETUP_PROMPT="Verify the dotfiles installation is complete:
+INSTALL_LOG_PATH="$INSTALL_LOG"
+SETUP_PROMPT="The ./install command just completed. I have captured the full output to a log file.
 
-1. Check that ~/.common_shell_setup_local.sh contains:
-   - VE_CODE_API_KEY (already set by bootstrap)
-   - FEISHU_WEBHOOK_URL placeholder for wechat-reminder (already added)
+Your task: Read the install log at $INSTALL_LOG_PATH, analyze what failed, and fix the issues.
 
-2. Verify wechat-reminder is installed:
-   command -v wechat-reminder && echo '✓ wechat-reminder OK' || echo '✗ wechat-reminder not found'
+Follow these steps:
 
-3. Print a summary: confirm everything is working, note any issues, and remind user to:
-   - Restart shell
-   - Set FEISHU_WEBHOOK_URL if they use wechat-reminder
-   - Use 'sdcc' command for Claude Code
+1. Read the log file: cat $INSTALL_LOG_PATH
 
-If any issues are found, fix them. No need to ask for confirmation - just do it."
+2. Identify failed operations by looking for:
+   - 'git command failed' (plugin clones)
+   - 'Some tasks were not executed successfully' (dotbot summary)
+   - 'fatal:' or 'error:' messages
+   - 'command not found' (missing packages)
+   - Network timeout errors
+
+3. For each failure found, fix it:
+   - Failed git clones: Retry them with 'git clone --recursive'
+   - Missing oh-my-zsh plugins: Clone to ~/.oh-my-zsh/custom/plugins/
+   - Missing packages: Install with 'brew install' (macOS) or 'apt-get install' (Linux)
+   - fzf not installed properly: Run ~/.fzf/install
+   - Missing AI CLIs: Re-run the npm install or curl commands
+
+4. Verify critical components work:
+   - ls ~/.oh-my-zsh/custom/plugins/
+   - command -v fzf
+   - command -v claude codex gemini opencode
+   - command -v wechat-reminder
+
+5. Report what you found and what you fixed.
+
+Start by reading the log file, then proceed with fixes. No need to ask for confirmation."
+
+
 
 # Launch Claude Code like sdcc() does (interactive mode with initial prompt)
 env -u ANTHROPIC_API_KEY \
@@ -260,6 +297,9 @@ env -u ANTHROPIC_API_KEY \
     ANTHROPIC_SMALL_FAST_MODEL="$ANTHROPIC_MODEL" \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$SETUP_PROMPT" --dangerously-skip-permissions
+
+# Clean up install log
+rm -f "$INSTALL_LOG"
 
 echo ""
 info "========================================="

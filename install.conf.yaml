@@ -178,10 +178,10 @@
           test "$(uname)" = "Linux" && command -v timeout >/dev/null && sudo timeout 300 apt-get install -y zsh tmux vim htop ranger bubblewrap || test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger bubblewrap || true,
           Installing zsh tmux vim htop ranger and bubblewrap on Linux (with 5min timeout),
       ]
-    - [
-          test "$(uname)" = "Darwin" && command -v brew >/dev/null && command -v timeout >/dev/null && timeout 300 brew install rg lazygit zellij bubblewrap || test "$(uname)" = "Darwin" && command -v brew >/dev/null && brew install rg lazygit zellij bubblewrap || true,
-          Installing rg, lazygit, zellij and bubblewrap on macOS (with 5min timeout),
-      ]
+    # - [
+    #       test "$(uname)" = "Darwin" && command -v brew >/dev/null && command -v timeout >/dev/null && timeout 300 brew install rg lazygit zellij bubblewrap || test "$(uname)" = "Darwin" && command -v brew >/dev/null && brew install rg lazygit zellij bubblewrap || true,
+    #       Installing rg, lazygit, zellij and bubblewrap on macOS (with 5min timeout),
+    #   ]
 
 # ---------------------------------------------------------------------------
 # oh-my-zsh
