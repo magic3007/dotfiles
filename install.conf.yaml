@@ -138,6 +138,7 @@
     ~/.chatgpt.sh: chatgpt
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
+    ~/.local/bin/yolo: scripts/yolo-generic.sh
 
     # ---- Cursor skills ----
     ~/.cursor/skills: cursor_config/skills
@@ -174,12 +175,12 @@
 # ---------------------------------------------------------------------------
 - shell:
     - [
-          test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger || true,
-          Installing zsh tmux vim htop and ranger on Linux,
+          test "$(uname)" = "Linux" && command -v timeout >/dev/null && sudo timeout 300 apt-get install -y zsh tmux vim htop ranger bubblewrap || test "$(uname)" = "Linux" && sudo apt-get install -y zsh tmux vim htop ranger bubblewrap || true,
+          Installing zsh tmux vim htop ranger and bubblewrap on Linux (with 5min timeout),
       ]
     - [
-          test "$(uname)" = "Darwin" && command -v brew >/dev/null && brew install rg lazygit zellij || true,
-          Installing rg, lazygit and zellij on macOS,
+          test "$(uname)" = "Darwin" && command -v brew >/dev/null && command -v timeout >/dev/null && timeout 300 brew install rg lazygit zellij bubblewrap || test "$(uname)" = "Darwin" && command -v brew >/dev/null && brew install rg lazygit zellij bubblewrap || true,
+          Installing rg, lazygit, zellij and bubblewrap on macOS (with 5min timeout),
       ]
 
 # ---------------------------------------------------------------------------
