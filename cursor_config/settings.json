@@ -524,7 +524,9 @@
         "qs_b200_16x4": "linux",
         "magic_dev": "linux",
         "magic_dev2": "linux",
-        "lyqhd": "linux"
+        "lyqhd": "linux",
+        "alish": "linux",
+        "alsh": "linux"
     },
     "security.workspace.trust.untrustedFiles": "open",
     "settingsSync.ignoredExtensions": [
@@ -11206,7 +11208,7 @@
     "editor.smoothScrolling": true,
     "editor.fontFamily": "'Monaspace Neon', Menlo, Monaco, 'Courier New', monospace",
     "workbench.sideBar.location": "right",
-    "workbench.colorTheme": "Runic Minimal",
+    "workbench.colorTheme": "Cursor Dark Midnight",
     "workbench.layoutControl.enabled": false,
     "remote.autoForwardPortsSource": "hybrid",
     "git.blame.statusBarItem.enabled": false,
@@ -11222,5 +11224,6 @@
     "terminal.integrated.fontFamily": "monospace",
     "cursor.rpcFileLogger.enabled": true,
     "window.commandCenter": true,
-    "cursor.general.disableHttp2": true
+    "cursor.general.disableHttp2": true,
+    "terminal.integrated.macOptionIsMeta": true
 }
