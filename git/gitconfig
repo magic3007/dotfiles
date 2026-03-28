@@ -112,7 +112,7 @@
 
 [core]
 	excludesfile = ~/.gitignore_global
-	hooksPath = /Users/minimax/.git-hooks
+	hooksPath = ~/.git-hooks
 	quotepath = false
 
 # Allow local customizations in the .gitconfig_local file
