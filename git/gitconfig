@@ -103,8 +103,6 @@
 
 [user]
 	useConfigOnly = true
-	email = jingmai@pku.edu.cn
-	name = Jing Mai
 
 [http]
 	cookieFile = ~/.gitcookies
