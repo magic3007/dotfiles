@@ -78,4 +78,11 @@ Package managers are configured with Chinese mirrors for faster downloads:
 ### Cross-Platform
 
 - **Linux**: apt-get for zsh, tmux, vim, htop, ranger
-- **macOS**: Homebrew for rg, lazygit, zellij; Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management
+- **macOS**: Homebrew for rg, lazygit, zellij; Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 configuration sync via `~/.config/iterm2`
+
+### Adding New Configs
+
+When adding new dotfile configs:
+1. Add the config file to this repo
+2. Add a symlink entry to the `link` section in `install.conf.yaml`
+3. If platform-specific, wrap in a shell condition: `test "$(uname)" = "Darwin" && ...`

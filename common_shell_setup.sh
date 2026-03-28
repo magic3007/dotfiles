@@ -252,9 +252,18 @@ dscc() {
     claude "$@" --dangerously-skip-permissions
 }
 
-
 # claude code with VolcEngine Coding Plan
 # Reference: https://www.volcengine.com/docs/82379/1928262?lang=zh
+sdcc() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
+    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=doubao-seed-2.0-lite \
+    ANTHROPIC_SMALL_FAST_MODEL=doubao-seed-2.0-lite \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
 
 kmcc() {
   env -u ANTHROPIC_API_KEY \
