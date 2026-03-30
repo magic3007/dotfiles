@@ -190,9 +190,16 @@ fi
 
 # -- Gather git user info --
 echo ""
-# Check existing git configuration
+# Check existing git configuration (try global, then local config file)
 existing_name=$(git config --global user.name 2>/dev/null || true)
 existing_email=$(git config --global user.email 2>/dev/null || true)
+
+# Also check ~/.gitconfig_local which is included by the dotfiles gitconfig
+GIT_CONFIG_LOCAL="$HOME/.gitconfig_local"
+if [ -z "$existing_name" ] && [ -f "$GIT_CONFIG_LOCAL" ]; then
+    existing_name=$(git config -f "$GIT_CONFIG_LOCAL" user.name 2>/dev/null || true)
+    existing_email=$(git config -f "$GIT_CONFIG_LOCAL" user.email 2>/dev/null || true)
+fi
 
 if [ -n "$existing_name" ] && [ -n "$existing_email" ]; then
     info "Found existing git configuration:"
