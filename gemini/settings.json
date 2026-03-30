@@ -28,12 +28,12 @@
     "hideFooter": true
   },
   "hooksConfig": {
-          "enabled": true
-            
+    "enabled": true
   },
   "context": {
-          "includeDirectories": ["~/.gemini/extensions/ralph"]
-            
+    "includeDirectories": [
+      "~/.gemini/extensions/ralph"
+    ]
   },
   "ide": {
     "enabled": true
