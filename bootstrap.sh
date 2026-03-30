@@ -266,19 +266,8 @@ INSTALL_LOG="$HOME/.cache/dotfiles_install_$$.log"
 mkdir -p "$HOME/.cache"
 info "Running install with output capture to $INSTALL_LOG"
 
-# Use script command to capture full output (works on both macOS and Linux)
-if command -v script &>/dev/null; then
-    if [ "$(uname)" = "Darwin" ]; then
-        # macOS: script -q /dev/null ./install
-        script -q "$INSTALL_LOG" ./install || true
-    else
-        # Linux: script -q -c ./install /dev/null
-        script -q -c "./install" /dev/null > "$INSTALL_LOG" 2>&1 || true
-    fi
-else
-    # Fallback to unbuffered tee
-    stdbuf -oL ./install > >(tee "$INSTALL_LOG") 2>&1 || true
-fi
+# Capture output to log while also displaying on screen
+./install 2>&1 | tee "$INSTALL_LOG" || true
 
 echo ""
 info "Dotfiles install completed (any failed steps can be manually retried later)"
