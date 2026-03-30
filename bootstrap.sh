@@ -116,11 +116,20 @@ fi
 export NVM_DIR="$HOME/.nvm"
 # shellcheck source=/dev/null
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# Add user npm global bin to PATH for non-root installs
+export PATH="$HOME/.npm-global/bin:$PATH"
 
 if ! command -v claude &>/dev/null; then
     info "Installing Claude Code..."
-    npm install -g @anthropic-ai/claude-code
-    info "Claude Code installed"
+    # Install to user directory to avoid requiring root permissions
+    npm config set prefix "$HOME/.npm-global"
+    export PATH="$HOME/.npm-global/bin:$PATH"
+    npm install -g @anthropic-ai/claude-code --prefix "$HOME/.npm-global"
+    # Add to PATH in local setup if not already there
+    if ! grep -q "npm-global/bin" "$LOCAL_SETUP" 2>/dev/null; then
+        printf '\n# Add npm global bin to PATH (user install)\nexport PATH="$HOME/.npm-global/bin:$PATH"\n' >> "$LOCAL_SETUP"
+    fi
+    info "Claude Code installed to ~/.npm-global"
 else
     info "Claude Code already installed"
 fi
@@ -181,8 +190,30 @@ fi
 
 # -- Gather git user info --
 echo ""
-ask "Git user.name (for ~/.gitconfig_local):"; read -r git_name
-ask "Git user.email:"; read -r git_email
+# Check existing git configuration
+existing_name=$(git config --global user.name 2>/dev/null || true)
+existing_email=$(git config --global user.email 2>/dev/null || true)
+
+if [ -n "$existing_name" ] && [ -n "$existing_email" ]; then
+    info "Found existing git configuration:"
+    info "  user.name  = $existing_name"
+    info "  user.email = $existing_email"
+    ask "Would you like to update it? [y/N]"; read -r update_yn
+    case "$update_yn" in
+        [yY]*)
+            ask "Git user.name:"; read -r git_name
+            ask "Git user.email:"; read -r git_email
+            ;;
+        *)
+            git_name="$existing_name"
+            git_email="$existing_email"
+            info "Keeping existing git configuration"
+            ;;
+    esac
+else
+    ask "Git user.name (for ~/.gitconfig_local):"; read -r git_name
+    ask "Git user.email:"; read -r git_email
+fi
 
 [ -z "$RESOLVED_TOKEN" ] && err "No API token configured. Cannot continue."
 info "API configuration complete"
@@ -217,7 +248,8 @@ warn "  - Depending on your network speed, this takes **3-10 minutes**"
 warn "  - Failed network operations won't block the installation\n"
 
 # Capture install output to file for later analysis
-INSTALL_LOG="/tmp/dotfiles_install_$$.log"
+INSTALL_LOG="$HOME/.cache/dotfiles_install_$$.log"
+mkdir -p "$HOME/.cache"
 info "Running install with output capture to $INSTALL_LOG"
 
 # Use script command to capture full output (works on both macOS and Linux)
@@ -237,15 +269,29 @@ fi
 echo ""
 info "Dotfiles install completed (any failed steps can be manually retried later)"
 
-# Write git local config if not exists
+# Write git local config
 GIT_CONFIG_LOCAL="$HOME/.gitconfig_local"
-if [ ! -f "$GIT_CONFIG_LOCAL" ] && [ -n "$git_name" ] && [ -n "$git_email" ]; then
-    info "Creating ~/.gitconfig_local with your git user info"
-    cat > "$GIT_CONFIG_LOCAL" <<EOF
+if [ -n "$git_name" ] && [ -n "$git_email" ]; then
+    if [ -f "$GIT_CONFIG_LOCAL" ]; then
+        # Check if user actually changed it
+        if [ "$git_name" != "$existing_name" ] || [ "$git_email" != "$existing_email" ]; then
+            info "Updating ~/.gitconfig_local with new git user info"
+            cat > "$GIT_CONFIG_LOCAL" <<EOF
 [user]
     name = ${git_name}
     email = ${git_email}
 EOF
+        else
+            info "Git configuration unchanged"
+        fi
+    else
+        info "Creating ~/.gitconfig_local with your git user info"
+        cat > "$GIT_CONFIG_LOCAL" <<EOF
+[user]
+    name = ${git_name}
+    email = ${git_email}
+EOF
+    fi
 fi
 
 # ===========================================================================
