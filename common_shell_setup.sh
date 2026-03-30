@@ -265,6 +265,17 @@ sdcc() {
     claude "$@" --dangerously-skip-permissions
 }
 
+sdccpro() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
+    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=doubao-seed-2.0-pro \
+    ANTHROPIC_SMALL_FAST_MODEL=doubao-seed-2.0-pro \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
 kmcc() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic \
