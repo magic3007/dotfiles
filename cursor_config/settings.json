@@ -11208,7 +11208,6 @@
     "editor.smoothScrolling": true,
     "editor.fontFamily": "'Monaspace Neon', Menlo, Monaco, 'Courier New', monospace",
     "workbench.sideBar.location": "right",
-    "workbench.colorTheme": "Cursor Dark Midnight",
     "workbench.layoutControl.enabled": false,
     "remote.autoForwardPortsSource": "hybrid",
     "git.blame.statusBarItem.enabled": false,
