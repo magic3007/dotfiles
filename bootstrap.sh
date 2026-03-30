@@ -232,15 +232,22 @@ echo ""
 title "Step 4/5: Clone & Install Dotfiles"
 
 # Clone repo if not exists
-if [ ! -d "$HOME/dotfiles" ]; then
-    info "Cloning dotfiles to ~/dotfiles..."
-    git clone --recursive https://github.com/magic3007/dotfiles.git "$HOME/dotfiles"
+DEFAULT_DOTFILES_DIR="$HOME/dotfiles"
+ask "Dotfiles directory [${DEFAULT_DOTFILES_DIR}]:"; read -r input_dotfiles_dir
+DOTFILES_DIR="${input_dotfiles_dir:-$DEFAULT_DOTFILES_DIR}"
+
+# Expand ~ to $HOME
+DOTFILES_DIR="${DOTFILES_DIR/#\~/$HOME}"
+
+if [ ! -d "$DOTFILES_DIR" ]; then
+    info "Cloning dotfiles to ${DOTFILES_DIR}..."
+    git clone --recursive https://github.com/magic3007/dotfiles.git "$DOTFILES_DIR"
 else
-    info "~/dotfiles already exists, skipping clone"
+    info "${DOTFILES_DIR} already exists, skipping clone"
 fi
 
 # Run the main install
-cd "$HOME/dotfiles"
+cd "$DOTFILES_DIR"
 echo ""
 warn "Running full dotfiles installation..."
 warn "  - This includes: Homebrew (macOS), oh-my-zsh, fzf, GitHub CLI, wechat-reminder, etc."
