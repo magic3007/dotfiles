@@ -131,17 +131,17 @@
     ~/.claude/scripts: claude/scripts
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
-    ~/.codex/config.toml: codex/config.toml
     ~/.codex/codex_env.sh: codex/codex_env.sh
+    ~/.codex/skills: claude/skills
     ~/.gemini/settings.json: gemini/settings.json
-    ~/.gemini/skills: gemini/skills
+    ~/.gemini/skills: claude/skills
     ~/.chatgpt.sh: chatgpt
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
     ~/.local/bin/yolo: scripts/yolo-generic.sh
 
     # ---- Cursor skills ----
-    ~/.cursor/skills: cursor_config/skills
+    ~/.cursor/skills: claude/skills
 
     # ---- iTerm2 ----
     ~/.config/iterm2/com.googlecode.iterm2.plist: iterm2/com.googlecode.iterm2.plist
