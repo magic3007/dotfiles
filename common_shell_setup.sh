@@ -265,6 +265,17 @@ sdcc() {
     claude "$@" --dangerously-skip-permissions
 }
 
+sdccmini() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/compatible \
+    ANTHROPIC_AUTH_TOKEN="${SD2MINI_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=doubao-seed-2-0-mini-260215 \
+    ANTHROPIC_SMALL_FAST_MODEL=doubao-seed-2-0-mini-260215 \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
 sdccpro() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
