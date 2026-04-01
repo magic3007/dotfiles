@@ -346,6 +346,19 @@ mmcc() {
 
 alias remind="ssh -t pkucpu \"export FEISHU_WEBHOOK_URL=\$FEISHU_WEBHOOK_URL; ~/.local/bin/wechat-reminder --title \$HOSTNAME\""
 
+# uv - Python package manager
+# uv installs to ~/.local/bin by default
+export PATH="$HOME/.local/bin:$PATH"
+
+# uv Python mirror for China
+export UV_PYTHON=3.12
+export UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+export UV_PYTHON_PREFERENCE=only-managed
+
+# Activate global uv python environment if exists
+# The global environment is at ~/.local/share/uv/python
+[ -d "$HOME/.local/share/uv/python" ] && export UV_PYTHON_INSTALL_DIR="$HOME/.local/share/uv/python"
+
 # codex environment setup
 [ -f ~/.codex/codex_env.sh ] && source ~/.codex/codex_env.sh
 

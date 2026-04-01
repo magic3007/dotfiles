@@ -267,6 +267,19 @@
       ]
 
 # ---------------------------------------------------------------------------
+# uv - Python package manager
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "command -v uv >/dev/null || curl --connect-timeout 30 -LsSf https://astral.sh/uv/install.sh | sh || true",
+          Installing uv Python package manager,
+      ]
+    - [
+          "command -v uv >/dev/null && uv python install 3.12 3.11 3.10 || true",
+          Installing Python versions via uv,
+      ]
+
+# ---------------------------------------------------------------------------
 # iTerm2 configuration
 # ---------------------------------------------------------------------------
 - shell:
