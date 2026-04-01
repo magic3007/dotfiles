@@ -234,15 +234,16 @@
 # ---------------------------------------------------------------------------
 # AI Coding Tools
 # ---------------------------------------------------------------------------
-# Manual install:
-#   Claude Code:  curl -fsSL https://claude.ai/install.sh | bash
-#   OpenAI Codex: . ~/.nvm/nvm.sh; npm install -g @openai/codex
-#   Gemini CLI:   . ~/.nvm/nvm.sh; npm install -g @google/gemini-cli
+# Note: Claude Code now uses npm (was official install script)
+# Manual install references:
+#   Claude Code:  npm install -g @anthropic-ai/claude-code
+#   OpenAI Codex: npm install -g @openai/codex
+#   Gemini CLI:   npm install -g @google/gemini-cli
 #   Opencode:     curl -fsSL https://opencode.ai/install | bash
 - shell:
     - [
-          "command -v claude >/dev/null || curl --connect-timeout 10 -fsSL https://claude.ai/install.sh | bash || true",
-          Installing Claude Code CLI,
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v claude >/dev/null || npm install -g @anthropic-ai/claude-code || true",
+          Installing Claude Code CLI via npm,
       ]
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex || true",
