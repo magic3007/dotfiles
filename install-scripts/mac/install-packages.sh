@@ -27,7 +27,7 @@ install_packages() {
     info "Installing packages with Homebrew..."
 
     # Core packages
-    local packages="rg lazygit zellij"
+    local packages="rg lazygit zellij ranger"
 
     for pkg in $packages; do
         if ! command -v "$pkg" >/dev/null 2>&1; then

@@ -3,7 +3,7 @@
 # Linux System Packages Installation
 # =============================================================================
 # Install zsh, tmux, vim, htop, ranger without requiring sudo password
-# Priority: sudo apt-get > mamba > conda > skip
+# Priority: sudo apt-get > mamba > conda > pip > skip
 
 set -e
 
@@ -57,6 +57,11 @@ install_with_conda() {
     conda install -y zsh tmux vim htop ranger 2>/dev/null || return 1
 }
 
+install_with_pip() {
+    info "Trying pip for ranger..."
+    pip install ranger-fm 2>/dev/null || return 1
+}
+
 main() {
     if [ "$(uname)" != "Linux" ]; then
         echo "Not Linux, skipping"
@@ -65,7 +70,8 @@ main() {
 
     # Check if already installed
     if command -v zsh >/dev/null 2>&1 && command -v tmux >/dev/null 2>&1 && \
-       command -v vim >/dev/null 2>&1 && command -v htop >/dev/null 2>&1; then
+       command -v vim >/dev/null 2>&1 && command -v htop >/dev/null 2>&1 && \
+       command -v ranger >/dev/null 2>&1; then
         info "Core packages already installed"
         exit 0
     fi
@@ -77,8 +83,10 @@ main() {
         info "Packages installed via mamba"
     elif command -v conda >/dev/null 2>&1 && install_with_conda; then
         info "Packages installed via conda"
+    elif command -v pip >/dev/null 2>&1 && install_with_pip; then
+        info "ranger installed via pip"
     else
-        warn "No passwordless sudo and no conda/mamba available."
+        warn "No passwordless sudo and no conda/mamba/pip available."
         warn "Skipping system packages installation."
         warn "You may need to ask admin to install: zsh tmux vim htop ranger"
         # Don't fail the whole installation
