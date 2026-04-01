@@ -279,6 +279,10 @@
           "command -v uv >/dev/null && uv python install 3.12 3.11 3.10 || true",
           Installing Python versions via uv,
       ]
+    - [
+          "command -v uv >/dev/null && uv venv --python 3.12 ~/.venv || true",
+          Creating global Python venv at ~/.venv,
+      ]
 
 # ---------------------------------------------------------------------------
 # iTerm2 configuration
