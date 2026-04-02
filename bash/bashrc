@@ -117,6 +117,8 @@ if ! shopt -oq posix; then
 fi
 # ================ DO NOT EDIT ABOVE THIS LINE ================
 
+# Prepend ~/.fzf/bin to PATH so user-installed fzf takes priority over system fzf
+[[ -d ~/.fzf/bin ]] && PATH="$HOME/.fzf/bin${PATH:+:${PATH}}"
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # ================ DO NOT EDIT BELOW THIS LINE ================
