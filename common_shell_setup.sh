@@ -321,7 +321,7 @@ kmccc() {
 }
 
 # claude code with MiniMax 2.7
-mxcc2() {
+mxcc() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://openrouter.ai/api \
     ANTHROPIC_AUTH_TOKEN="${OPENROUTER_API_KEY}" \
@@ -334,6 +334,18 @@ mxcc2() {
 
 # claude code with mimo-v2-pro
 mmcc() {
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://token-plan-cn.xiaomimimo.com/anthropic\
+    ANTHROPIC_AUTH_TOKEN="${MIMO_CODE_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=mimo-v2-pro \
+    ANTHROPIC_SMALL_FAST_MODEL=mimo-v2-pro \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
+# claude code with mimo-v2-pro
+mmcc2() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.xiaomimimo.com/anthropic \
     ANTHROPIC_AUTH_TOKEN="${MIMO_API_KEY}" \
