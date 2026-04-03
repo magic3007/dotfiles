@@ -289,33 +289,22 @@ sdccpro() {
 
 kmcc() {
   env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic \
-    ANTHROPIC_AUTH_TOKEN="${KIMI_API_KEY}" \
+    ANTHROPIC_BASE_URL=https://api.kimi.com/coding/ \
+    ANTHROPIC_AUTH_TOKEN="${KIMI_CODE_API_KEY}" \
     API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=kimi-k2.5 \
-    ANTHROPIC_SMALL_FAST_MODEL=kimi-k2.5 \
+    ANTHROPIC_MODEL=kimi-for-coding \
+    ANTHROPIC_SMALL_FAST_MODEL=kimi-for-coding \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
 kmcc2() {
   env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://openrouter.ai/api \
-    ANTHROPIC_AUTH_TOKEN="${OPENROUTER_API_KEY}" \
+    ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic \
+    ANTHROPIC_AUTH_TOKEN="${KIMI_API_KEY}" \
     API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=moonshotai/kimi-k2.5 \
-    ANTHROPIC_SMALL_FAST_MODEL=moonshotai/kimi-k2.5 \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-kmccc() {
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.kimi.com/coding/ \
-    ANTHROPIC_AUTH_TOKEN="${KIMI_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=kimi-for-coding \
-    ANTHROPIC_SMALL_FAST_MODEL=kimi-for-coding \
+    ANTHROPIC_MODEL=kimi-k2.5 \
+    ANTHROPIC_SMALL_FAST_MODEL=kimi-k2.5 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$@" --dangerously-skip-permissions
 }
