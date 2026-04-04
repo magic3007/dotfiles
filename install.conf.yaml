@@ -220,7 +220,7 @@
 # ---------------------------------------------------------------------------
 - shell:
     - [
-          "command -v node >/dev/null || (export NVM_DIR=\"$HOME/.nvm\" && (test -d \"$NVM_DIR\" || curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . \"$NVM_DIR/nvm.sh\" && nvm install --lts) || true",
+          "(export NVM_DIR=\"$HOME/.nvm\" && (test -d \"$NVM_DIR\" || curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . \"$NVM_DIR/nvm.sh\" && nvm install --lts) || true",
           Installing nvm and Node.js LTS,
       ]
 
