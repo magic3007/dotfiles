@@ -280,7 +280,7 @@
           Installing Python versions via uv,
       ]
     - [
-          "command -v uv >/dev/null && uv venv --python 3.12 ~/.venv || true",
+          "command -v uv >/dev/null && uv venv --python 3.12 --prompt base ~/.venv || true",
           Creating global Python venv at ~/.venv,
       ]
 
