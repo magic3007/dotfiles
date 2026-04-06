@@ -129,6 +129,7 @@
     ~/.claude/hooks: claude/hooks
     ~/.claude/rules: claude/rules
     ~/.claude/scripts: claude/scripts
+    ~/.claude/cc-gateway: claude/cc-gateway
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh
@@ -280,8 +281,8 @@
           Installing Python versions via uv,
       ]
     - [
-          "command -v uv >/dev/null && uv venv --python 3.12 --prompt base ~/.venv || true",
-          Creating global Python venv at ~/.venv,
+          "command -v uv >/dev/null && uv venv --python 3.12 --prompt base --seed ~/.venv || true",
+          Creating global Python venv at ~/.venv with pip,
       ]
 
 # ---------------------------------------------------------------------------
@@ -291,4 +292,13 @@
     - [
           test "$(uname)" = "Darwin" && defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "~/.config/iterm2" && defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true || true,
           Configuring iTerm2 to load preferences from ~/.config/iterm2,
+      ]
+
+# ---------------------------------------------------------------------------
+# CC Gateway - Claude Code reverse proxy
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          bash ~/.claude/cc-gateway/install.sh || true,
+          Installing CC Gateway for Claude Code,
       ]
