@@ -1,6 +1,7 @@
 {
   "env": {
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_MODEL": "claude-4-6-opus",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "attribution": {
@@ -100,7 +101,7 @@
     }
   },
   "language": "Chinese",
+  "skipWebFetchPreflight": true,
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true,
-  "skipWebFetchPreflight": true
+  "skipDangerousModePermissionPrompt": true
 }

@@ -37,7 +37,10 @@ cheat(){
 }
 
 # ranger
-alias rr='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+rr() {
+  ranger --choosedir="$HOME/.rangerdir"
+  cd "$(cat "$HOME/.rangerdir")"
+}
 
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -223,17 +226,37 @@ export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
 alias cs='cursor'
 
 # claude code
-alias cc='claude --dangerously-skip-permissions'
+cc() {
+  claude --dangerously-skip-permissions "$@"
+}
+
+ccg() {
+  local ccg_bin
+  ccg_bin=$(find "$HOME/.cc-gateway/clients" -maxdepth 1 -type f -name "cc-*" | head -n 1)
+  if [[ -n "$ccg_bin" ]]; then
+    "$ccg_bin" --dangerously-skip-permissions "$@"
+  else
+    echo "No ccg client found in $HOME/.cc-gateway/clients/" >&2
+    return 1
+  fi
+}
 
 # openai codex
-alias cx='codex --full-auto'
+cx() {
+  codex --full-auto "$@"
+}
 
 # opencode
-alias oc='opencode'
+oc() {
+  opencode "$@"
+}
 export PATH="$PATH:$HOME/.opencode/bin"
 
 # google gemini cli (override oh-my-zsh git plugin's gm='git merge')
-unalias gm 2>/dev/null; alias gm='gemini --yolo'
+unalias gm 2>/dev/null
+gm() {
+  gemini --yolo "$@"
+}
 
 # claude code with deepseek API
 # Reference: https://api-docs.deepseek.com/guides/anthropic_api
@@ -341,7 +364,9 @@ mmcc2() {
     claude "$@" --dangerously-skip-permissions
 }
 
-alias remind="ssh -t pkucpu \"export FEISHU_WEBHOOK_URL=\$FEISHU_WEBHOOK_URL; ~/.local/bin/wechat-reminder --title \$HOSTNAME\""
+remind() {
+  ssh -t pkucpu "export FEISHU_WEBHOOK_URL=$FEISHU_WEBHOOK_URL; ~/.local/bin/wechat-reminder --title $HOSTNAME"
+}
 
 # uv - Python package manager
 # uv installs to ~/.local/bin by default
