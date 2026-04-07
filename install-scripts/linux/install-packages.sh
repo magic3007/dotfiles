@@ -62,9 +62,6 @@ install_with_pip() {
     pip install ranger-fm 2>/dev/null || return 1
 }
 
-    info "Package installation complete"
-}
-
 main() {
     if [ "$(uname)" != "Linux" ]; then
         echo "Not Linux, skipping"
@@ -105,11 +102,32 @@ install_joshuto() {
         return 0
     fi
 
+    # Method 1: cargo install
     if command -v cargo >/dev/null 2>&1; then
         info "Installing joshuto via cargo..."
-        cargo install --git https://github.com/kamiyaa/joshuto.git --force || warn "Failed to install joshuto via cargo"
+        cargo install --git https://github.com/kamiyaa/joshuto.git --force && return 0
+        warn "cargo install failed, trying prebuilt binary..."
+    fi
+
+    # Method 2: download prebuilt binary from GitHub releases
+    local arch
+    arch="$(uname -m)"
+    if [ "$arch" = "x86_64" ]; then
+        info "Downloading joshuto prebuilt binary..."
+        local tmp_dir
+        tmp_dir="$(mktemp -d)"
+        if curl --connect-timeout 10 -fsSL "https://github.com/kamiyaa/joshuto/releases/latest/download/joshuto-${arch}-unknown-linux-musl.tar.gz" -o "${tmp_dir}/joshuto.tar.gz"; then
+            tar -xzf "${tmp_dir}/joshuto.tar.gz" -C "${tmp_dir}"
+            mkdir -p "$HOME/.local/bin"
+            cp "${tmp_dir}"/joshuto-*/joshuto "$HOME/.local/bin/joshuto"
+            chmod +x "$HOME/.local/bin/joshuto"
+            info "joshuto installed to ~/.local/bin/joshuto"
+        else
+            warn "Failed to download joshuto prebuilt binary"
+        fi
+        \rm -rf "${tmp_dir}"
     else
-        warn "cargo not found, skipping joshuto installation"
+        warn "No prebuilt joshuto binary for arch ${arch}, need cargo to build from source"
     fi
 }
 
