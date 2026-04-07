@@ -90,10 +90,31 @@ main() {
         fi
     fi
 
+    # Install Rust/Cargo
+    install_rust
+
     # Install joshuto (not available in apt, use cargo)
     install_joshuto
 
     info "Package installation complete"
+}
+
+install_rust() {
+    if command -v cargo >/dev/null 2>&1; then
+        info "Rust/Cargo already installed"
+        return 0
+    fi
+
+    info "Installing Rust via rustup..."
+    # Use Chinese mirror (rsproxy.cn) configured in common_shell_setup.sh
+    export RUSTUP_DIST_SERVER="https://rsproxy.cn"
+    export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"
+    if curl --connect-timeout 10 -fsSL https://rsproxy.cn/rustup-init.sh | sh -s -- -y --no-modify-path; then
+        source "$HOME/.cargo/env"
+        info "Rust installed: $(rustc --version)"
+    else
+        warn "Failed to install Rust"
+    fi
 }
 
 install_joshuto() {
@@ -112,18 +133,34 @@ install_joshuto() {
     # Method 2: download prebuilt binary from GitHub releases
     local arch
     arch="$(uname -m)"
-    if [ "$arch" = "x86_64" ]; then
+    if [ "$arch" = "x86_64" ] || [ "$arch" = "aarch64" ]; then
         info "Downloading joshuto prebuilt binary..."
+        # Query GitHub API to get latest version tag
+        local version
+        version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/kamiyaa/joshuto/releases" | grep -m1 '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')"
+        if [ -z "$version" ]; then
+            warn "Failed to query joshuto latest version"
+            return 1
+        fi
+        info "Latest joshuto version: ${version}"
         local tmp_dir
         tmp_dir="$(mktemp -d)"
-        if curl --connect-timeout 10 -fsSL "https://github.com/kamiyaa/joshuto/releases/latest/download/joshuto-${arch}-unknown-linux-musl.tar.gz" -o "${tmp_dir}/joshuto.tar.gz"; then
+        local download_url="https://github.com/kamiyaa/joshuto/releases/download/${version}/joshuto-${version}-${arch}-unknown-linux-gnu.tar.gz"
+        if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/joshuto.tar.gz"; then
             tar -xzf "${tmp_dir}/joshuto.tar.gz" -C "${tmp_dir}"
             mkdir -p "$HOME/.local/bin"
-            cp "${tmp_dir}"/joshuto-*/joshuto "$HOME/.local/bin/joshuto"
-            chmod +x "$HOME/.local/bin/joshuto"
-            info "joshuto installed to ~/.local/bin/joshuto"
+            # Find the joshuto binary inside extracted directory
+            local bin_path
+            bin_path="$(find "${tmp_dir}" -name joshuto -type f | head -1)"
+            if [ -n "$bin_path" ]; then
+                cp "$bin_path" "$HOME/.local/bin/joshuto"
+                chmod +x "$HOME/.local/bin/joshuto"
+                info "joshuto installed to ~/.local/bin/joshuto"
+            else
+                warn "joshuto binary not found in archive"
+            fi
         else
-            warn "Failed to download joshuto prebuilt binary"
+            warn "Failed to download joshuto prebuilt binary from ${download_url}"
         fi
         \rm -rf "${tmp_dir}"
     else

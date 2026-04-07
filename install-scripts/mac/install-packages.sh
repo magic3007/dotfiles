@@ -39,6 +39,23 @@ install_packages() {
     done
 }
 
+install_rust() {
+    if command -v cargo >/dev/null 2>&1; then
+        info "Rust/Cargo already installed"
+        return 0
+    fi
+
+    info "Installing Rust via rustup..."
+    export RUSTUP_DIST_SERVER="https://rsproxy.cn"
+    export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"
+    if curl --connect-timeout 10 -fsSL https://rsproxy.cn/rustup-init.sh | sh -s -- -y --no-modify-path; then
+        source "$HOME/.cargo/env"
+        info "Rust installed: $(rustc --version)"
+    else
+        warn "Failed to install Rust"
+    fi
+}
+
 main() {
     if [ "$(uname)" != "Darwin" ]; then
         echo "Not macOS, skipping"
@@ -46,6 +63,7 @@ main() {
     fi
 
     install_homebrew
+    install_rust
     install_packages
 
     info "macOS package installation complete"
