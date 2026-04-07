@@ -129,7 +129,6 @@
     ~/.claude/hooks: claude/hooks
     ~/.claude/rules: claude/rules
     ~/.claude/scripts: claude/scripts
-    ~/.claude/cc-gateway: claude/cc-gateway
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh

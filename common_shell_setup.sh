@@ -225,45 +225,6 @@ alias cs='cursor'
 # claude code
 alias cc='claude --dangerously-skip-permissions'
 
-# cc-gateway - Claude Code reverse proxy
-# Usage: ccg [hijack|release]
-#   ccg          - Start Claude Code through gateway (with --dangerously-skip-permissions)
-#   ccg hijack   - Hijack 'claude' command to use gateway
-#   ccg release  - Restore original 'claude' command
-ccg() {
-    CC_GATEWAY_DIR="$HOME/.cc-gateway"
-    CLIENT_BIN="$HOME/.local/bin/ccg"
-
-    # Check if CC Gateway is installed
-    if [ ! -d "$CC_GATEWAY_DIR" ]; then
-        echo "CC Gateway not installed, run: ~/.claude/cc-gateway/install.sh"
-        return 1
-    fi
-
-    # Check if configured
-    if [ ! -f "$CC_GATEWAY_DIR/config.yaml" ]; then
-        echo "CC Gateway not configured yet."
-        echo "Please run: cd ~/.cc-gateway && bash scripts/quick-setup.sh"
-        return 1
-    fi
-
-    # Find client launcher if not linked
-    if [ ! -L "$CLIENT_BIN" ]; then
-        CLIENT_LAUNCHER=$(find "$CC_GATEWAY_DIR/clients" -name "cc-*" -type f 2>/dev/null | head -1)
-        if [ -z "$CLIENT_LAUNCHER" ]; then
-            echo "CC Gateway client not found."
-            echo "Please run: cd ~/.cc-gateway && bash scripts/quick-setup.sh"
-            return 1
-        fi
-        mkdir -p "$HOME/.local/bin"
-        ln -sf "$CLIENT_LAUNCHER" "$CLIENT_BIN"
-        chmod +x "$CLIENT_LAUNCHER"
-    fi
-
-    # Run the client launcher with all arguments
-    "$CLIENT_BIN" "$@"
-}
-
 # openai codex
 alias cx='codex --full-auto'
 
