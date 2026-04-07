@@ -1,0 +1,121 @@
+# =============================================================================
+# Joshuto Mimetype Configuration
+# =============================================================================
+# Defines which programs open which file types.
+# First entry in app_list is the default opener.
+
+[class]
+text_default = [
+  { command = "nvim" },
+  { command = "vim" },
+]
+
+image_default = [
+  { command = "open", fork = true, silent = true },
+]
+
+video_default = [
+  { command = "open", fork = true, silent = true },
+  { command = "mpv", args = ["--"] },
+]
+
+audio_default = [
+  { command = "open", fork = true, silent = true },
+  { command = "mpv", args = ["--"] },
+]
+
+reader_default = [
+  { command = "open", fork = true, silent = true },
+]
+
+[extension]
+# Text / Code
+txt.inherit = "text_default"
+md.inherit = "text_default"
+org.inherit = "text_default"
+rst.inherit = "text_default"
+log.inherit = "text_default"
+conf.inherit = "text_default"
+cfg.inherit = "text_default"
+ini.inherit = "text_default"
+toml.inherit = "text_default"
+yaml.inherit = "text_default"
+yml.inherit = "text_default"
+json.inherit = "text_default"
+xml.inherit = "text_default"
+csv.inherit = "text_default"
+sh.inherit = "text_default"
+bash.inherit = "text_default"
+zsh.inherit = "text_default"
+py.inherit = "text_default"
+rb.inherit = "text_default"
+js.inherit = "text_default"
+ts.inherit = "text_default"
+tsx.inherit = "text_default"
+jsx.inherit = "text_default"
+go.inherit = "text_default"
+rs.inherit = "text_default"
+c.inherit = "text_default"
+cpp.inherit = "text_default"
+h.inherit = "text_default"
+hpp.inherit = "text_default"
+java.inherit = "text_default"
+lua.inherit = "text_default"
+vim.inherit = "text_default"
+tex.inherit = "text_default"
+css.inherit = "text_default"
+html.inherit = "text_default"
+sql.inherit = "text_default"
+makefile.inherit = "text_default"
+
+# Images
+png.inherit = "image_default"
+jpg.inherit = "image_default"
+jpeg.inherit = "image_default"
+gif.inherit = "image_default"
+bmp.inherit = "image_default"
+svg.inherit = "image_default"
+webp.inherit = "image_default"
+
+# Video
+mp4.inherit = "video_default"
+mkv.inherit = "video_default"
+avi.inherit = "video_default"
+mov.inherit = "video_default"
+webm.inherit = "video_default"
+
+# Audio
+mp3.inherit = "audio_default"
+flac.inherit = "audio_default"
+wav.inherit = "audio_default"
+ogg.inherit = "audio_default"
+m4a.inherit = "audio_default"
+
+# Documents
+pdf.inherit = "reader_default"
+doc.inherit = "reader_default"
+docx.inherit = "reader_default"
+xls.inherit = "reader_default"
+xlsx.inherit = "reader_default"
+ppt.inherit = "reader_default"
+pptx.inherit = "reader_default"
+
+# Archives
+zip.app_list = [{ command = "open" }]
+tar.app_list = [{ command = "open" }]
+gz.app_list = [{ command = "open" }]
+rar.app_list = [{ command = "open" }]
+7z.app_list = [{ command = "open" }]
+
+[mimetype]
+[mimetype."text/*"]
+inherit = "text_default"
+
+[mimetype."image/*"]
+inherit = "image_default"
+
+[mimetype."video/*"]
+inherit = "video_default"
+
+[mimetype."audio/*"]
+inherit = "audio_default"

@@ -1,0 +1,46 @@
+# =============================================================================
+# Joshuto Configuration
+# =============================================================================
+# Docs: https://github.com/kamiyaa/joshuto/wiki/Configuration
+
+# Use xdg-open / open to open files
+xdg_open = true
+
+# Automatically change directory in the shell when quitting with Q
+xdg_open_fork = true
+
+# Show hidden files by default
+show_hidden = true
+
+# Case insensitive sorting
+case_sensitive = false
+
+# Reverse sort
+reverse = false
+
+# Sort method: natural, lexical, mtime, size, ext
+sort_method = "natural"
+
+[display]
+# Show borders
+show_borders = true
+
+# Show icons (requires nerd font)
+show_icons = false
+
+# Collapse preview pane if there is nothing to preview
+collapse_preview = true
+
+# Ratios for columns (parent:current:preview)
+column_ratio = [1, 3, 4]
+
+[preview]
+# Max file size to preview (in bytes)
+max_preview_size = 2097152
+
+[search]
+# Incremental search
+incremental = true
+
+# Case-insensitive string matching
+string_case_sensitivity = "insensitive"

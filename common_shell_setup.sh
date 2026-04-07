@@ -42,6 +42,20 @@ rr() {
   cd "$(cat "$HOME/.rangerdir")"
 }
 
+# joshuto
+jj() {
+  local output_file="$(mktemp)"
+  joshuto --output-file="$output_file" "$@"
+  local exit_code=$?
+  case "$exit_code" in
+    101)
+      local joshuto_cwd="$(cat "$output_file")"
+      [ -n "$joshuto_cwd" ] && [ "$joshuto_cwd" != "$(pwd)" ] && cd "$joshuto_cwd"
+      ;;
+  esac
+  \rm -f "$output_file"
+}
+
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -225,11 +239,12 @@ export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
 # cursor
 alias cs='cursor'
 
-# claude code
+# native claude code
 cc() {
   claude --dangerously-skip-permissions "$@"
 }
 
+# cc-gateway claude code
 ccg() {
   local ccg_bin
   ccg_bin=$(find "$HOME/.cc-gateway/clients" -maxdepth 1 -type f -name "cc-*" | head -n 1)
