@@ -62,6 +62,9 @@ install_with_pip() {
     pip install ranger-fm 2>/dev/null || return 1
 }
 
+    info "Package installation complete"
+}
+
 main() {
     if [ "$(uname)" != "Linux" ]; then
         echo "Not Linux, skipping"
@@ -73,27 +76,41 @@ main() {
        command -v vim >/dev/null 2>&1 && command -v htop >/dev/null 2>&1 && \
        command -v ranger >/dev/null 2>&1; then
         info "Core packages already installed"
-        exit 0
+    else
+        # Try installation methods in order
+        if can_sudo_without_password && install_with_apt; then
+            info "Packages installed via apt"
+        elif command -v mamba >/dev/null 2>&1 && install_with_mamba; then
+            info "Packages installed via mamba"
+        elif command -v conda >/dev/null 2>&1 && install_with_conda; then
+            info "Packages installed via conda"
+        elif command -v pip >/dev/null 2>&1 && install_with_pip; then
+            info "ranger installed via pip"
+        else
+            warn "No passwordless sudo and no conda/mamba/pip available."
+            warn "Skipping system packages installation."
+            warn "You may need to ask admin to install: zsh tmux vim htop ranger"
+        fi
     fi
 
-    # Try installation methods in order
-    if can_sudo_without_password && install_with_apt; then
-        info "Packages installed via apt"
-    elif command -v mamba >/dev/null 2>&1 && install_with_mamba; then
-        info "Packages installed via mamba"
-    elif command -v conda >/dev/null 2>&1 && install_with_conda; then
-        info "Packages installed via conda"
-    elif command -v pip >/dev/null 2>&1 && install_with_pip; then
-        info "ranger installed via pip"
-    else
-        warn "No passwordless sudo and no conda/mamba/pip available."
-        warn "Skipping system packages installation."
-        warn "You may need to ask admin to install: zsh tmux vim htop ranger"
-        # Don't fail the whole installation
-        exit 0
-    fi
+    # Install joshuto (not available in apt, use cargo)
+    install_joshuto
 
     info "Package installation complete"
+}
+
+install_joshuto() {
+    if command -v joshuto >/dev/null 2>&1; then
+        info "joshuto already installed"
+        return 0
+    fi
+
+    if command -v cargo >/dev/null 2>&1; then
+        info "Installing joshuto via cargo..."
+        cargo install --git https://github.com/kamiyaa/joshuto.git --force || warn "Failed to install joshuto via cargo"
+    else
+        warn "cargo not found, skipping joshuto installation"
+    fi
 }
 
 main "$@"
