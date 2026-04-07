@@ -40,9 +40,17 @@ install_packages() {
 }
 
 install_rust() {
-    if command -v cargo >/dev/null 2>&1; then
-        info "Rust/Cargo already installed"
-        return 0
+    if command -v rustup >/dev/null 2>&1; then
+        # Ensure default toolchain is set
+        if ! rustup default >/dev/null 2>&1; then
+            info "Setting Rust default toolchain to stable..."
+            rustup default stable
+        fi
+        source "$HOME/.cargo/env"
+        if command -v cargo >/dev/null 2>&1; then
+            info "Rust/Cargo already installed"
+            return 0
+        fi
     fi
 
     info "Installing Rust via rustup..."
@@ -50,6 +58,8 @@ install_rust() {
     export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"
     if curl --connect-timeout 10 -fsSL https://rsproxy.cn/rustup-init.sh | sh -s -- -y --no-modify-path; then
         source "$HOME/.cargo/env"
+        info "Setting Rust default toolchain to stable..."
+        rustup default stable
         info "Rust installed: $(rustc --version)"
     else
         warn "Failed to install Rust"
