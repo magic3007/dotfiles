@@ -155,6 +155,18 @@
     ~/.config/ghostty/config: ghostty/config
 
 # ---------------------------------------------------------------------------
+# Sync vim plugins to local disk for faster startup on network filesystems
+# ---------------------------------------------------------------------------
+- create:
+    - ~/.vim_plugins
+
+- shell:
+    - [
+          "rsync -a --delete vim/vimrc/sources_non_forked/ ~/.vim_plugins/sources_non_forked/ && rsync -a --delete vim/vimrc/sources_forked/ ~/.vim_plugins/sources_forked/",
+          Syncing vim plugins to local disk,
+      ]
+
+# ---------------------------------------------------------------------------
 # Local post-link setup
 # ---------------------------------------------------------------------------
 - shell:
