@@ -39,6 +39,16 @@ install_packages() {
     done
 }
 
+install_ghostty() {
+    if [ -d "/Applications/Ghostty.app" ]; then
+        info "Ghostty already installed"
+        return 0
+    fi
+
+    info "Installing Ghostty..."
+    brew install --cask ghostty || warn "Failed to install Ghostty"
+}
+
 install_rust() {
     if command -v rustup >/dev/null 2>&1; then
         # Ensure default toolchain is set
@@ -75,6 +85,7 @@ main() {
     install_homebrew
     install_rust
     install_packages
+    install_ghostty
 
     info "macOS package installation complete"
 }

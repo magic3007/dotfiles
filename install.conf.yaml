@@ -54,6 +54,10 @@
           test "$(uname)" = "Darwin" && mkdir -p ~/.config/iterm2 || true,
           Creating iTerm2 config directory,
       ]
+    - [
+          mkdir -p ~/.config/ghostty || true,
+          Creating Ghostty config directory,
+      ]
 
 # ---------------------------------------------------------------------------
 # Backup existing configs before symlinking
@@ -146,6 +150,9 @@
 
     # ---- iTerm2 ----
     ~/.config/iterm2/com.googlecode.iterm2.plist: iterm2/com.googlecode.iterm2.plist
+
+    # ---- Ghostty ----
+    ~/.config/ghostty/config: ghostty/config
 
 # ---------------------------------------------------------------------------
 # Local post-link setup
