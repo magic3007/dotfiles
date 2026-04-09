@@ -295,6 +295,7 @@ sdcc() {
     API_TIMEOUT_MS=600000 \
     ANTHROPIC_MODEL=doubao-seed-2.0-lite \
     ANTHROPIC_SMALL_FAST_MODEL=doubao-seed-2.0-lite \
+    CLAUDE_CODE_SUBAGENT_MODEL=doubao-seed-2.0-lite \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$@" --dangerously-skip-permissions
 }
@@ -328,6 +329,7 @@ kmcc() {
     API_TIMEOUT_MS=600000 \
     ANTHROPIC_MODEL=kimi-for-coding \
     ANTHROPIC_SMALL_FAST_MODEL=kimi-for-coding \
+    CLAUDE_CODE_SUBAGENT_MODEL=kimi-for-coding \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$@" --dangerously-skip-permissions
 }
@@ -368,13 +370,13 @@ mmcc() {
 }
 
 # claude code with mimo-v2-pro
-mmcc2() {
+glmcc() {
   env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.xiaomimimo.com/anthropic \
-    ANTHROPIC_AUTH_TOKEN="${MIMO_API_KEY}" \
+    ANTHROPIC_BASE_URL=https://api.siliconflow.cn/ \
+    ANTHROPIC_AUTH_TOKEN="${SLFLOW_API_KEY}" \
     API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=mimo-v2-pro \
-    ANTHROPIC_SMALL_FAST_MODEL=mimo-v2-pro \
+    ANTHROPIC_MODEL=Pro/zai-org/GLM-5.1 \
+    ANTHROPIC_SMALL_FAST_MODEL=Pro/zai-org/GLM-5.1 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     claude "$@" --dangerously-skip-permissions
 }
