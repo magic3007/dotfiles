@@ -259,6 +259,8 @@ function preexec() {
 }
 
 function precmd() {
+  # restore cursor visibility (fixes invisible cursor after unexpected SSH disconnect)
+  printf '\e[?25h'
   # add a newline after each command
   print ""
   if [ $timer ]; then
