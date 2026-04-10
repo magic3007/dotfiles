@@ -241,6 +241,10 @@ alias cs='cursor'
 
 # native claude code
 cc() {
+  CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+  CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+  CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
+  API_TIMEOUT_MS=600000 \
   claude --dangerously-skip-permissions "$@"
 }
 
@@ -249,6 +253,10 @@ ccg() {
   local ccg_bin
   ccg_bin=$(find "$HOME/.cc-gateway/clients" -maxdepth 1 -type f -name "cc-*" | head -n 1)
   if [[ -n "$ccg_bin" ]]; then
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
+    API_TIMEOUT_MS=600000 \
     "$ccg_bin" --dangerously-skip-permissions "$@"
   else
     echo "No ccg client found in $HOME/.cc-gateway/clients/" >&2
@@ -283,6 +291,9 @@ dscc() {
     ANTHROPIC_MODEL=deepseek-chat \
     ANTHROPIC_SMALL_FAST_MODEL=deepseek-chat \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
+    CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=50 \
     claude "$@" --dangerously-skip-permissions
 }
 
@@ -297,6 +308,8 @@ sdcc() {
     ANTHROPIC_SMALL_FAST_MODEL=doubao-seed-2.0-lite \
     CLAUDE_CODE_SUBAGENT_MODEL=doubao-seed-2.0-lite \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
@@ -308,6 +321,8 @@ sdccmini() {
     ANTHROPIC_MODEL=doubao-seed-2-0-mini-260215 \
     ANTHROPIC_SMALL_FAST_MODEL=doubao-seed-2-0-mini-260215 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
@@ -319,6 +334,8 @@ sdccpro() {
     ANTHROPIC_MODEL=doubao-seed-2.0-pro \
     ANTHROPIC_SMALL_FAST_MODEL=doubao-seed-2.0-pro \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
@@ -331,6 +348,8 @@ kmcc() {
     ANTHROPIC_SMALL_FAST_MODEL=kimi-for-coding \
     CLAUDE_CODE_SUBAGENT_MODEL=kimi-for-coding \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
@@ -342,6 +361,8 @@ kmcc2() {
     ANTHROPIC_MODEL=kimi-k2.5 \
     ANTHROPIC_SMALL_FAST_MODEL=kimi-k2.5 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
@@ -354,6 +375,8 @@ mxcc() {
     ANTHROPIC_MODEL=minimax/minimax-m2.7 \
     ANTHROPIC_SMALL_FAST_MODEL=minimax/minimax-m2.7 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
@@ -366,10 +389,12 @@ mmcc() {
     ANTHROPIC_MODEL=mimo-v2-pro \
     ANTHROPIC_SMALL_FAST_MODEL=mimo-v2-pro \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
-# claude code with mimo-v2-pro
+# claude code with GLM-5.1
 glmcc() {
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.siliconflow.cn/ \
@@ -378,6 +403,8 @@ glmcc() {
     ANTHROPIC_MODEL=Pro/zai-org/GLM-5.1 \
     ANTHROPIC_SMALL_FAST_MODEL=Pro/zai-org/GLM-5.1 \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
