@@ -401,5 +401,15 @@
   "key": "cmd+k",
   "command": "-glass.openPalette",
   "when": "glassNoModalOpen && isGlassEmptyWorkspace && !isSettingsPaneOpen || isGlassEmptyWorkspace && !isSettingsPaneOpen && glassActiveModal == 'palette'"
+},
+{
+  "key": "cmd+k cmd+r",
+  "command": "-git.revertSelectedRanges",
+  "when": "editorTextFocus && !operationInProgress && resourceScheme == 'file'"
+},
+{
+  "key": "cmd+k alt+cmd+s",
+  "command": "-git.stageSelectedRanges",
+  "when": "editorTextFocus && !operationInProgress && resourceScheme == 'file'"
 }
 ]
