@@ -48,6 +48,15 @@
             "command": "bash ~/.claude/scripts/check_dangerous_ops.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
