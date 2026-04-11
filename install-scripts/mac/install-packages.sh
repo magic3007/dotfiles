@@ -76,6 +76,20 @@ install_rust() {
     fi
 }
 
+install_rtk() {
+    if command -v rtk >/dev/null 2>&1; then
+        info "RTK (Rust Token Killer) already installed: $(rtk --version)"
+        return 0
+    fi
+
+    info "Installing RTK (Rust Token Killer) via Homebrew..."
+    if brew install rtk; then
+        info "RTK installed successfully"
+    else
+        warn "Failed to install RTK"
+    fi
+}
+
 main() {
     if [ "$(uname)" != "Darwin" ]; then
         echo "Not macOS, skipping"
@@ -86,6 +100,7 @@ main() {
     install_rust
     install_packages
     install_ghostty
+    install_rtk
 
     info "macOS package installation complete"
 }

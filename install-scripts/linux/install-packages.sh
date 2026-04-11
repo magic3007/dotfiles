@@ -96,6 +96,9 @@ main() {
     # Install joshuto (not available in apt, use cargo)
     install_joshuto
 
+    # Install RTK (Rust Token Killer) via cargo
+    install_rtk
+
     info "Package installation complete"
 }
 
@@ -175,6 +178,25 @@ install_joshuto() {
         \rm -rf "${tmp_dir}"
     else
         warn "No prebuilt joshuto binary for arch ${arch}, need cargo to build from source"
+    fi
+}
+
+install_rtk() {
+    if command -v rtk >/dev/null 2>&1; then
+        info "RTK (Rust Token Killer) already installed: $(rtk --version)"
+        return 0
+    fi
+
+    if ! command -v cargo >/dev/null 2>&1; then
+        warn "Cargo not found, cannot install RTK"
+        return 1
+    fi
+
+    info "Installing RTK (Rust Token Killer) via cargo..."
+    if cargo install rtk --locked; then
+        info "RTK installed successfully"
+    else
+        warn "Failed to install RTK"
     fi
 }
 
