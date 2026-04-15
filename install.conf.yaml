@@ -290,6 +290,14 @@
           "echo y | bash <(curl --connect-timeout 10 -s https://gitee.com/magic3007/wechat-reminder/raw/master/install-gitee.sh) || true",
           Installing wechat-reminder,
       ]
+    - [
+          "test -d $HOME/.wechat-reminder && cp wechat-reminder/wechat-reminder $HOME/.wechat-reminder/wechat-reminder && chmod +x $HOME/.wechat-reminder/wechat-reminder || true",
+          Patching wechat-reminder wrapper with venv support,
+      ]
+    - [
+          "test -d $HOME/.wechat-reminder && python3 -m venv $HOME/.wechat-reminder/.venv && $HOME/.wechat-reminder/.venv/bin/pip install -q -r $HOME/.wechat-reminder/requirements.txt || true",
+          Setting up wechat-reminder venv,
+      ]
 
 # ---------------------------------------------------------------------------
 # uv - Python package manager

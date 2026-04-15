@@ -1,0 +1,20 @@
+#!/bin/bash
+# File              : wechat-reminder
+# Author            : Jing Mai <jingmai@pku.edu.cn>
+# Date              : 05.25.2022
+# Last Modified Date: 2026-04-15
+# Last Modified By  : Jing Mai <jingmai@pku.edu.cn>
+
+WECHAT_DIR="$HOME/.wechat-reminder"
+VENV_DIR="$WECHAT_DIR/.venv"
+
+# Auto-create venv and install dependencies if missing
+if [ ! -f "$VENV_DIR/bin/python" ]; then
+    echo "Setting up wechat-reminder virtual environment..." >&2
+    python3 -m venv "$VENV_DIR" 2>/dev/null || python3 -m virtualenv "$VENV_DIR" 2>/dev/null
+    if [ -f "$VENV_DIR/bin/pip" ]; then
+        "$VENV_DIR/bin/pip" install -q -r "$WECHAT_DIR/requirements.txt"
+    fi
+fi
+
+exec "$VENV_DIR/bin/python" "$WECHAT_DIR/wechat-reminder_main.py" "$@"
