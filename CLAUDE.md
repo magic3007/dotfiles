@@ -80,6 +80,15 @@ Package managers are configured with Chinese mirrors for faster downloads:
 - **Linux**: apt-get for zsh, tmux, vim, htop, ranger
 - **macOS**: Homebrew for rg, lazygit, zellij; Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 configuration sync via `~/.config/iterm2`
 
+### wechat-reminder (`wechat-reminder/`)
+
+通知工具，支持 WeChat (PushDeer) 和飞书双通道。通过 Claude Code hook（Stop/StopFailure/TaskCompleted）自动发送任务完成通知。
+
+- `install.conf.yaml` 只复制 `wechat-reminder` 和 `wechat-reminder_main.py` 到 `~/.wechat-reminder/`，新增功能必须放在这两个文件内
+- 飞书 `lark_md` **不支持** Markdown 表格语法（`| col | col |`），`wechat-reminder_main.py` 中的 `parse_content_segments()` 会自动将 Markdown 表格转换为飞书原生 `table` 卡片元素
+- 单张卡片最多 5 个表格，超出降级为纯文本
+- 环境变量：`FEISHU_WEBHOOK_URL`（飞书 webhook，支持逗号分隔多个）、`PUSHDEER_KEY`（微信推送）
+
 ### Adding New Configs
 
 When adding new dotfile configs:
