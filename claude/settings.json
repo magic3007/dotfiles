@@ -124,7 +124,8 @@
     "command": "~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "feishu@minimax-plugins": true
   },
   "extraKnownMarketplaces": {
     "minimax-matrix-plugins": {
