@@ -11223,6 +11223,5 @@
     "terminal.integrated.fontFamily": "monospace",
     "cursor.rpcFileLogger.enabled": true,
     "window.commandCenter": true,
-    "cursor.general.disableHttp2": true,
     "terminal.integrated.macOptionIsMeta": true
 }

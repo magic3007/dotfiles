@@ -3,14 +3,7 @@
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_MODEL": "claude-4-6-opus",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "ANTHROPIC_BASE_URL": "https://platform-api.xaminim.com",
-    "ANTHROPIC_CUSTOM_HEADERS": "X-Sub-Module: claude-code-internal",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5-20251001",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6-thinking-max",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
-    "ANTHROPIC_MODEL": "claude-opus-4-6-thinking-max",
     "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1",
-    "ANTHROPIC_AUTH_TOKEN": "sk-YrQNlVVoo3TOIWxce0pu96VFSKiSL5MZD0vBgu59uXMDBKNK",
     "DISABLE_TELEMETRY": "1"
   },
   "attribution": {
