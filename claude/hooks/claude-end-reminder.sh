@@ -1,8 +1,21 @@
 #!/bin/bash
 # Claude Code 任务完成后发送飞书提醒
-# 此脚本在 Claude Code TaskCompleted 事件时被调用
+# 此脚本在 Claude Code Stop/StopFailure/TaskCompleted 事件时被调用
+
+# 读取 stdin JSON 输入（包含 hook 事件数据）
+INPUT=$(cat)
 
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
+
+# 从 stdin 提取 Claude 的最后回复
+LAST_REPLY=""
+if [ -n "$INPUT" ]; then
+    if command -v jq &>/dev/null; then
+        LAST_REPLY=$(echo "$INPUT" | jq -r '.last_assistant_message // empty' 2>/dev/null)
+    else
+        LAST_REPLY=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('last_assistant_message',''))" 2>/dev/null)
+    fi
+fi
 
 # 收集项目信息
 PROJECT_DIR=$(pwd)
@@ -21,20 +34,31 @@ fi
 # 主机名
 HOSTNAME=$(hostname 2>/dev/null || echo "unknown")
 
-# 构建 lark_md 格式的描述
+# 构建 lark_md 格式的描述（使用真实换行符而非字面 \n）
 DESP="**项目**: ${GIT_REPO:-$PROJECT_NAME}"
-DESP="${DESP}\n**目录**: ${PROJECT_DIR}"
+DESP+=$'\n'"**目录**: ${PROJECT_DIR}"
 
 if [ -n "$GIT_BRANCH" ]; then
-    DESP="${DESP}\n**分支**: ${GIT_BRANCH}"
+    DESP+=$'\n'"**分支**: ${GIT_BRANCH}"
 fi
 
 if [ -n "$GIT_LAST_COMMIT" ]; then
-    DESP="${DESP}\n**最近提交**: ${GIT_LAST_COMMIT}"
+    DESP+=$'\n'"**最近提交**: ${GIT_LAST_COMMIT}"
 fi
 
-DESP="${DESP}\n**用户**: $(whoami)@${HOSTNAME}"
-DESP="${DESP}\n**完成时间**: ${TIMESTAMP}"
+DESP+=$'\n'"**用户**: $(whoami)@${HOSTNAME}"
+DESP+=$'\n'"**完成时间**: ${TIMESTAMP}"
+
+# 添加 Claude 的最后回复（截断到合理长度）
+if [ -n "$LAST_REPLY" ]; then
+    TRUNCATED_REPLY="${LAST_REPLY:0:500}"
+    if [ ${#LAST_REPLY} -gt 500 ]; then
+        TRUNCATED_REPLY="${TRUNCATED_REPLY}..."
+    fi
+    DESP+=$'\n\n'"---"
+    DESP+=$'\n'"**Claude 回复**:"
+    DESP+=$'\n'"${TRUNCATED_REPLY}"
+fi
 
 # 调用 wechat-reminder 发送提醒（使用飞书卡片格式）
 LOG_FILE="$HOME/.claude/logs/claude-end.log"

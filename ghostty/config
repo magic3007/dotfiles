@@ -7,14 +7,17 @@
 # Font
 # -----------------------------------------------------------------------------
 font-family = JetBrains Mono
-font-size = 14
+font-size = 12
 font-thicken = true
 adjust-cell-height = 2
 
 # -----------------------------------------------------------------------------
 # Theme & Colors
 # -----------------------------------------------------------------------------
-theme = Atom
+# theme = Atom
+# theme = Github Dark
+# theme = Adwaita
+theme = Adventure
 background-opacity = 0.92
 background-blur-radius = 20
 
