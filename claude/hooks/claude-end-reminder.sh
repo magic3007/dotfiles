@@ -17,6 +17,16 @@ if [ -n "$INPUT" ]; then
     fi
 fi
 
+# 从 stdin 提取 Session ID
+SESSION_ID=""
+if [ -n "$INPUT" ]; then
+    if command -v jq &>/dev/null; then
+        SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // empty' 2>/dev/null)
+    else
+        SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('session_id',''))" 2>/dev/null)
+    fi
+fi
+
 # 收集项目信息
 PROJECT_DIR=$(pwd)
 PROJECT_NAME=$(basename "$PROJECT_DIR")
@@ -46,18 +56,18 @@ if [ -n "$GIT_LAST_COMMIT" ]; then
     DESP+=$'\n'"**最近提交**: ${GIT_LAST_COMMIT}"
 fi
 
+if [ -n "$SESSION_ID" ]; then
+    DESP+=$'\n'"**Session**: ${SESSION_ID}"
+fi
+
 DESP+=$'\n'"**用户**: $(whoami)@${HOSTNAME}"
 DESP+=$'\n'"**完成时间**: ${TIMESTAMP}"
 
-# 添加 Claude 的最后回复（截断到合理长度）
+# 添加 Claude 的最后回复（完整内容，不截断）
 if [ -n "$LAST_REPLY" ]; then
-    TRUNCATED_REPLY="${LAST_REPLY:0:500}"
-    if [ ${#LAST_REPLY} -gt 500 ]; then
-        TRUNCATED_REPLY="${TRUNCATED_REPLY}..."
-    fi
     DESP+=$'\n\n'"---"
     DESP+=$'\n'"**Claude 回复**:"
-    DESP+=$'\n'"${TRUNCATED_REPLY}"
+    DESP+=$'\n'"${LAST_REPLY}"
 fi
 
 # 调用 wechat-reminder 发送提醒（使用飞书卡片格式）
