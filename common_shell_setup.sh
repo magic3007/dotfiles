@@ -374,7 +374,7 @@ kmcc() {
 }
 
 kmcc2() {
-  local m=kimi-k2.5
+  local m=kimi-k2.6
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic \
     ANTHROPIC_AUTH_TOKEN="${KIMI_API_KEY}" \
