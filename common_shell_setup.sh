@@ -444,9 +444,6 @@ glmcc() {
     claude "$@" --dangerously-skip-permissions
 }
 
-remind() {
-  ssh -t pkucpu "export FEISHU_WEBHOOK_URL=$FEISHU_WEBHOOK_URL; ~/.local/bin/wechat-reminder --title $HOSTNAME"
-}
 
 # uv - Python package manager
 # uv installs to ~/.local/bin by default
