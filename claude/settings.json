@@ -118,7 +118,8 @@
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
-    "feishu@minimax-plugins": true
+    "feishu@minimax-plugins": true,
+    "humanize@PolyArch": true
   },
   "extraKnownMarketplaces": {
     "minimax-matrix-plugins": {
@@ -137,6 +138,12 @@
       "source": {
         "source": "github",
         "repo": "obra/superpowers-marketplace"
+      }
+    },
+    "PolyArch": {
+      "source": {
+        "source": "github",
+        "repo": "PolyArch/humanize"
       }
     }
   },
