@@ -98,6 +98,11 @@
     ~/.config/joshuto: joshuto
     ~/.config/yazi: yazi
 
+    # ---- CLI tools ----
+    ~/.config/lsd: lsd
+    ~/.config/starship.toml: starship/starship.toml
+    ~/.config/bat/config: bat/config
+
     # ---- Debugger ----
     ~/.gdb: gdb
     ~/.gdbinit: gdb/gdbinit
