@@ -102,8 +102,32 @@ main() {
     # Install joshuto (not available in apt, use cargo)
     install_joshuto
 
+    # Install zoxide (smart cd)
+    install_zoxide
+
+    # Install fd (fast find alternative)
+    install_fd
+
+    # Install zellij (terminal multiplexer)
+    install_zellij
+
     # Install RTK (Rust Token Killer) via cargo
     install_rtk
+
+    # Install jd (JSON diff tool)
+    install_jd
+
+    # Install lsd (modern ls replacement)
+    install_lsd
+
+    # Install starship (cross-shell prompt)
+    install_starship
+
+    # Install bat (cat with syntax highlighting)
+    install_bat
+
+    # Install fastfetch (system information tool)
+    install_fastfetch
 
     info "Package installation complete"
 }
@@ -278,6 +302,106 @@ install_joshuto() {
     fi
 }
 
+install_zoxide() {
+    if command -v zoxide >/dev/null 2>&1; then
+        info "zoxide already installed"
+        return 0
+    fi
+
+    info "Installing zoxide..."
+    if curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
+        info "zoxide installed to ~/.local/bin/zoxide"
+    else
+        warn "Failed to install zoxide"
+    fi
+}
+
+install_zellij() {
+    if command -v zellij >/dev/null 2>&1; then
+        info "zellij already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local zj_arch=""
+    case "$arch" in
+        x86_64)  zj_arch="x86_64-unknown-linux-musl" ;;
+        aarch64) zj_arch="aarch64-unknown-linux-musl" ;;
+        *)       warn "No prebuilt zellij binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading zellij prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/zellij-org/zellij/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query zellij latest version"
+        return 1
+    fi
+    info "Latest zellij version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/zellij-org/zellij/releases/download/v${version}/zellij-${zj_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/zellij.tar.gz"; then
+        tar -xzf "${tmp_dir}/zellij.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        if [ -f "${tmp_dir}/zellij" ]; then
+            cp "${tmp_dir}/zellij" "$HOME/.local/bin/zellij"
+            chmod +x "$HOME/.local/bin/zellij"
+            info "zellij installed to ~/.local/bin/zellij"
+        else
+            warn "zellij binary not found in archive"
+        fi
+    else
+        warn "Failed to download zellij from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
+}
+
+install_fd() {
+    if command -v fd >/dev/null 2>&1 || command -v fdfind >/dev/null 2>&1; then
+        info "fd already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local fd_arch=""
+    case "$arch" in
+        x86_64)  fd_arch="x86_64-unknown-linux-gnu" ;;
+        aarch64) fd_arch="aarch64-unknown-linux-gnu" ;;
+        *)       warn "No prebuilt fd binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading fd prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/sharkdp/fd/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query fd latest version"
+        return 1
+    fi
+    info "Latest fd version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/sharkdp/fd/releases/download/v${version}/fd-v${version}-${fd_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/fd.tar.gz"; then
+        tar -xzf "${tmp_dir}/fd.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        local bin_path
+        bin_path="$(find "${tmp_dir}" -name fd -type f -executable | head -1)"
+        if [ -n "$bin_path" ]; then
+            cp "$bin_path" "$HOME/.local/bin/fd"
+            chmod +x "$HOME/.local/bin/fd"
+            info "fd installed to ~/.local/bin/fd"
+        else
+            warn "fd binary not found in archive"
+        fi
+    else
+        warn "Failed to download fd from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
+}
+
 install_rtk() {
     if command -v rtk >/dev/null 2>&1; then
         info "RTK (Rust Token Killer) already installed: $(rtk --version)"
@@ -295,6 +419,186 @@ install_rtk() {
     else
         warn "Failed to install RTK"
     fi
+}
+
+install_jd() {
+    if command -v jd >/dev/null 2>&1; then
+        info "jd already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local jd_arch=""
+    case "$arch" in
+        x86_64)  jd_arch="amd64" ;;
+        aarch64) jd_arch="arm64" ;;
+        *)       warn "No prebuilt jd binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading jd prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/josephburnett/jd/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query jd latest version"
+        return 1
+    fi
+    info "Latest jd version: ${version}"
+    local download_url="https://github.com/josephburnett/jd/releases/download/v${version}/jd-${jd_arch}-linux"
+    mkdir -p "$HOME/.local/bin"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "$HOME/.local/bin/jd"; then
+        chmod +x "$HOME/.local/bin/jd"
+        info "jd installed to ~/.local/bin/jd"
+    else
+        warn "Failed to download jd from ${download_url}"
+    fi
+}
+
+install_lsd() {
+    if command -v lsd >/dev/null 2>&1; then
+        info "lsd already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local lsd_arch=""
+    case "$arch" in
+        x86_64)  lsd_arch="x86_64-unknown-linux-gnu" ;;
+        aarch64) lsd_arch="aarch64-unknown-linux-gnu" ;;
+        *)       warn "No prebuilt lsd binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading lsd prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/lsd-rs/lsd/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query lsd latest version"
+        return 1
+    fi
+    info "Latest lsd version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/lsd-rs/lsd/releases/download/v${version}/lsd-v${version}-${lsd_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/lsd.tar.gz"; then
+        tar -xzf "${tmp_dir}/lsd.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        local bin_path
+        bin_path="$(find "${tmp_dir}" -name lsd -type f -executable | head -1)"
+        if [ -n "$bin_path" ]; then
+            cp "$bin_path" "$HOME/.local/bin/lsd"
+            chmod +x "$HOME/.local/bin/lsd"
+            info "lsd installed to ~/.local/bin/lsd"
+        else
+            warn "lsd binary not found in archive"
+        fi
+    else
+        warn "Failed to download lsd from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
+}
+
+install_starship() {
+    if command -v starship >/dev/null 2>&1; then
+        info "starship already installed"
+        return 0
+    fi
+
+    info "Installing starship..."
+    mkdir -p "$HOME/.local/bin"
+    if curl --connect-timeout 10 -fsSL https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$HOME/.local/bin"; then
+        info "starship installed to ~/.local/bin/starship"
+    else
+        warn "Failed to install starship"
+    fi
+}
+
+install_bat() {
+    if command -v bat >/dev/null 2>&1 || command -v batcat >/dev/null 2>&1; then
+        info "bat already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local bat_arch=""
+    case "$arch" in
+        x86_64)  bat_arch="x86_64-unknown-linux-gnu" ;;
+        aarch64) bat_arch="aarch64-unknown-linux-gnu" ;;
+        *)       warn "No prebuilt bat binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading bat prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/sharkdp/bat/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query bat latest version"
+        return 1
+    fi
+    info "Latest bat version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/sharkdp/bat/releases/download/v${version}/bat-v${version}-${bat_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/bat.tar.gz"; then
+        tar -xzf "${tmp_dir}/bat.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        local bin_path
+        bin_path="$(find "${tmp_dir}" -name bat -type f -executable | head -1)"
+        if [ -n "$bin_path" ]; then
+            cp "$bin_path" "$HOME/.local/bin/bat"
+            chmod +x "$HOME/.local/bin/bat"
+            info "bat installed to ~/.local/bin/bat"
+        else
+            warn "bat binary not found in archive"
+        fi
+    else
+        warn "Failed to download bat from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
+}
+
+install_fastfetch() {
+    if command -v fastfetch >/dev/null 2>&1; then
+        info "fastfetch already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local ff_arch=""
+    case "$arch" in
+        x86_64)  ff_arch="linux-amd64" ;;
+        aarch64) ff_arch="linux-aarch64" ;;
+        *)       warn "No prebuilt fastfetch binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading fastfetch prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query fastfetch latest version"
+        return 1
+    fi
+    info "Latest fastfetch version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/fastfetch-cli/fastfetch/releases/download/${version}/fastfetch-${ff_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/fastfetch.tar.gz"; then
+        tar -xzf "${tmp_dir}/fastfetch.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        local bin_path
+        bin_path="$(find "${tmp_dir}" -name fastfetch -type f -executable | head -1)"
+        if [ -n "$bin_path" ]; then
+            cp "$bin_path" "$HOME/.local/bin/fastfetch"
+            chmod +x "$HOME/.local/bin/fastfetch"
+            info "fastfetch installed to ~/.local/bin/fastfetch"
+        else
+            warn "fastfetch binary not found in archive"
+        fi
+    else
+        warn "Failed to download fastfetch from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
 }
 
 main "$@"
