@@ -40,10 +40,10 @@ install_with_apt() {
 
     if command -v timeout >/dev/null 2>&1; then
         run_sudo_noninteractive timeout 300 apt-get update || return 1
-        run_sudo_noninteractive timeout 300 apt-get install -y zsh tmux vim htop ranger bubblewrap || return 1
+        run_sudo_noninteractive timeout 300 apt-get install -y zsh tmux vim htop ranger bubblewrap fish || return 1
     else
         run_sudo_noninteractive apt-get update || return 1
-        run_sudo_noninteractive apt-get install -y zsh tmux vim htop ranger bubblewrap || return 1
+        run_sudo_noninteractive apt-get install -y zsh tmux vim htop ranger bubblewrap fish || return 1
     fi
 }
 
