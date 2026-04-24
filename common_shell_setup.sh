@@ -1,7 +1,17 @@
 # useful alias
 alias dirs="dirs -v"
-alias els="exa -l"
 alias rsy="rsync -avzP"
+
+# lsd - modern ls replacement
+if command -v lsd &> /dev/null; then
+  alias ls='lsd'
+  alias la='lsd -la'
+  alias ll='lsd -l'
+  alias lt='lsd --tree'
+  alias els='lsd -l'
+else
+  alias els="exa -l"
+fi
 
 # proxy
 # function pc() {
@@ -238,6 +248,12 @@ export PATH="$PATH:$HOME/.chatgpt"
 
 # lazygit
 alias lg='lazygit'
+
+# rg + fzf interactive search
+rgf() {
+  local pattern="${1:?Usage: rgf <pattern>}"
+  rg -l "$pattern" | fzf --preview "rg -n --color=always -C 3 '$pattern' {}"
+}
 
 # zellij
 alias zj="zellij"
@@ -489,6 +505,23 @@ fi
 
 # codex environment setup
 [ -f ~/.codex/codex_env.sh ] && source ~/.codex/codex_env.sh
+
+# zoxide - smart cd
+command -v zoxide &> /dev/null && eval "$(zoxide init zsh)"
+
+# starship - cross-shell prompt
+if command -v starship &> /dev/null; then
+  export STARSHIP_CONFIG=~/.config/starship.toml
+  eval "$(starship init ${SHELL##*/})"
+fi
+
+# bat - cat with syntax highlighting
+if command -v bat &> /dev/null; then
+  alias cat='bat'
+elif command -v batcat &> /dev/null; then
+  alias cat='batcat'
+  alias bat='batcat'
+fi
 
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
 

@@ -1,0 +1,23 @@
+# lsd configuration
+# https://github.com/lsd-rs/lsd#config-file-content
+
+classic: false
+blocks:
+  - permission
+  - user
+  - group
+  - size
+  - date
+  - name
+
+date: relative
+icons:
+  when: auto
+  theme: fancy
+  separator: " "
+
+layout: grid
+sorting:
+  dir-grouping: first
+
+symlink-arrow: ⇒
