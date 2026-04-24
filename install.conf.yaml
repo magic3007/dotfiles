@@ -103,6 +103,9 @@
     ~/.config/starship.toml: starship/starship.toml
     ~/.config/bat/config: bat/config
 
+    # ---- Fish shell ----
+    ~/.config/fish: fish
+
     # ---- Debugger ----
     ~/.gdb: gdb
     ~/.gdbinit: gdb/gdbinit
@@ -246,6 +249,19 @@
     - [test -d ~/.fzf && ~/.fzf/install --all || true, Installing fzf]
 
 # ---------------------------------------------------------------------------
+# Fish shell plugins (Fisher)
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "command -v fish >/dev/null && fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher' || true",
+          Installing Fisher plugin manager for fish,
+      ]
+    - [
+          "command -v fish >/dev/null && test -f ~/.config/fish/fish_plugins && fish -c 'fisher update' || true",
+          Installing fish plugins via Fisher,
+      ]
+
+# ---------------------------------------------------------------------------
 # Node.js (prerequisite for AI coding tools)
 # ---------------------------------------------------------------------------
 - shell:
@@ -338,4 +354,13 @@
     - [
           bash ~/.claude/cc-gateway/install.sh || true,
           Installing CC Gateway for Claude Code,
+      ]
+
+# ---------------------------------------------------------------------------
+# Offer to change default shell (last step)
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          bash install-scripts/change-default-shell.sh || true,
+          Offering to change default shell,
       ]
