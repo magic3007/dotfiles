@@ -282,7 +282,7 @@ gm() {
 # claude code with deepseek API
 # Reference: https://api-docs.deepseek.com/guides/anthropic_api
 dscc() {
-  local m=deepseek-chat
+  local m=deepseek-v4-flash
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
     ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY}" \
@@ -294,7 +294,22 @@ dscc() {
     ANTHROPIC_SMALL_FAST_MODEL=$m \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=50 \
+    claude "$@" --dangerously-skip-permissions
+}
+
+dsccpro() {
+  local m=deepseek-v4-pro
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
+    ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=$m \
+    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
+    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
+    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
+    ANTHROPIC_SMALL_FAST_MODEL=$m \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
     claude "$@" --dangerously-skip-permissions
 }
 
