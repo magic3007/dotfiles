@@ -17,7 +17,8 @@ adjust-cell-height = 2
 # theme = Atom
 # theme = Github Dark
 # theme = Adwaita
-theme = Adventure
+# theme = Adventure
+theme = Atom One Dark
 background-opacity = 0.92
 background-blur-radius = 20
 
@@ -64,5 +65,14 @@ term = xterm-256color
 # -----------------------------------------------------------------------------
 # Misc
 # -----------------------------------------------------------------------------
+unfocused-split-opacity = 1
 confirm-close-surface = false
 auto-update = check
+
+# -----------------------------------------------------------------------------
+# Quick Terminal
+# -----------------------------------------------------------------------------
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+quick-terminal-position = top
+quick-terminal-animation-duration = 0.15
+quick-terminal-autohide = true
