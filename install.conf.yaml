@@ -96,6 +96,7 @@
     # ---- File manager ----
     ~/.config/ranger: ranger
     ~/.config/joshuto: joshuto
+    ~/.config/yazi: yazi
 
     # ---- Debugger ----
     ~/.gdb: gdb

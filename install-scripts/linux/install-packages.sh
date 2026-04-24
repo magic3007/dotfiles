@@ -96,6 +96,9 @@ main() {
     # Install lazygit (not available in apt, use prebuilt binary)
     install_lazygit
 
+    # Install yazi (not available in apt, use cargo or prebuilt binary)
+    install_yazi
+
     # Install joshuto (not available in apt, use cargo)
     install_joshuto
 
@@ -172,6 +175,55 @@ install_rust() {
         info "Rust installed: $(rustc --version)"
     else
         warn "Failed to install Rust"
+    fi
+}
+
+install_yazi() {
+    if command -v yazi >/dev/null 2>&1; then
+        info "yazi already installed"
+        return 0
+    fi
+
+    # Method 1: download prebuilt binary from GitHub releases
+    local arch
+    arch="$(uname -m)"
+    if [ "$arch" = "x86_64" ] || [ "$arch" = "aarch64" ]; then
+        info "Downloading yazi prebuilt binary..."
+        local version
+        version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/sxyazi/yazi/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')"
+        if [ -z "$version" ]; then
+            warn "Failed to query yazi latest version"
+        else
+            info "Latest yazi version: ${version}"
+            local tmp_dir
+            tmp_dir="$(mktemp -d)"
+            local download_url="https://github.com/sxyazi/yazi/releases/download/${version}/yazi-${arch}-unknown-linux-gnu.zip"
+            if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/yazi.zip"; then
+                unzip -q "${tmp_dir}/yazi.zip" -d "${tmp_dir}"
+                mkdir -p "$HOME/.local/bin"
+                local bin_path
+                bin_path="$(find "${tmp_dir}" -name yazi -type f | head -1)"
+                if [ -n "$bin_path" ]; then
+                    cp "$bin_path" "$HOME/.local/bin/yazi"
+                    chmod +x "$HOME/.local/bin/yazi"
+                    info "yazi installed to ~/.local/bin/yazi"
+                else
+                    warn "yazi binary not found in archive"
+                fi
+            else
+                warn "Failed to download yazi prebuilt binary"
+            fi
+            \rm -rf "${tmp_dir}"
+            return 0
+        fi
+    fi
+
+    # Method 2: cargo install
+    if command -v cargo >/dev/null 2>&1; then
+        info "Installing yazi via cargo..."
+        cargo install --locked yazi-fm yazi-cli || warn "Failed to install yazi via cargo"
+    else
+        warn "No prebuilt yazi binary for arch ${arch:-unknown} and cargo not available"
     fi
 }
 

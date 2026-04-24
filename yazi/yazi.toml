@@ -1,0 +1,61 @@
+# =============================================================================
+# Yazi File Manager Configuration
+# =============================================================================
+# Docs: https://yazi-rs.github.io/docs/configuration/yazi
+
+[mgr]
+ratio        = [1, 4, 3]
+sort_by      = "natural"
+sort_dir_first = true
+show_hidden  = false
+show_symlink = true
+linemode     = "size"
+scrolloff    = 5
+
+[preview]
+wrap       = "no"
+tab_size   = 2
+max_width  = 600
+max_height = 900
+
+[opener]
+edit = [
+  { run = '${EDITOR:-vim} "$@"', block = true, for = "unix" },
+]
+open = [
+  { run = 'xdg-open "$@"',  desc = "Open", for = "linux" },
+  { run = 'open "$@"',      desc = "Open", for = "macos" },
+]
+reveal = [
+  { run = 'open -R "$@"',                desc = "Reveal in Finder", for = "macos" },
+  { run = '''exiftool "$1"; echo "Press enter to exit"; read''', block = true, desc = "Show EXIF", for = "unix" },
+]
+
+[open]
+rules = [
+  { name = "*/", use = [ "edit", "open", "reveal" ] },
+
+  { mime = "text/*",  use = [ "edit", "reveal" ] },
+  { mime = "image/*", use = [ "open", "reveal" ] },
+  { mime = "video/*", use = [ "open", "reveal" ] },
+  { mime = "audio/*", use = [ "open", "reveal" ] },
+  { mime = "inode/x-empty", use = [ "edit", "reveal" ] },
+
+  { mime = "application/json", use = [ "edit", "reveal" ] },
+  { mime = "*/javascript",    use = [ "edit", "reveal" ] },
+
+  { mime = "application/zip",             use = [ "reveal" ] },
+  { mime = "application/gzip",            use = [ "reveal" ] },
+  { mime = "application/x-tar",           use = [ "reveal" ] },
+  { mime = "application/x-bzip2",         use = [ "reveal" ] },
+  { mime = "application/x-7z-compressed", use = [ "reveal" ] },
+  { mime = "application/x-rar",           use = [ "reveal" ] },
+  { mime = "application/xz",              use = [ "reveal" ] },
+
+  { mime = "*", use = [ "open", "reveal" ] },
+]
+
+[tasks]
+micro_workers  = 10
+macro_workers  = 25
+bizarre_retry  = 5

@@ -27,7 +27,7 @@ install_packages() {
     info "Installing packages with Homebrew..."
 
     # Core packages
-    local packages="rg lazygit zellij ranger joshuto"
+    local packages="rg lazygit zellij ranger joshuto yazi ffmpeg sevenzip poppler fd fzf zoxide imagemagick"
 
     for pkg in $packages; do
         if ! command -v "$pkg" >/dev/null 2>&1; then

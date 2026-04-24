@@ -1,0 +1,11 @@
+# =============================================================================
+# Yazi Keybindings
+# =============================================================================
+# Docs: https://yazi-rs.github.io/docs/configuration/keymap
+# Using prepend_keymap to add custom bindings on top of defaults.
+
+[mgr]
+prepend_keymap = [
+  { on = "<C-n>", run = "create",               desc = "Create file or directory" },
+  { on = "T",     run = "shell '$SHELL' --block --confirm", desc = "Open shell here" },
+]
