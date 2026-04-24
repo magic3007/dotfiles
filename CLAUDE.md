@@ -30,11 +30,23 @@ All configs live in this repo and are symlinked to `~` via Dotbot. The `link` se
 Machine-specific overrides go in `*_local` files (not tracked by git):
 - `~/.gitconfig_local` — local git user/config (included via `[include]` in gitconfig)
 - `~/.zsh_local` — local zsh config
-- `~/.common_shell_setup_local.sh` — local shell setup
+- `~/.common_shell_setup_local.sh` — local shell setup (bash/zsh)
+- `~/.config/fish/conf.d/local.fish` — local fish config
 
 ### Shell Setup
 
-`common_shell_setup.sh` is sourced by both `.zshrc` and `.bashrc`. It contains:
+Three shells are supported: zsh, bash, and fish.
+
+**bash/zsh**: `common_shell_setup.sh` is sourced by both `.zshrc` and `.bashrc`. It contains shared aliases, functions, env vars, and AI tool wrappers.
+
+**fish**: `fish/` directory is symlinked to `~/.config/fish/`. Fish config is maintained separately (not sourced from `common_shell_setup.sh`) because fish syntax is incompatible with POSIX shell. Structure:
+- `config.fish` — tool initialization (starship, zoxide, conda, venv)
+- `conf.d/` — modular config (env vars, PATH, aliases, fzf, ssh)
+- `functions/` — lazy-loaded functions (one per file, fish best practice)
+- `fish_plugins` — Fisher plugin list
+- AI tool wrappers use `_claude_with_api` helper function to reduce duplication
+
+Common features across all shells:
 - Safe `rm` override: `rm` is aliased to a warning; use `rem` for reversible delete or `\rm` for real delete
 - Safe `mv`/`cp`: aliased with `-i` (interactive) flags
 - Docker helper functions: `docker-run`, `docker-slave`, `docker-run-gui`
@@ -77,8 +89,8 @@ Package managers are configured with Chinese mirrors for faster downloads:
 
 ### Cross-Platform
 
-- **Linux**: apt-get for zsh, tmux, vim, htop, ranger
-- **macOS**: Homebrew for rg, lazygit, zellij; Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 configuration sync via `~/.config/iterm2`
+- **Linux**: apt-get for zsh, tmux, vim, htop, ranger, fish
+- **macOS**: Homebrew for rg, lazygit, zellij, fish; Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 configuration sync via `~/.config/iterm2`
 
 ### wechat-reminder (`wechat-reminder/`)
 

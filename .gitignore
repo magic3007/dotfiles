@@ -5,3 +5,4 @@ vim/undo-history
 .vscode
 .claude/
 **/*.pyc
+fish/conf.d/local.fish
