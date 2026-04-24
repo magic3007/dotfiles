@@ -93,6 +93,9 @@ main() {
     # Install Rust/Cargo
     install_rust
 
+    # Install lazygit (not available in apt, use prebuilt binary)
+    install_lazygit
+
     # Install joshuto (not available in apt, use cargo)
     install_joshuto
 
@@ -100,6 +103,48 @@ main() {
     install_rtk
 
     info "Package installation complete"
+}
+
+install_lazygit() {
+    if command -v lazygit >/dev/null 2>&1; then
+        info "lazygit already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local lg_arch=""
+    case "$arch" in
+        x86_64)  lg_arch="Linux_x86_64" ;;
+        aarch64) lg_arch="Linux_arm64" ;;
+        *)       warn "No prebuilt lazygit binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading lazygit prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query lazygit latest version"
+        return 1
+    fi
+    info "Latest lazygit version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/jesseduffield/lazygit/releases/download/v${version}/lazygit_${version}_${lg_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/lazygit.tar.gz"; then
+        tar -xzf "${tmp_dir}/lazygit.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        if [ -f "${tmp_dir}/lazygit" ]; then
+            cp "${tmp_dir}/lazygit" "$HOME/.local/bin/lazygit"
+            chmod +x "$HOME/.local/bin/lazygit"
+            info "lazygit installed to ~/.local/bin/lazygit"
+        else
+            warn "lazygit binary not found in archive"
+        fi
+    else
+        warn "Failed to download lazygit from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
 }
 
 install_rust() {
