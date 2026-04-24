@@ -282,7 +282,7 @@ gm() {
 # claude code with deepseek API
 # Reference: https://api-docs.deepseek.com/guides/anthropic_api
 dscc() {
-  local m=deepseek-v4-flash
+  local m=deepseek-v4-flash[1m]
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
     ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY}" \
@@ -298,7 +298,7 @@ dscc() {
 }
 
 dsccpro() {
-  local m=deepseek-v4-pro
+  local m=deepseek-v4-pro[1m]
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
     ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY}" \
