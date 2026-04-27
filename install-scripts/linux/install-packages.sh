@@ -129,6 +129,9 @@ main() {
     # Install fastfetch (system information tool)
     install_fastfetch
 
+    # Install jnv (interactive JSON viewer with jq/fzf-like features)
+    install_jnv
+
     info "Package installation complete"
 }
 
@@ -597,6 +600,48 @@ install_fastfetch() {
         fi
     else
         warn "Failed to download fastfetch from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
+}
+
+install_jnv() {
+    if command -v jnv >/dev/null 2>&1; then
+        info "jnv already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local jnv_arch=""
+    case "$arch" in
+        x86_64)  jnv_arch="x86_64-unknown-linux-gnu" ;;
+        aarch64) jnv_arch="aarch64-unknown-linux-gnu" ;;
+        *)       warn "No prebuilt jnv binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading jnv prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/ynqa/jnv/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query jnv latest version"
+        return 1
+    fi
+    info "Latest jnv version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/ynqa/jnv/releases/download/v${version}/jnv-v${version}-${jnv_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/jnv.tar.gz"; then
+        tar -xzf "${tmp_dir}/jnv.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        if [ -f "${tmp_dir}/jnv" ]; then
+            cp "${tmp_dir}/jnv" "$HOME/.local/bin/jnv"
+            chmod +x "$HOME/.local/bin/jnv"
+            info "jnv installed to ~/.local/bin/jnv"
+        else
+            warn "jnv binary not found in archive"
+        fi
+    else
+        warn "Failed to download jnv from ${download_url}"
     fi
     \rm -rf "${tmp_dir}"
 }
