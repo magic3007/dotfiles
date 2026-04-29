@@ -475,6 +475,23 @@ mmcc() {
 
 # claude code with GLM-5.1
 glmcc() {
+  local m=glm-5.1
+  env -u ANTHROPIC_API_KEY \
+    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
+    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
+    API_TIMEOUT_MS=600000 \
+    ANTHROPIC_MODEL=$m \
+    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
+    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
+    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
+    ANTHROPIC_SMALL_FAST_MODEL=$m \
+    CLAUDE_CODE_SUBAGENT_MODEL=$m \
+    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
+    claude "$@" --dangerously-skip-permissions
+}
+
+glmcc2() {
   local m=Pro/zai-org/GLM-5.1
   env -u ANTHROPIC_API_KEY \
     ANTHROPIC_BASE_URL=https://api.siliconflow.cn/ \
