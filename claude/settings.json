@@ -150,6 +150,5 @@
   "language": "Chinese",
   "skipWebFetchPreflight": true,
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true,
-  "effortLevel": "high"
+  "skipDangerousModePermissionPrompt": true
 }
