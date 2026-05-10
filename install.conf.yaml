@@ -303,6 +303,14 @@
           "command -v opencode >/dev/null || curl --connect-timeout 10 -fsSL https://opencode.ai/install | bash || true",
           Installing Opencode CLI,
       ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v happy >/dev/null || npm install -g happy || true",
+          Installing happy git workflow helper,
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codexapp >/dev/null || npm install -g codexapp firebase@12.2.1 --legacy-peer-deps || true",
+          Installing CodexApp UI (firebase pinned to 12.2.1, 12.13.0 requires missing @firebase/remote-config@0.8.3),
+      ]
 
 # ---------------------------------------------------------------------------
 # WeChat Reminder
