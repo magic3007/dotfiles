@@ -358,3 +358,8 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Share history across multiple shell sessions
 setopt SHARE_HISTORY
+
+# opencode
+export PATH=$HOME/.opencode/bin:$PATH
+
+. "$HOME/.local/bin/env"

@@ -583,6 +583,9 @@ elif command -v batcat &> /dev/null; then
   alias bat='batcat'
 fi
 
+# better color for claude code
+export COLORTERM=truecolor
+
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
 
 
