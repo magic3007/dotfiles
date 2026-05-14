@@ -129,6 +129,9 @@ main() {
     # Install fastfetch (system information tool)
     install_fastfetch
 
+    # Install neovim (modern Vim)
+    install_neovim
+
     # Install jnv (interactive JSON viewer with jq/fzf-like features)
     install_jnv
 
@@ -600,6 +603,54 @@ install_fastfetch() {
         fi
     else
         warn "Failed to download fastfetch from ${download_url}"
+    fi
+    \rm -rf "${tmp_dir}"
+}
+
+install_neovim() {
+    if command -v nvim >/dev/null 2>&1; then
+        info "neovim already installed"
+        return 0
+    fi
+
+    local arch
+    arch="$(uname -m)"
+    local nvim_arch=""
+    case "$arch" in
+        x86_64)  nvim_arch="linux-x86_64" ;;
+        aarch64) nvim_arch="linux-arm64" ;;
+        *)       warn "No prebuilt neovim binary for arch ${arch}"; return 1 ;;
+    esac
+
+    info "Downloading neovim prebuilt binary..."
+    local version
+    version="$(curl --connect-timeout 10 -sL "https://api.github.com/repos/neovim/neovim/releases/latest" | grep -m1 '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')"
+    if [ -z "$version" ]; then
+        warn "Failed to query neovim latest version"
+        return 1
+    fi
+    info "Latest neovim version: ${version}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d)"
+    local download_url="https://github.com/neovim/neovim/releases/download/v${version}/nvim-${nvim_arch}.tar.gz"
+    if curl --connect-timeout 10 -fsSL "${download_url}" -o "${tmp_dir}/nvim.tar.gz"; then
+        tar -xzf "${tmp_dir}/nvim.tar.gz" -C "${tmp_dir}"
+        mkdir -p "$HOME/.local/bin"
+        local bin_path
+        bin_path="$(find "${tmp_dir}" -name nvim -type f -executable | head -1)"
+        if [ -n "$bin_path" ]; then
+            # Copy the entire neovim runtime alongside the binary
+            local nvim_dir
+            nvim_dir="$(dirname "$(dirname "$bin_path")")"
+            rm -rf "$HOME/.local/nvim"
+            cp -r "$nvim_dir" "$HOME/.local/nvim"
+            ln -sf "$HOME/.local/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+            info "neovim installed to ~/.local/nvim (symlinked from ~/.local/bin/nvim)"
+        else
+            warn "nvim binary not found in archive"
+        fi
+    else
+        warn "Failed to download neovim from ${download_url}"
     fi
     \rm -rf "${tmp_dir}"
 }
