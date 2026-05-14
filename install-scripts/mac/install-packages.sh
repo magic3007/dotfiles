@@ -76,6 +76,16 @@ install_rust() {
     fi
 }
 
+install_neovim() {
+    if command -v nvim >/dev/null 2>&1; then
+        info "neovim already installed"
+        return 0
+    fi
+
+    info "Installing neovim..."
+    brew install neovim || warn "Failed to install neovim"
+}
+
 install_rtk() {
     if command -v rtk >/dev/null 2>&1; then
         info "RTK (Rust Token Killer) already installed: $(rtk --version)"
@@ -99,6 +109,7 @@ main() {
     install_homebrew
     install_rust
     install_packages
+    install_neovim
     install_ghostty
     install_rtk
 
