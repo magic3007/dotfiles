@@ -64,14 +64,25 @@ Shell aliases and wrapper functions in `common_shell_setup.sh`:
 - `mxcc()` — Claude Code with MiniMax via OpenRouter
 - `qwcc()` — Claude Code with Qwen3.5 via Aliyun
 
-### Claude Code Configuration (`claude/`)
+### AI Tool Configurations (`claude/`, `codex/`, `gemini/`, `opencode/`)
 
-Symlinked to `~/.claude/`. Contains:
-- `settings.json` — permissions, hooks, language (Chinese), plugins, env vars
-- `config.json` — API key config
-- `commands/` — slash commands (`create-pr`, `gen-commit-msg`, `pr-review`)
-- `hooks/` — PostToolUse and UserPromptSubmit hooks
-- `rules/` — global rules (e.g., `debug-experience.md`)
+Each AI coding tool has its own config directory symlinked to `~/`:
+- `claude/` → `~/.claude/` — Claude Code settings, hooks, skills, rules, commands, agents
+- `codex/` → `~/.codex/` — OpenAI Codex config and env
+- `gemini/` → `~/.gemini/` — Gemini CLI settings
+- `opencode/` → `~/.config/opencode/` — Opencode config
+
+**Shared skills**: `claude/skills/` is symlinked to all tools (`~/.codex/skills`, `~/.gemini/skills`, `~/.cursor/skills`) so custom skills are available everywhere. Similarly, AGENTS.md and GEMINI.md mirror CLAUDE.md to share project context across tools.
+
+**Claude Code hooks** (`claude/hooks/`):
+- `check_dangerous_ops.sh` (PreToolUse) — blocks destructive git commands (`reset --hard`, `push --force`, `clean -f`, etc.), prevents writes to `/tmp/`, and intercepts file deletions outside safe directories
+- `check-expert-update.sh` (PostToolUse) — reminds to update docs when editing configs/scripts
+- `claudeception-activator.sh` (UserPromptSubmit) — triggers knowledge extraction evaluation
+- `claude-end-reminder.sh` (Stop/StopFailure/TaskCompleted) — sends Feishu notifications on task completion via wechat-reminder
+
+**Safe directories**: `output/`, `test_output/`, `debug_output/` are whitelisted in `check_dangerous_ops.sh` — Claude can freely write/delete within these without prompts.
+
+**Plugins** (in `settings.json`): superpowers (official), feishu, humanize — installed via marketplace system with `extraKnownMarketplaces` config.
 
 ### Chinese Mirrors
 
@@ -89,8 +100,10 @@ Package managers are configured with Chinese mirrors for faster downloads:
 
 ### Cross-Platform
 
-- **Linux**: apt-get for zsh, tmux, vim, htop, ranger, fish
-- **macOS**: Homebrew for rg, lazygit, zellij, fish; Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 configuration sync via `~/.config/iterm2`
+- **Linux**: apt-get for zsh, tmux, vim, htop, ranger, fish (see `install-scripts/linux/`)
+- **macOS**: Homebrew for rg, lazygit, zellij, fish (see `install-scripts/mac/`); Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 plist sync via `~/.config/iterm2`; Ghostty terminal config via `ghostty/config`
+
+When adding new platform packages, edit the relevant `install-scripts/{linux,mac}/install-packages.sh`.
 
 ### wechat-reminder (`wechat-reminder/`)
 
