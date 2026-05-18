@@ -151,5 +151,7 @@
   "skipWebFetchPreflight": true,
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "auto"
+  "theme": "auto",
+  "verbose": true,
+  "teammateMode": "tmux"
 }
