@@ -6,8 +6,8 @@
 
 [class]
 text_default = [
-  { command = "nvim" },
   { command = "vim" },
+  { command = "nvim" },
 ]
 
 image_default = [
