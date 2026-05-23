@@ -288,11 +288,6 @@ ccg() {
   fi
 }
 
-# openai codex
-cx() {
-  codex --full-auto "$@"
-}
-
 # opencode
 oc() {
   opencode "$@"

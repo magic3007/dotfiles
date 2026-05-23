@@ -31,5 +31,5 @@ if [ -f ~/.codex/settings.json ]; then
     fi
 fi
 
-# Alias for codex with common options
-alias cx='codex'
+# Alias for codex with full-auto mode
+alias cx='codex --full-auto'
