@@ -1,3 +1,3 @@
 function cx --description "OpenAI Codex with full auto"
-    codex --full-auto $argv
+    codex -a never -s danger-full-access --search $argv
 end
