@@ -1,0 +1,5 @@
+# zsh reads ~/.zshenv for every invocation, including non-interactive remote
+# commands. Mobile/remote Codex clients may execute `codex` without loading
+# ~/.zshrc, so tools installed through nvm are otherwise invisible to PATH.
+# Keep this file small and side-effect free.
+export PATH="$HOME/.nvm/versions/node/v24.15.0/bin:$PATH"

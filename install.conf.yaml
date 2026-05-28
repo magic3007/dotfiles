@@ -71,12 +71,17 @@
           "test -f ~/.zshrc && ! test -L ~/.zshrc && ! test -f ~/.zshrc_bk && mv ~/.zshrc ~/.zshrc_bk && echo 'Moved existing ~/.zshrc to ~/.zshrc_bk' || true",
           Backing up existing ~/.zshrc to ~/.zshrc_bk,
       ]
+    - [
+          "test -f ~/.zshenv && ! test -L ~/.zshenv && ! test -f ~/.zshenv_bk && mv ~/.zshenv ~/.zshenv_bk && echo 'Moved existing ~/.zshenv to ~/.zshenv_bk' || true",
+          Backing up existing ~/.zshenv to ~/.zshenv_bk,
+      ]
 
 # ---------------------------------------------------------------------------
 # Symlinks
 # ---------------------------------------------------------------------------
 - link:
     # ---- Shell ----
+    ~/.zshenv: oh-my-zsh/zshenv
     ~/.zshrc: oh-my-zsh/zshrc
     ~/.bashrc: bash/bashrc
     ~/.common_shell_setup.sh: common_shell_setup.sh
@@ -363,4 +368,3 @@
           bash ~/.claude/cc-gateway/install.sh || true,
           Installing CC Gateway for Claude Code,
       ]
-
