@@ -146,9 +146,9 @@
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh
-    ~/.codex/skills: claude/skills
+    ~/.codex/skills: codex/skills
     ~/.gemini/settings.json: gemini/settings.json
-    ~/.gemini/skills: claude/skills
+    ~/.gemini/skills: gemini/skills
     ~/.chatgpt.sh: chatgpt
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json

@@ -72,7 +72,12 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 - `gemini/` → `~/.gemini/` — Gemini CLI settings
 - `opencode/` → `~/.config/opencode/` — Opencode config
 
-**Shared skills**: `claude/skills/` is symlinked to all tools (`~/.codex/skills`, `~/.gemini/skills`, `~/.cursor/skills`) so custom skills are available everywhere. Similarly, AGENTS.md and GEMINI.md mirror CLAUDE.md to share project context across tools.
+**Tool-specific skills**: Claude, Codex, and Gemini use independent skill directories:
+- `claude/skills/` -> `~/.claude/skills`
+- `codex/skills/` -> `~/.codex/skills`
+- `gemini/skills/` -> `~/.gemini/skills`
+
+Add a skill to each tool's own directory when it should be available there. Cursor currently keeps using `claude/skills/` via `~/.cursor/skills`.
 
 **Claude Code hooks** (`claude/hooks/`):
 - `check_dangerous_ops.sh` (PreToolUse) — blocks destructive git commands (`reset --hard`, `push --force`, `clean -f`, etc.), prevents writes to `/tmp/`, and intercepts file deletions outside safe directories
