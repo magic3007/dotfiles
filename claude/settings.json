@@ -78,6 +78,15 @@
             "command": "for f in $CLAUDE_MODIFIED_FILES; do [[ $f == *.py ]] && python -m py_compile \"$f\" 2>&1 || true; done"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'for f in \"$CLAUDE_CHANGED_FILES\"; do case \"$f\" in *.yaml|*.yml) python -c \"import yaml; yaml.safe_load(open(\"'\"$f\"'\"))\" 2>&1 || echo \"YAML INVALID: $f\";; Makefile) make -n help >/dev/null 2>&1 || echo \"Makefile syntax error\";; esac; done'"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
