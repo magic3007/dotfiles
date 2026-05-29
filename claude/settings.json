@@ -69,6 +69,15 @@
             "command": "~/.claude/hooks/check-expert-update.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "for f in $CLAUDE_MODIFIED_FILES; do [[ $f == *.py ]] && python -m py_compile \"$f\" 2>&1 || true; done"
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
