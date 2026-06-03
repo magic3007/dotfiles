@@ -83,6 +83,7 @@
     # ---- Shell ----
     ~/.zshenv: oh-my-zsh/zshenv
     ~/.zshrc: oh-my-zsh/zshrc
+    ~/.zshrc.d: oh-my-zsh/zshrc.d
     ~/.bashrc: bash/bashrc
     ~/.common_shell_setup.sh: common_shell_setup.sh
 
