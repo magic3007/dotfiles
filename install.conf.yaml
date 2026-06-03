@@ -154,7 +154,7 @@
     ~/.codex/skills: codex/skills
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
-    ~/.chatgpt.sh: chatgpt
+    ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
     ~/.local/bin/yolo: scripts/yolo-generic.sh

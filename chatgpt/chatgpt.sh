@@ -96,7 +96,7 @@ while [ "$1" != "" ]; do
 		exit
 		;;
 	--writing)
-		PROMPT_SYSTEM=PROMPT_WRITING
+		PROMPT_SYSTEM="$PROMPT_WRITING"
 		;;
 	--verbose)
 		set -x
