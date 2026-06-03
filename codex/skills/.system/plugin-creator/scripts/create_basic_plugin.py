@@ -11,14 +11,15 @@ from typing import Any
 
 
 MAX_PLUGIN_NAME_LENGTH = 64
+DEFAULT_PLUGIN_PARENT = Path.home() / "plugins"
+DEFAULT_MARKETPLACE_PATH = Path.home() / ".agents" / "plugins" / "marketplace.json"
 DEFAULT_INSTALL_POLICY = "AVAILABLE"
 DEFAULT_AUTH_POLICY = "ON_INSTALL"
 DEFAULT_CATEGORY = "Productivity"
 DEFAULT_MARKETPLACE_NAME = "personal"
+DEFAULT_MARKETPLACE_DISPLAY_NAME = "Personal"
 VALID_INSTALL_POLICIES = {"NOT_AVAILABLE", "AVAILABLE", "INSTALLED_BY_DEFAULT"}
 VALID_AUTH_POLICIES = {"ON_INSTALL", "ON_USE"}
-DEFAULT_PLUGIN_PARENT = Path.home() / "plugins"
-DEFAULT_MARKETPLACE_PATH = Path.home() / ".agents" / "plugins" / "marketplace.json"
 
 
 def normalize_plugin_name(plugin_name: str) -> str:
@@ -40,17 +41,8 @@ def validate_plugin_name(plugin_name: str) -> None:
         )
 
 
-def validate_marketplace_name(marketplace_name: str) -> None:
-    if not marketplace_name:
-        raise ValueError("Marketplace name must include at least one letter or digit.")
-    if re.fullmatch(r"[A-Za-z0-9_-]+", marketplace_name) is None:
-        raise ValueError(
-            "Marketplace name may only contain ASCII letters, digits, `_`, and `-`."
-        )
-
-
 def display_name_from_plugin_name(plugin_name: str) -> str:
-    return " ".join(part.capitalize() for part in re.split(r"[-_]+", plugin_name))
+    return " ".join(part.capitalize() for part in plugin_name.split("-"))
 
 
 def build_plugin_json(plugin_name: str, *, with_mcp: bool, with_apps: bool) -> dict[str, Any]:
@@ -105,11 +97,11 @@ def load_json(path: Path) -> dict[str, Any]:
         return json.load(handle)
 
 
-def build_default_marketplace(marketplace_name: str) -> dict[str, Any]:
+def build_default_marketplace() -> dict[str, Any]:
     return {
-        "name": marketplace_name,
+        "name": DEFAULT_MARKETPLACE_NAME,
         "interface": {
-            "displayName": display_name_from_plugin_name(marketplace_name),
+            "displayName": DEFAULT_MARKETPLACE_DISPLAY_NAME,
         },
         "plugins": [],
     }
@@ -123,7 +115,6 @@ def validate_marketplace_interface(payload: dict[str, Any]) -> None:
 
 def update_marketplace_json(
     marketplace_path: Path,
-    marketplace_name: str | None,
     plugin_name: str,
     install_policy: str,
     auth_policy: str,
@@ -133,23 +124,12 @@ def update_marketplace_json(
     if marketplace_path.exists():
         payload = load_json(marketplace_path)
     else:
-        payload = build_default_marketplace(marketplace_name or DEFAULT_MARKETPLACE_NAME)
+        payload = build_default_marketplace()
 
     if not isinstance(payload, dict):
         raise ValueError(f"{marketplace_path} must contain a JSON object.")
 
     validate_marketplace_interface(payload)
-
-    existing_marketplace_name = payload.get("name")
-    if marketplace_name is not None:
-        if not isinstance(existing_marketplace_name, str) or not existing_marketplace_name.strip():
-            raise ValueError(f"{marketplace_path} must contain a non-empty string 'name'.")
-        if existing_marketplace_name != marketplace_name:
-            raise ValueError(
-                f"{marketplace_path} already uses marketplace name "
-                f"'{existing_marketplace_name}'. Create a new marketplace file to use "
-                f"'{marketplace_name}' instead."
-            )
 
     plugins = payload.setdefault("plugins", [])
     if not isinstance(plugins, list):
@@ -227,13 +207,6 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--marketplace-name",
-        help=(
-            "Marketplace name to seed into a new marketplace.json. Use this only when the default "
-            "'personal' marketplace name is already taken and you need a different new marketplace."
-        ),
-    )
-    parser.add_argument(
         "--install-policy",
         default=DEFAULT_INSTALL_POLICY,
         choices=sorted(VALID_INSTALL_POLICIES),
@@ -261,10 +234,6 @@ def main() -> None:
     if plugin_name != raw_plugin_name:
         print(f"Note: Normalized plugin name from '{raw_plugin_name}' to '{plugin_name}'.")
     validate_plugin_name(plugin_name)
-    marketplace_name = None
-    if args.marketplace_name is not None:
-        marketplace_name = args.marketplace_name.strip()
-        validate_marketplace_name(marketplace_name)
 
     plugin_root = (Path(args.path).expanduser().resolve() / plugin_name)
     plugin_root.mkdir(parents=True, exist_ok=True)
@@ -306,7 +275,6 @@ def main() -> None:
         marketplace_path = Path(args.marketplace_path).expanduser().resolve()
         update_marketplace_json(
             marketplace_path,
-            marketplace_name,
             plugin_name,
             args.install_policy,
             args.auth_policy,
