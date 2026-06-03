@@ -8,9 +8,6 @@ if command -v lsd &> /dev/null; then
   alias la='lsd -la'
   alias ll='lsd -l'
   alias lt='lsd --tree'
-  alias els='lsd -l'
-else
-  alias els="exa -l"
 fi
 
 # proxy
@@ -302,255 +299,44 @@ gm() {
 
 # claude code with deepseek API
 # Reference: https://api-docs.deepseek.com/guides/anthropic_api
-dscc() {
-  local m=deepseek-v4-flash[1m]
+_claude_with_api() {
+  local model="$1" base_url="$2" api_key="$3" binary="${4:-claude}"
+  shift 4
   env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
-    ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY}" \
+    ANTHROPIC_BASE_URL="$base_url" \
+    ANTHROPIC_AUTH_TOKEN="$api_key" \
     API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
+    ANTHROPIC_MODEL="$model" \
+    ANTHROPIC_DEFAULT_SONNET_MODEL="$model" \
+    ANTHROPIC_DEFAULT_OPUS_MODEL="$model" \
+    ANTHROPIC_DEFAULT_HAIKU_MODEL="$model" \
+    ANTHROPIC_SMALL_FAST_MODEL="$model" \
+    CLAUDE_CODE_SUBAGENT_MODEL="$model" \
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
     CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
+    "$binary" "$@" --dangerously-skip-permissions
 }
 
-dsccpro() {
-  local m=deepseek-v4-pro[1m]
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic \
-    ANTHROPIC_AUTH_TOKEN="${DEEPSEEK_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
+dscc()    { _claude_with_api "deepseek-v4-flash[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
+dsccpro() { _claude_with_api "deepseek-v4-pro[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
 
-autocc() {
-  local m=ark-code-latest
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
-    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_SUBAGENT_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
+autocc()  { _claude_with_api "ark-code-latest" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+sdcc()    { _claude_with_api "doubao-seed-2.0-lite" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+sdccmini(){ _claude_with_api "doubao-seed-2-0-mini-260215" "https://ark.cn-beijing.volces.com/api/compatible" "${SD2MINI_API_KEY}" claude "$@"; }
+sdccpro() { _claude_with_api "doubao-seed-2.0-pro" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
-# claude code with VolcEngine Coding Plan
-# Reference: https://www.volcengine.com/docs/82379/1928262?lang=zh
-sdcc() {
-  local m=doubao-seed-2.0-lite
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
-    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_SUBAGENT_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
+kmcc()    { _claude_with_api "kimi-for-coding" "https://api.kimi.com/coding/" "${KIMI_CODE_API_KEY}" claude "$@"; }
+kmcc2()   { _claude_with_api "kimi-k2.6" "https://api.moonshot.cn/anthropic" "${KIMI_API_KEY}" claude "$@"; }
+kmcc3()   { _claude_with_api "kimi-k2.6" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
-sdccmini() {
-  local m=doubao-seed-2-0-mini-260215
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/compatible \
-    ANTHROPIC_AUTH_TOKEN="${SD2MINI_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
+mxcc()    { _claude_with_api "MiniMax-M2.7" "https://api.minimaxi.com/anthropic" "${MM_CODE_API_KEY}" claude "$@"; }
+mmcc()    { _claude_with_api "mimo-v2-pro" "https://token-plan-cn.xiaomimimo.com/anthropic" "${MIMO_CODE_API_KEY}" claude "$@"; }
 
-sdccpro() {
-  local m=doubao-seed-2.0-pro
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
-    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
+glmcc()   { _claude_with_api "glm-5.1" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+glmcc2()  { _claude_with_api "Pro/zai-org/GLM-5.1" "https://api.siliconflow.cn/" "${SLFLOW_API_KEY}" claude "$@"; }
 
-kmcc() {
-  local m=kimi-for-coding
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.kimi.com/coding/ \
-    ANTHROPIC_AUTH_TOKEN="${KIMI_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_SUBAGENT_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-kmcc2() {
-  local m=kimi-k2.6
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic \
-    ANTHROPIC_AUTH_TOKEN="${KIMI_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-kmcc3() {
-  local m=kimi-k2.6
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
-    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-# claude code with MiniMax 2.7
-mxcc() {
-  local m=MiniMax-M2.7
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.minimaxi.com/anthropic \
-    ANTHROPIC_AUTH_TOKEN="${MM_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-# claude code with mimo-v2-pro
-mmcc() {
-  local m=mimo-v2-pro
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://token-plan-cn.xiaomimimo.com/anthropic\
-    ANTHROPIC_AUTH_TOKEN="${MIMO_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-# claude code with GLM-5.1
-glmcc() {
-  local m=glm-5.1
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
-    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_SUBAGENT_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-glmcc2() {
-  local m=Pro/zai-org/GLM-5.1
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.siliconflow.cn/ \
-    ANTHROPIC_AUTH_TOKEN="${SLFLOW_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    claude "$@" --dangerously-skip-permissions
-}
-
-hglmcc() {
-  local m=glm-5.1
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://ark.cn-beijing.volces.com/api/coding \
-    ANTHROPIC_AUTH_TOKEN="${VE_CODE_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_SUBAGENT_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    happy "$@" --dangerously-skip-permissions
-}
-
-hglmcc2() {
-  local m=Pro/zai-org/GLM-5.1
-  env -u ANTHROPIC_API_KEY \
-    ANTHROPIC_BASE_URL=https://api.siliconflow.cn/ \
-    ANTHROPIC_AUTH_TOKEN="${SLFLOW_API_KEY}" \
-    API_TIMEOUT_MS=600000 \
-    ANTHROPIC_MODEL=$m \
-    ANTHROPIC_DEFAULT_SONNET_MODEL=$m \
-    ANTHROPIC_DEFAULT_OPUS_MODEL=$m \
-    ANTHROPIC_DEFAULT_HAIKU_MODEL=$m \
-    ANTHROPIC_SMALL_FAST_MODEL=$m \
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
-    CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 \
-    happy "$@" --dangerously-skip-permissions
-}
+hglmcc()  { _claude_with_api "glm-5.1" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" happy "$@"; }
+hglmcc2() { _claude_with_api "Pro/zai-org/GLM-5.1" "https://api.siliconflow.cn/" "${SLFLOW_API_KEY}" happy "$@"; }
 
 
 # uv - Python package manager
