@@ -168,6 +168,9 @@
     # ---- Ghostty ----
     ~/.config/ghostty/config: ghostty/config
 
+    # ---- Warp ----
+    ~/.warp: warp
+
 # ---------------------------------------------------------------------------
 # Sync vim plugins to local disk for faster startup on network filesystems
 # ---------------------------------------------------------------------------

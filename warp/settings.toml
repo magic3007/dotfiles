@@ -1,0 +1,94 @@
+[appearance]
+
+[appearance.themes]
+system_theme = false
+theme = "adeberry"
+
+[appearance.vertical_tabs]
+enabled = true
+primary_info = "command"
+display_granularity = "panes"
+view_mode = "compact"
+
+[appearance.window]
+zoom_level = 90
+
+[appearance.text]
+notebook_font_size = 14.0
+font_size = 13.0
+
+[terminal]
+osc52_clipboard_access = "read_write"
+
+[terminal.input]
+input_box_type_setting = "universal"
+
+[agents]
+cloud_conversation_storage_enabled = true
+
+[agents.warp_agent]
+is_any_ai_enabled = true
+
+[agents.warp_agent.input]
+nld_in_terminal_enabled = true
+
+[agents.warp_agent.other]
+show_agent_notifications = true
+show_conversation_history = true
+cloud_agent_computer_use_enabled = true
+
+[agents.third_party]
+should_render_cli_agent_toolbar = true
+
+[agents.profiles]
+agent_mode_coding_permissions = "always_allow_reading"
+
+[account]
+is_settings_sync_enabled = true
+
+[general]
+default_session_mode = "agent"
+show_warning_before_quitting = false
+
+[code]
+
+[code.editor]
+show_code_review_button = true
+show_project_explorer = true
+show_global_search = true
+
+[warp_drive]
+enabled = true
+
+[privacy]
+telemetry_enabled = true
+crash_reporting_enabled = true
+
+[warpify]
+
+[warpify.ssh]
+ssh_extension_install_mode = "always_install"
+
+[text_editing]
+vim_mode_enabled = true
+vim_unnamed_system_clipboard = true
+
+[notifications]
+toast_duration_secs = 8
+
+[notifications.preferences]
+is_agent_task_completed_enabled = true
+is_long_running_enabled = true
+is_needs_attention_enabled = true
+is_password_prompt_enabled = true
+long_running_threshold = 30
+mode = "enabled"
+play_notification_sound = true
+
+[cloud_platform]
+
+[cloud_platform.third_party_api_keys]
+can_use_warp_credits_with_byok = true
+
+[experimental]
+async_find_enabled = true
