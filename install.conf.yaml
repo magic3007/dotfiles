@@ -316,8 +316,8 @@
           Installing happy git workflow helper,
       ]
     - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codexapp >/dev/null || npm install -g codexapp@latest firebase@12.2.1 --legacy-peer-deps || true",
-          Installing CodexApp UI (firebase pinned to 12.2.1),
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codexapp >/dev/null || npm install -g codexapp@latest firebase@latest || true",
+          Installing CodexApp UI,
       ]
 
 # ---------------------------------------------------------------------------
