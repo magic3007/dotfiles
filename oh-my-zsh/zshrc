@@ -121,3 +121,5 @@ done
 unset ZSHRC_MODULE_DIR zshrc_module
 
 (( DOTFILES_ZSHRC_LOAD_DEPTH-- ))
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
