@@ -32,4 +32,4 @@ if [ -f ~/.codex/settings.json ]; then
 fi
 
 # Alias for codex with full-auto mode
-alias cx='pc codex -a never -s danger-full-access --search'
+alias cx='codex -a never -s danger-full-access --search'
