@@ -319,6 +319,7 @@ _claude_with_api() {
 
 dscc()    { _claude_with_api "deepseek-v4-flash[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
 dsccpro() { _claude_with_api "deepseek-v4-pro[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
+dsccpro2()    { _claude_with_api "deepseek-v4-pro[1m]" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
 autocc()  { _claude_with_api "ark-code-latest" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 sdcc()    { _claude_with_api "doubao-seed-2.0-lite" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
