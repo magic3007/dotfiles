@@ -38,7 +38,7 @@ Dotfiles use [Dotbot](https://github.com/anishathalye/dotbot) for installation. 
 | Terminal | tmux, zellij |
 | File Manager | ranger |
 | Git | gitconfig with aliases, custom hooks |
-| AI Tools | Claude Code (`cc`, `sdcc`, `dscc`, `kmcc`), Codex (`cx`), Gemini (`gm`), Opencode (`oc`) |
+| AI Tools | Claude Code (`cc`, `sdcc`, `dscc`, `kmcc`), Codex (`cx`), Gemini (`gm`), Pi (`pi`), Opencode (`oc`) |
 | Package Mirrors | npm, pip, conda, cargo, Go, Julia, Flutter (CN mirrors) |
 | macOS | Homebrew, Karabiner, skhd, Cursor, iTerm2 |
 | Utilities | wechat-reminder, lazygit |
@@ -56,7 +56,13 @@ mmcc    # Claude Code + MiMo
 cx      # OpenAI Codex
 gm      # Google Gemini CLI
 oc      # Opencode
+pi      # Pi coding agent
 ```
+
+Pi uses `~/.pi/agent/settings.json`. Its default model mirrors the `dsccpro`
+shell function: `deepseek-v4-pro[1m]` through DeepSeek's Anthropic-compatible
+endpoint. The API key is resolved from `DEEPSEEK_API_KEY` at runtime and is
+never stored in the repository.
 
 ## Local Customization
 

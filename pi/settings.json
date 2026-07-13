@@ -1,0 +1,6 @@
+{
+  "theme": "dark",
+  "defaultProvider": "dsccpro",
+  "defaultModel": "deepseek-v4-pro[1m]",
+  "lastChangelogVersion": "0.80.6"
+}

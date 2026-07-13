@@ -35,6 +35,7 @@
     - ~/.config/karabiner
     - ~/.codex
     - ~/.gemini
+    - ~/.pi/agent
 
 # ---------------------------------------------------------------------------
 # Git submodules (local if already initialized)
@@ -155,6 +156,8 @@
     ~/.codex/skills: codex/skills
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
+    ~/.pi/agent/settings.json: pi/settings.json
+    ~/.pi/agent/models.json: pi/models.json
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
@@ -294,6 +297,7 @@
 #   Claude Code:  npm install -g @anthropic-ai/claude-code
 #   OpenAI Codex: npm install -g @openai/codex
 #   Gemini CLI:   npm install -g @google/gemini-cli
+#   Pi:           npm install -g --ignore-scripts @earendil-works/pi-coding-agent
 #   Opencode:     curl -fsSL https://opencode.ai/install | bash
 - shell:
     - [
@@ -307,6 +311,10 @@
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v gemini >/dev/null || npm install -g @google/gemini-cli@latest || true",
           Installing Google Gemini CLI,
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null || npm install -g --ignore-scripts @earendil-works/pi-coding-agent@latest || true",
+          Installing Pi coding agent,
       ]
     - [
           "command -v opencode >/dev/null || curl --connect-timeout 10 -fsSL https://opencode.ai/install | bash || true",

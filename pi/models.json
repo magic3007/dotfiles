@@ -1,0 +1,19 @@
+{
+    "providers": {
+        "dspro": {
+            "baseUrl": "https://api.deepseek.com/anthropic",
+            "api": "anthropic-messages",
+            "apiKey": "$DEEPSEEK_API_KEY",
+            "models": [
+                {
+                    "id": "deepseek-v4-pro[1m]",
+                    "name": "DeepSeek V4 Pro 1M",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 1000000
+                }
+            ]
+        }
+    }
+}
+
