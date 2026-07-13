@@ -1,0 +1,6 @@
+{
+  "name": "ralph-loop",
+  "description": "Ralph Wiggum 迭代开发循环。三阶段工作流（需求→规划→构建），每阶段有 code review + 测试 gate。",
+  "version": "2.0.1",
+  "skills": ["./"]
+}
