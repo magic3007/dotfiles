@@ -8,7 +8,7 @@ theme = "adeberry"
 enabled = true
 primary_info = "command"
 display_granularity = "panes"
-view_mode = "compact"
+view_mode = "expanded"
 
 [appearance.window]
 zoom_level = 90

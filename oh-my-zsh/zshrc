@@ -121,5 +121,7 @@ done
 unset ZSHRC_MODULE_DIR zshrc_module
 
 (( DOTFILES_ZSHRC_LOAD_DEPTH-- ))
+# 在多个 shell 会话之间共享历史记录
+setopt SHARE_HISTORY
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

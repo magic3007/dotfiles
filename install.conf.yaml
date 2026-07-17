@@ -161,6 +161,7 @@
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
+    ~/.kimi-code/config.toml: kimi-code/config.toml
     ~/.local/bin/yolo: scripts/yolo-generic.sh
 
     # ---- Cursor skills ----
@@ -319,6 +320,10 @@
     - [
           "command -v opencode >/dev/null || curl --connect-timeout 10 -fsSL https://opencode.ai/install | bash || true",
           Installing Opencode CLI,
+      ]
+    - [
+          "command -v kimi >/dev/null || curl --connect-timeout 10 -fsSL https://code.kimi.com/kimi-code/install.sh | bash || true",
+          Installing Kimi Code CLI,
       ]
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v happy >/dev/null || npm install -g happy@latest || true",
