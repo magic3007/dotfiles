@@ -137,7 +137,8 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "feishu@minimax-plugins": true,
-    "humanize@PolyArch": true
+    "humanize@PolyArch": true,
+    "notion@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "minimax-matrix-plugins": {
