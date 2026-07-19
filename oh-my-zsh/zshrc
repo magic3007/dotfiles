@@ -130,7 +130,7 @@ setopt SHARE_HISTORY
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export CLASHCTL_HOME=$HOME/clashctl
-. $CLASHCTL_HOME/scripts/cmd/clashctl.sh
+[ -f $CLASHCTL_HOME/scripts/cmd/clashctl.sh ] && source $CLASHCTL_HOME/scripts/cmd/clashctl.sh
 
 # kimi-code
 export PATH="$HOME/.kimi-code/bin:$PATH"
