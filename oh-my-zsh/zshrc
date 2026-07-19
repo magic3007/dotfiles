@@ -124,4 +124,13 @@ unset ZSHRC_MODULE_DIR zshrc_module
 # 在多个 shell 会话之间共享历史记录
 setopt SHARE_HISTORY
 
+# common shell setup for bash and zsh
+[ -f ~/.common_shell_setup.sh ] && source ~/.common_shell_setup.sh
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+export CLASHCTL_HOME=$HOME/clashctl
+. $CLASHCTL_HOME/scripts/cmd/clashctl.sh
+
+# kimi-code
+export PATH="$HOME/.kimi-code/bin:$PATH"
