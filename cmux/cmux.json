@@ -14,7 +14,13 @@
     "forkConversationDefaultDestination": "right",
     "focusPaneOnFirstClick": true,
     "minimalMode": false,
-    "renameSelectsExistingName": true
+    "renameSelectsExistingName": true,
+    "menuBarOnly": false,
+    "globalFontMagnification": 100,
+    "commandPaletteSearchesAllSurfaces": false,
+    "reorderOnNotification": true,
+    "iMessageMode": false,
+    "keepWorkspaceOpenWhenClosingLastSurface": false
   },
 
   "terminal": {
@@ -25,6 +31,8 @@
     "showTextBoxOnNewTerminals": false,
     "focusTextBoxOnNewTerminals": false,
     "textBoxMaxLines": 10,
+    "sessionContentMaxWidth": false,
+    "sessionContentAlignment": "center",
     "agentHibernation": {
       "enabled": true,
       "idleSeconds": 300,
@@ -76,6 +84,7 @@
     "showInMenuBar": true,
     "unreadPaneRing": true,
     "paneFlash": true,
+    "suppressOnlyFocusedSurface": false,
     "agentPermissionPrompt": true,
     "agentTurnComplete": "whenIdle",
     "agentIdleReminder": true,
@@ -99,7 +108,10 @@
     "watchGitStatus": true,
     "showCustomMetadata": true,
     "branchLayout": "vertical",
-    "wrapWorkspaceTitles": false
+    "wrapWorkspaceTitles": false,
+    "hideAllDetails": false,
+    "loadingSpinnerPosition": "leading",
+    "notificationBadgePosition": "leading"
   },
 
   "workspaceColors": {
@@ -120,15 +132,34 @@
     "kiroIntegration": true,
     "ampIntegration": true,
     "suppressSubagentNotifications": true,
-    "workspaceAutoNaming": true
+    "workspaceAutoNaming": true,
+    "autoNamingAgent": "auto",
+    "portBase": 9100,
+    "portRange": 10
+  },
+
+  "workspaceGroups": {
+    "newWorkspacePlacement": "afterCurrent"
+  },
+
+  "ui": {
+    "newWorkspaceButton": "default",
+    "surfaceTabBarNewButton": "default",
+    "surfaceTabBarPlusMenu": "default"
+  },
+
+  "agentChat": {
+    "startCommand": ""
   },
 
   "browser": {
     "defaultSearchEngine": "google",
     "theme": "system",
+    "showSearchSuggestions": true,
     "openTerminalLinksInCmuxBrowser": true,
     "interceptTerminalOpenCommandInCmuxBrowser": true,
     "discardHiddenWebViews": true,
+    "hiddenWebViewDiscardDelaySeconds": 300,
     "askWhereToSaveDownloads": false
   },
 
@@ -147,5 +178,56 @@
 
   "diffViewer": {
     "defaultLayout": "unified"
+  },
+
+  "shortcuts": {
+    "showModifierHoldHints": true,
+    "bindings": {
+      "toggleSidebar": "cmd+b",
+      "commandPalette": "cmd+shift+p",
+      "openSettings": "cmd+,",
+      "reloadConfiguration": "cmd+shift+,",
+      "newTab": "cmd+n",
+      "closeWorkspace": "cmd+shift+w",
+      "splitRight": "cmd+d",
+      "splitDown": "cmd+shift+d",
+      "newSurface": "cmd+t",
+      "closeTab": "cmd+w",
+      "find": "cmd+f",
+      "findInDirectory": "cmd+shift+f",
+      "goToWorkspace": "cmd+p",
+      "openFolder": "cmd+o",
+      "quit": "cmd+q",
+      "renameWorkspace": "cmd+shift+r",
+      "openBrowser": "cmd+shift+l",
+      "focusBrowserAddressBar": "cmd+l",
+      "toggleSplitZoom": "cmd+shift+return",
+      "showNotifications": "cmd+i",
+      "jumpToUnread": "cmd+shift+u",
+      "showHideAllWindows": "ctrl+opt+cmd+.",
+      "newWindow": "cmd+shift+n",
+      "closeWindow": "ctrl+cmd+w",
+      "toggleFullScreen": "ctrl+cmd+f",
+      "globalSearch": "opt+cmd+f",
+      "toggleFileExplorer": "cmd+opt+b",
+      "focusLeft": "opt+cmd+left",
+      "focusRight": "opt+cmd+right",
+      "focusUp": "opt+cmd+up",
+      "focusDown": "opt+cmd+down",
+      "newBrowserWorkspace": "opt+cmd+n",
+      "selectWorkspaceByNumber": "cmd+1",
+      "selectSurfaceByNumber": "ctrl+1",
+      "toggleCanvasLayout": "ctrl+cmd+c",
+      "openDiffViewer": "ctrl+cmd+shift+d",
+      "saveLayoutTemplate": "ctrl+cmd+s",
+      "reopenPreviousSession": "cmd+shift+o",
+      "renameTab": "cmd+r",
+      "cycleWorkspaceStatus": "cmd+shift+;",
+      "markWorkspaceDone": "cmd+;",
+      "toggleTerminalCopyMode": "cmd+shift+m",
+      "focusTextBoxInput": "cmd+shift+a",
+      "clearScreenKeepScrollback": "cmd+shift+k",
+      "sendFeedback": ""
+    }
   }
 }
