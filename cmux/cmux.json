@@ -1,0 +1,151 @@
+{
+  "$schema": "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
+  "schemaVersion": 1,
+
+  "app": {
+    "language": "zh-Hans",
+    "appearance": "dark",
+    "windowTitleTemplate": "[cmux] {activeWorkspace}",
+    "newWorkspacePlacement": "afterCurrent",
+    "workspaceInheritWorkingDirectory": true,
+    "confirmQuit": "always",
+    "openSupportedFilesInCmux": true,
+    "openMarkdownInCmuxViewer": true,
+    "forkConversationDefaultDestination": "right",
+    "focusPaneOnFirstClick": true,
+    "minimalMode": false,
+    "renameSelectsExistingName": true
+  },
+
+  "terminal": {
+    "showScrollBar": true,
+    "scrollSpeed": 1,
+    "autoResumeAgentSessions": true,
+    "copyOnSelect": false,
+    "showTextBoxOnNewTerminals": false,
+    "focusTextBoxOnNewTerminals": false,
+    "textBoxMaxLines": 10,
+    "agentHibernation": {
+      "enabled": true,
+      "idleSeconds": 300,
+      "maxLiveTerminals": 12
+    },
+    "rendererRealization": {
+      "enabled": true,
+      "maxWarmRenderers": 12,
+      "idleSeconds": 30
+    },
+    "textBoxSubmitActions": [
+      {
+        "id": "claude",
+        "title": "Claude Code",
+        "kind": "commandTemplate",
+        "commandTemplate": "claude --dangerously-skip-permissions -- {{prompt}}",
+        "backgroundColorHex": "#F6D5C8",
+        "systemImage": "sparkle"
+      },
+      {
+        "id": "codex",
+        "title": "Codex --yolo",
+        "kind": "commandTemplate",
+        "commandTemplate": "codex --yolo -- {{prompt}}",
+        "backgroundColorHex": "#8FDBFF",
+        "systemImage": "sparkles"
+      },
+      {
+        "id": "gemini",
+        "title": "Gemini",
+        "kind": "commandTemplate",
+        "commandTemplate": "gemini --yolo -- {{prompt}}",
+        "backgroundColorHex": "#B5E48C",
+        "systemImage": "brain.head.profile"
+      },
+      {
+        "id": "opencode",
+        "title": "OpenCode",
+        "kind": "commandTemplate",
+        "commandTemplate": "opencode --prompt {{prompt}}",
+        "backgroundColorHex": "#D0B3FF",
+        "systemImage": "curlybraces"
+      }
+    ]
+  },
+
+  "notifications": {
+    "dockBadge": true,
+    "showInMenuBar": true,
+    "unreadPaneRing": true,
+    "paneFlash": true,
+    "agentPermissionPrompt": true,
+    "agentTurnComplete": "whenIdle",
+    "agentIdleReminder": true,
+    "sound": "default"
+  },
+
+  "sidebar": {
+    "showBranchDirectory": true,
+    "showWorkspaceDescription": true,
+    "showPullRequests": true,
+    "makePullRequestsClickable": true,
+    "openPullRequestLinksInCmuxBrowser": true,
+    "openPortLinksInCmuxBrowser": true,
+    "showSSH": true,
+    "showPorts": true,
+    "showLog": true,
+    "showProgress": true,
+    "showAgentActivity": true,
+    "showNotificationMessage": true,
+    "notificationMessageLineLimit": 12,
+    "watchGitStatus": true,
+    "showCustomMetadata": true,
+    "branchLayout": "vertical",
+    "wrapWorkspaceTitles": false
+  },
+
+  "workspaceColors": {
+    "indicatorStyle": "leftRail"
+  },
+
+  "sidebarAppearance": {
+    "matchTerminalBackground": false,
+    "tintColor": "#000000",
+    "tintOpacity": 0.03
+  },
+
+  "automation": {
+    "socketControlMode": "cmuxOnly",
+    "claudeCodeIntegration": true,
+    "cursorIntegration": true,
+    "geminiIntegration": true,
+    "kiroIntegration": true,
+    "ampIntegration": true,
+    "suppressSubagentNotifications": true,
+    "workspaceAutoNaming": true
+  },
+
+  "browser": {
+    "defaultSearchEngine": "google",
+    "theme": "system",
+    "openTerminalLinksInCmuxBrowser": true,
+    "interceptTerminalOpenCommandInCmuxBrowser": true,
+    "discardHiddenWebViews": true,
+    "askWhereToSaveDownloads": false
+  },
+
+  "markdown": {
+    "fontSize": 15,
+    "maxWidth": 980
+  },
+
+  "fileEditor": {
+    "wordWrap": false
+  },
+
+  "fileExplorer": {
+    "doubleClickAction": "preview"
+  },
+
+  "diffViewer": {
+    "defaultLayout": "unified"
+  }
+}

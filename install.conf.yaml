@@ -59,6 +59,10 @@
           mkdir -p ~/.config/ghostty || true,
           Creating Ghostty config directory,
       ]
+    - [
+          mkdir -p ~/.config/cmux || true,
+          Creating cmux config directory,
+      ]
 
 # ---------------------------------------------------------------------------
 # Backup existing configs before symlinking
@@ -172,6 +176,9 @@
 
     # ---- Ghostty ----
     ~/.config/ghostty/config: ghostty/config
+
+    # ---- cmux ----
+    ~/.config/cmux/cmux.json: cmux/cmux.json
 
     # ---- Warp ----
     ~/.warp: warp
