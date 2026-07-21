@@ -134,3 +134,10 @@ export CLASHCTL_HOME=$HOME/clashctl
 
 # kimi-code
 export PATH="$HOME/.kimi-code/bin:$PATH"
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
