@@ -39,7 +39,7 @@ Three shells are supported: zsh, bash, and fish.
 
 **bash/zsh**: `common_shell_setup.sh` is sourced by both `.zshrc` and `.bashrc`. It contains shared aliases, functions, env vars, and AI tool wrappers.
 
-**fish**: `fish/` directory is symlinked to `~/.config/fish/`. Fish config is maintained separately (not sourced from `common_shell_setup.sh`) because fish syntax is incompatible with POSIX shell. Structure:
+**fish**: `fish/` directory is symlinked to `~/.config/fish/`. Fish config is maintained separately (not sourced from `common_shell_setup.sh`) because fish syntax is incompatible with POSIX shell. **注意：暂不更新 fish 相关配置。** Structure:
 - `config.fish` — tool initialization (starship, zoxide, conda, venv)
 - `conf.d/` — modular config (env vars, PATH, aliases, fzf, ssh)
 - `functions/` — lazy-loaded functions (one per file, fish best practice)
