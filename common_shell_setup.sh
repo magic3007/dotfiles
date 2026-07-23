@@ -326,8 +326,8 @@ sdcc()    { _claude_with_api "doubao-seed-2.0-lite" "https://ark.cn-beijing.volc
 sdccmini(){ _claude_with_api "doubao-seed-2-0-mini-260215" "https://ark.cn-beijing.volces.com/api/compatible" "${SD2MINI_API_KEY}" claude "$@"; }
 sdccpro() { _claude_with_api "doubao-seed-2.0-pro" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
-kmcc()    { _claude_with_api "kimi-for-coding" "https://api.kimi.com/coding/" "${KIMI_CODE_API_KEY}" claude "$@"; }
-kmcc2()   { _claude_with_api "kimi-k2.6" "https://api.moonshot.cn/anthropic" "${KIMI_API_KEY}" claude "$@"; }
+kmcc()    { _claude_with_api "kimi-f3" "https://api.kimi.com/coding/" "${KIMI_CODE_API_KEY}" claude "$@"; }
+kmcc2()   { _claude_with_api "kimi-k3" "https://api.moonshot.cn/anthropic" "${KIMI_API_KEY}" claude "$@"; }
 kmcc3()   { _claude_with_api "kimi-k2.6" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
 mxcc()    { _claude_with_api "MiniMax-M2.7" "https://api.minimaxi.com/anthropic" "${MM_CODE_API_KEY}" claude "$@"; }
