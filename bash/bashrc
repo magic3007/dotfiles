@@ -179,4 +179,4 @@ export PATH=$HOME/.opencode/bin:$PATH
 
 . "$HOME/.local/bin/env"
 export CLASHCTL_HOME=$HOME/clashctl
-. $CLASHCTL_HOME/scripts/cmd/clashctl.sh
+[ -f $CLASHCTL_HOME/scripts/cmd/clashctl.sh ] && source $CLASHCTL_HOME/scripts/cmd/clashctl.sh
