@@ -183,14 +183,27 @@ docker-run-gui(){
 # Make mv and cp safer
 OS=$(uname -s)
 
+# Helper: cross-shell read with prompt
+# Usage: _shell_read prompt_text result_var
+_shell_read() {
+  if [ -n "$ZSH_VERSION" ]; then
+    # zsh: use vared for variable assignment, or read with ?prompt
+    printf "%s" "$1"
+    read -r "$2"
+  else
+    # bash/sh
+    read -r -p "$1" "$2"
+  fi
+}
+
 if [[ $OS == "Darwin" ]]; then
   # Modified from https://apple.stackexchange.com/questions/17622/how-can-i-make-rm-move-files-to-the-trash-can
   # - Correcting bad habits
   alias rm='echo -e "Use rem for reversible delete, \\\\rm for regular delete"'
   rem () {
-    setopt sh_word_split  # handle filenames with properly escaped spaces
+    [ -n "$ZSH_VERSION" ] && setopt sh_word_split  # handle filenames with properly escaped spaces (zsh only)
     echo "Removing $*"
-    read "rem_resp?OK?(y/n) "
+    _shell_read "OK?(y/n) " rem_resp
     if [[ ${rem_resp} == "y" ]]; then
       trash $*
     else
@@ -202,9 +215,9 @@ elif [[ $OS == "Linux" ]]; then
   # Credit to https://web.physics.wustl.edu/alford/linux/precautions.html
   alias rm='echo -e "Use rem for reversible delete, \\\\rm for regular delete, wipe or srm for secure delete"'
   rem () {
-    setopt sh_word_split  # handle filenames with properly escaped spaces
+    [ -n "$ZSH_VERSION" ] && setopt sh_word_split  # handle filenames with properly escaped spaces (zsh only)
     echo "Removing $*"
-    read "rem_resp?OK?(y/n) "
+    _shell_read "OK?(y/n) " rem_resp
     if [[ ${rem_resp} == "y" ]]; then
       mv --backup=numbered -t ~/.wastebasket $*
     else
@@ -220,6 +233,68 @@ elif [[ $OS == "Linux" ]]; then
   alias mv='mv -i -b'
   alias cp='cp -i -b'
 fi
+
+
+# ============================================================
+# Common shell history settings (bash & zsh)
+# ============================================================
+# Increase history size
+export HISTSIZE=10000
+export HISTFILESIZE=20000
+
+# Ignore duplicate commands and commands starting with space
+export HISTCONTROL=ignoreboth:erasedups
+
+# Append to history file (don't overwrite)
+if [ -n "$ZSH_VERSION" ]; then
+  setopt INC_APPEND_HISTORY       # Write to history file immediately, not at shell exit
+  setopt SHARE_HISTORY            # Share history across concurrent sessions
+  setopt HIST_IGNORE_DUPS         # Don't record duplicate commands consecutively
+  setopt HIST_IGNORE_SPACE        # Don't record commands starting with space
+  setopt HIST_REDUCE_BLANKS       # Remove superfluous blanks from history
+elif [ -n "$BASH_VERSION" ]; then
+  shopt -s histappend             # Append to history file, don't overwrite
+  # PROMPT_COMMAND for immediate history saving in bash
+  # Prepend history commands to existing PROMPT_COMMAND if set
+  if [ -z "$PROMPT_COMMAND" ]; then
+    PROMPT_COMMAND="history -a; history -c; history -r"
+  else
+    PROMPT_COMMAND="history -a; history -c; history -r;${PROMPT_COMMAND}"
+  fi
+fi
+
+# ============================================================
+# Common color aliases (bash & zsh)
+# ============================================================
+if command -v grep >/dev/null 2>&1; then
+  if [[ $OS == "Linux" ]]; then
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+  fi
+fi
+
+# less with color support
+if command -v less >/dev/null 2>&1; then
+  export LESS='-R -F -X'
+  # Colored man pages
+  export LESS_TERMCAP_mb=$'\e[1;32m'
+  export LESS_TERMCAP_md=$'\e[1;32m'
+  export LESS_TERMCAP_me=$'\e[0m'
+  export LESS_TERMCAP_se=$'\e[0m'
+  export LESS_TERMCAP_so=$'\e[01;33m'
+  export LESS_TERMCAP_ue=$'\e[0m'
+  export LESS_TERMCAP_us=$'\e[1;4;31m'
+fi
+
+# ============================================================
+# Common directory navigation
+# ============================================================
+# cd aliases
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
 
 
 # vscode
