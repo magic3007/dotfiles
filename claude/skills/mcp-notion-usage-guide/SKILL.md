@@ -7,10 +7,12 @@ description: |
   (3) 查询数据库中的条目内容，
   (4) 创建页面时MULTI_SELECT字段值不存在导致失败，
   (5) 需要更新数据库schema添加新选项，
-  (6) 开发需要集成Notion数据的自动化工作流。
+  (6) 开发需要集成Notion数据的自动化工作流，
+  (7) query_data_sources/query-database-view返回Business Plan要求错误，
+  (8) 需要在无Business Plan的情况下枚举数据库所有条目。
 author: Claude Code
-version: 1.3.0
-date: 2026-05-07
+version: 1.4.0
+date: 2026-07-10
 ---
 
 # MCP Notion工具使用指南
@@ -79,6 +81,57 @@ ALTER COLUMN "Institution" SET MULTI_SELECT('existing1':blue, 'existing2':red, '
 - 多选字段的内容需要以JSON数组格式传递，如`["THU", "Yale"]`
 - MULTI_SELECT字段的值必须是数据库schema中已定义的选项，否则创建会失败
 
+### 6. 数据库查询限制与无Business Plan的枚举方案
+
+#### 背景：两个查询工具均需Business Plan
+MCP Notion提供了两个数据库查询工具，但**都需要Notion Business计划 + Notion AI**：
+- `query_data_sources`（SQL模式）：支持SQLite查询，需Business Plan
+- `query_data_sources`（view模式）：基于视图查询，需Business Plan
+- `query-database-view`：查询视图数据，需Business Plan
+
+当账户为Free/Plus计划时，这些工具会返回：
+```
+This tool requires a Business plan or higher with Notion AI. Upgrade your plan to query data sources
+```
+
+#### 解决方案：多关键词语义搜索枚举法
+当无法使用SQL/视图查询时，可以通过`notion-search`工具配合`data_source_url`参数，使用**多种不同搜索关键词**系统性地枚举数据库中的所有条目。
+
+**核心原理：**
+- `notion-search`对`data_source_url`内的语义搜索没有计划限制
+- 不同搜索关键词会匹配到数据库中不同的条目子集
+- 通过足够多的关键词轮次，可以覆盖绝大部分（甚至全部）数据库条目
+
+**操作步骤：**
+1. 先用`notion-fetch`获取数据库页面，从中提取`data_source_url`（格式：`collection://...`）
+2. 使用`notion-search`，传入`data_source_url`参数，用不同关键词进行多轮搜索
+3. 将所有轮次的结果去重合并，得到完整的条目列表
+
+**关键词策略（按覆盖效果排序）：**
+1. **字母分组**：`a b c d e`, `h i j k l m n`, `v w x y z` 等 → 覆盖面最广
+2. **领域关键词**：`AI ML PhD`, `computer science`, `deep learning` → 命中研究相关条目
+3. **角色/身份词**：`student lab research`, `professor`, `postdoc` → 按类型覆盖
+4. **通用标签**：`University`, `engineering`, `candidate` → 补充遗漏
+
+**实战经验：**
+- 对于~60条记录的数据库，6-7轮不同关键词搜索可覆盖95%+的条目
+- 每轮`page_size=25`，实际去重后通常获得40-60条唯一记录
+- 搜索结果按语义相关性排序，配合不同关键词可让不同条目轮流"置顶"
+
+#### 两个工具的能力矩阵
+
+| 工具 | 用途 | Free/Plus | Business+AI |
+|------|------|-----------|-------------|
+| `notion-fetch` | 获取页面/数据库schema | ✅ | ✅ |
+| `notion-search` | 语义搜索（支持data_source限定） | ✅ | ✅ |
+| `query_data_sources` (SQL) | SQL查询数据库 | ❌ | ✅ |
+| `query_data_sources` (view) | 视图查询 | ❌ | ✅ |
+| `query-database-view` | 视图查询 | ❌ | ✅ |
+
+#### SQL查询返回结构无数据的说明
+- `query_data_sources` 的SQL模式在Free/Plus计划完全不可用（直接报Business Plan错误），不是"返回空数据"
+- 这与早期版本的`notion-fetch` SQL查询限制（仅返回schema）是**两个不同的问题**
+
 ## Verification
 1. 调用`mcp__notion__notion-fetch`传入数据库页面URL，能够正常返回包含schema和表结构的信息
 2. 使用data source URL和SQL查询，能够获取到数据库中的条目内容
@@ -114,6 +167,8 @@ for researcher in researchers:
 - 敏感数据库需要确保Claude Code有访问权限，否则会返回权限错误
 - 定期检查MCP官方文档获取最新功能和API变化
 - **重要限制**：当前版本MCP Notion工具的SQL查询功能仅支持获取表结构和schema信息，不支持查询数据库中的实际数据记录，相关功能可能会在未来版本中实现
+- **Business Plan限制**：`query_data_sources`和`query-database-view`工具在Free/Plus计划不可用。如需枚举数据库条目，使用第6节的多关键词语义搜索枚举法
+- **搜索枚举覆盖率**：对于大型数据库（100条+），多轮语义搜索可能无法100%覆盖，需要更多的关键词轮次和更大的page_size。如确实需要完整数据，建议升级到Business计划
 
 ## References
 - [Notion MCP 工具官方文档](https://github.com/modelcontextprotocol/servers/tree/main/src/notion)
