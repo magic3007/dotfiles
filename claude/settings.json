@@ -35,7 +35,7 @@
       "Bash(chmod:*)"
     ],
     "deny": [],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
   "hooks": {
     "PreToolUse": [
@@ -127,7 +127,9 @@
     "superpowers@claude-plugins-official": true,
     "feishu@minimax-plugins": true,
     "humanize@PolyArch": true,
-    "notion@claude-plugins-official": true
+    "notion@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "minimax-matrix-plugins": {
