@@ -7,7 +7,8 @@
 1. **扫描 memory** — 查找今天修改的 `~/.claude/projects/*/memory/*.md` 文件
 2. **运行 `/insights`** — 生成 Claude Code 使用分析报告（会话模式、摩擦点）
 3. **生成报告** — 通过 DeepSeek API 分析数据，输出结构化自省报告
-4. **推送通知** — 通过 wechat-reminder 发送到飞书/微信
+4. **创建飞书文档** — 通过 lark-cli 将报告写入飞书云文档，便于存档和搜索
+5. **IM 提醒** — 可选，通过 lark-cli 发送文档链接到指定会话
 
 ## 报告内容
 
@@ -45,9 +46,22 @@ tail -f ~/.claude/logs/daily-insights.log
 ## 依赖
 
 - `claude` CLI（通过 nvm 安装）
-- `wechat-reminder`（`~/.local/bin/wechat-reminder`）
+- `lark-cli`（需完成 `lark-cli auth login` 用户认证）
 - `DEEPSEEK_API_KEY` 环境变量
-- `FEISHU_WEBHOOK_URL` 环境变量（飞书通道）
+- `SELF_REFLECTION_LARK_CHAT_ID` 环境变量（可选，格式 `ou_xxx` 或 `oc_xxx`，设置后会收到 IM 提醒）
+
+## 环境变量配置
+
+在 `~/.zshenv` 中添加：
+
+```bash
+# 必需：DeepSeek API key
+export DEEPSEEK_API_KEY="sk-xxx"
+
+# 可选：IM 提醒目标（不设置则只创建文档，不发消息）
+export SELF_REFLECTION_LARK_CHAT_ID="ou_b396f13f1f20846b2a2537160c7ac128"  # 发给自己
+# export SELF_REFLECTION_LARK_CHAT_ID="oc_xxx"   # 或发到群里
+```
 
 ## 跨平台
 

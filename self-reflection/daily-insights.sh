@@ -5,13 +5,14 @@
 # 流程:
 #   1. 查找今天修改的 memory/*.md 文件
 #   2. 调用 claude (DeepSeek API) 读取 memory + 运行 /insights
-#   3. 通过 wechat-reminder 发送结构化自省报告
+#   3. 创建飞书文档存放完整报告
+#   4. 通过 lark-cli IM 发送文档链接提醒
 #
 # 依赖:
 #   - claude CLI (通过 nvm)
-#   - wechat-reminder (~/.local/bin/wechat-reminder)
+#   - lark-cli (需完成 auth login，默认 --as user)
 #   - DEEPSEEK_API_KEY 环境变量
-#   - FEISHU_WEBHOOK_URL 环境变量（可选，用于飞书通道）
+#   - SELF_REFLECTION_LARK_CHAT_ID 环境变量（飞书群 ID 或个人 open_id，用于发送提醒）
 
 set -euo pipefail
 
@@ -50,13 +51,23 @@ export PATH="$NODE_BIN:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
 # 检查必需的工具
 command -v claude >/dev/null 2>&1 || { log "错误: claude CLI 未找到（PATH=$PATH）"; exit 1; }
-command -v wechat-reminder >/dev/null 2>&1 || { log "错误: wechat-reminder 未找到"; exit 1; }
+command -v lark-cli >/dev/null 2>&1 || { log "错误: lark-cli 未找到"; exit 1; }
+
+# 检查 lark-cli 认证状态
+LARK_AUTH=$(LARKSUITE_CLI_NO_UPDATE_NOTIFIER=1 LARKSUITE_CLI_NO_SKILLS_NOTIFIER=1 lark-cli auth status --json --verify 2>&1)
+if ! echo "$LARK_AUTH" | python3 -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if d.get('verified') else 1)" 2>/dev/null; then
+    log "错误: lark-cli 未认证，请先运行 lark-cli auth login"
+    exit 1
+fi
 
 # 检查 API key
 if [[ -z "${DEEPSEEK_API_KEY:-}" ]]; then
     log "错误: DEEPSEEK_API_KEY 环境变量未设置"
     exit 1
 fi
+
+# 目标会话 ID（用于发送文档链接提醒）
+LARK_CHAT_ID="${SELF_REFLECTION_LARK_CHAT_ID:-}"
 
 log "======== 开始每日自省 ========"
 
@@ -92,14 +103,14 @@ trap "rm -f $PROMPT_FILE" EXIT
 
 # Prompt 主体
 cat > "$PROMPT_FILE" << 'ENDOFPROMPT'
-你是一个每日自省助手。请严格按以下步骤操作：
+你是一个每日自省助手。**所有输出必须使用中文。** 请严格按以下步骤操作：
 
 ## 步骤1: 读取今天的 memory 文件
 
 ENDOFPROMPT
 
 if [[ -n "$MEMORY_FILES" ]]; then
-    echo "请使用 Read 工具逐个读取以下文件并总结今日活动：" >> "$PROMPT_FILE"
+    echo "请使用 Read 工具逐个读取以下文件并用中文总结今日活动：" >> "$PROMPT_FILE"
     echo "$MEMORY_FILES" | while IFS= read -r f; do
         echo "  - $f" >> "$PROMPT_FILE"
     done
@@ -112,34 +123,34 @@ cat >> "$PROMPT_FILE" << 'ENDOFPROMPT'
 ## 步骤2: 运行并读取 insights
 先运行 `/insights` 命令生成 insights 报告（记住输出的文件路径）。
 然后用 Read 工具读取该 HTML 报告的完整内容。
+**注意：/insights 生成的 HTML 是英文的，你需要把其中的核心信息翻译成中文后输出。**
 
 ## 步骤3: 输出每日自省报告
 
-综合 memory 文件内容（如有）和 insights 报告，输出一份结构化每日自省报告。
+综合 memory 文件内容（如有）和 insights 报告，用**纯中文**输出一份结构化每日自省报告。
+
+注意：这份报告将直接写入飞书文档，使用标准 Markdown 格式。
 
 ### 输出格式要求
 
-使用飞书 lark_md 格式。注意：lark_md 不支持 Markdown 表格，不要使用表格。
+严格按照以下结构输出，使用 Markdown 语法，**全文中文**：
 
-严格按照以下四个部分输出：
+# 📋 今日活动摘要
+（根据 memory 文件总结今日做了什么，3-5 个要点。无文件则写"今日无记录"）
 
-📋 **今日活动摘要**
-（根据 memory 文件总结今日做了什么，3-5 个要点，每点一行。无文件则写"今日无记录"）
+# 📊 Insights 报告
+（/insights HTML 中的完整信息翻译为中文后输出，保留原文结构不要删减。如无数据则写"今日无 insights 数据"）
 
-📊 **Insights 报告**
-（完整提取 /insights HTML 报告中的文本内容，保留原文，不要总结或删减。如果没有 insights 数据则写"今日无 insights 数据"）
+# 🔍 Insights 分析
+（基于数据，用中文列出核心发现、使用模式、摩擦点、效率问题）
 
-🔍 **Insights 分析**
-（基于 insights 报告的核心发现、使用模式、摩擦点、效率问题。每点一行，不超过 5 点）
+# 💡 改进建议
+（最多 3 条具体可操作建议，中文）
 
-💡 **改进建议**
-（基于以上数据，给出最多 3 条具体可操作的改进建议。每条一行，不空洞）
-
-### 风格要求
-- 不要用代码块，不要用 Markdown 表格
-- 直接输出报告正文，不要加任何前言或后记
-- 在报告末尾加上一行：📎 完整报告: file://<报告文件路径>
-- 完整保留原始报告的文字内容
+### 语言要求
+- **整个报告正文必须是中文**，包括标题、要点、分析、建议
+- Insights 中的英文术语（如 model、token、skill 等）保留英文原文，但在括号中给出中文说明
+- 日期、数据指标等数值原样保留，不翻译
 ENDOFPROMPT
 
 PROMPT=$(cat "$PROMPT_FILE")
@@ -185,18 +196,77 @@ fi
 
 log "claude 返回 ${#REPORT} 字符的报告"
 
-# ---- 步骤 4: 发送通知 ----
-log "发送自省报告..."
+# ---- 步骤 4: 创建飞书文档 ----
+log "创建飞书文档..."
 
-TITLE="📋 $(date '+%Y-%m-%d') 每日自省报告"
-SEND_RESULT=$(wechat-reminder --title "$TITLE" --desp "$REPORT" --color wathet 2>&1)
-SEND_EXIT=$?
+# 将报告写入临时文件（用 @file 传参避免 shell 转义问题）
+REPORT_FILE=$(mktemp /tmp/daily-insights-report-XXXXXX.md)
+echo "$REPORT" > "$REPORT_FILE"
 
-echo "$SEND_RESULT" | tee -a "$LOG_FILE"
+DOC_DATE=$(date '+%Y-%m-%d')
+DOC_TITLE="📋 ${DOC_DATE} 每日自省报告"
 
-if [[ $SEND_EXIT -eq 0 ]]; then
-    log "======== 自省报告发送成功 ========"
-else
-    log "======== 自省报告发送失败 ========"
+# 创建飞书文档（Markdown 格式）
+CREATE_RESULT=$(
+    LARKSUITE_CLI_NO_UPDATE_NOTIFIER=1 LARKSUITE_CLI_NO_SKILLS_NOTIFIER=1 \
+    lark-cli docs +create \
+        --doc-format markdown \
+        --title "$DOC_TITLE" \
+        --content "@$REPORT_FILE" \
+        --as user \
+        --json 2>&1
+)
+CREATE_EXIT=$?
+rm -f "$REPORT_FILE"
+
+if [[ $CREATE_EXIT -ne 0 ]]; then
+    log "错误: 飞书文档创建失败 (exit=$CREATE_EXIT)"
+    log "输出: $(echo "$CREATE_RESULT" | head -10)"
     exit 1
 fi
+
+# 检查创建是否成功
+if ! echo "$CREATE_RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if d.get('ok') else 1)" 2>/dev/null; then
+    log "错误: 飞书文档创建失败"
+    log "$CREATE_RESULT"
+    exit 1
+fi
+
+# 提取文档 URL
+DOC_URL=$(echo "$CREATE_RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['document']['url'])" 2>/dev/null || echo "")
+log "文档已创建: $DOC_URL"
+
+# ---- 步骤 5: 发送 IM 提醒 ----
+if [[ -n "$LARK_CHAT_ID" ]]; then
+    log "发送文档链接提醒到 $LARK_CHAT_ID..."
+
+    if [[ "$LARK_CHAT_ID" == oc_* ]]; then
+        # 群聊
+        LARKSUITE_CLI_NO_UPDATE_NOTIFIER=1 LARKSUITE_CLI_NO_SKILLS_NOTIFIER=1 \
+        lark-cli im +messages-send \
+            --chat-id "$LARK_CHAT_ID" \
+            --markdown "📋 [每日自省报告 ${DOC_DATE}](${DOC_URL}) 已生成，点击查看。" \
+            --as user 2>&1 | tee -a "$LOG_FILE" || true
+    else
+        # 个人（open_id，如 ou_xxx）
+        LARKSUITE_CLI_NO_UPDATE_NOTIFIER=1 LARKSUITE_CLI_NO_SKILLS_NOTIFIER=1 \
+        lark-cli im +messages-send \
+            --user-id "$LARK_CHAT_ID" \
+            --markdown "📋 [每日自省报告 ${DOC_DATE}](${DOC_URL}) 已生成，点击查看。" \
+            --as user 2>&1 | tee -a "$LOG_FILE" || true
+    fi
+else
+    log "未设置 SELF_REFLECTION_LARK_CHAT_ID，跳过 IM 提醒"
+    log "在 ~/.zshenv 或 cron 环境中设置:"
+    log "  export SELF_REFLECTION_LARK_CHAT_ID=ou_xxx   # 发给自己"
+    log "  export SELF_REFLECTION_LARK_CHAT_ID=oc_xxx   # 发到群里"
+fi
+
+# 输出文档链接到 stdout
+echo ""
+echo "======================================"
+echo "  自省报告已生成"
+echo "  文档: $DOC_URL"
+echo "======================================"
+
+log "======== 自省报告流程完成 ========"
