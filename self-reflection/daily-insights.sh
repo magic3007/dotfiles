@@ -99,7 +99,7 @@ fi
 # ---- 步骤 2: 构建 prompt ----
 # 使用临时文件放入 prompt 以避免 shell 转义问题
 PROMPT_FILE=$(mktemp /tmp/daily-insights-prompt.XXXXXX)
-trap "rm -f $PROMPT_FILE" EXIT
+trap 'rm -f "$PROMPT_FILE"' EXIT
 
 # Prompt 主体
 cat > "$PROMPT_FILE" << 'ENDOFPROMPT'
