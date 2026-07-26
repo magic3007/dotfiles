@@ -149,10 +149,8 @@
     ~/.claude/settings.json: claude/settings.json
     ~/.claude/config.json: claude/config.json
     ~/.claude/skills: claude/skills
-    ~/.claude/agents: claude/agents
     ~/.claude/commands: claude/commands
     ~/.claude/hooks: claude/hooks
-    ~/.claude/rules: claude/rules
     ~/.claude/scripts: claude/scripts
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
