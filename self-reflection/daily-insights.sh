@@ -99,7 +99,8 @@ fi
 # ---- 步骤 2: 构建 prompt ----
 # 使用临时文件放入 prompt 以避免 shell 转义问题
 PROMPT_FILE=$(mktemp /tmp/daily-insights-prompt.XXXXXX)
-trap 'rm -f "$PROMPT_FILE"' EXIT
+REPORT_FILE=""
+trap 'rm -f "$PROMPT_FILE" ${REPORT_FILE:+"$REPORT_FILE"}' EXIT
 
 # Prompt 主体
 cat > "$PROMPT_FILE" << 'ENDOFPROMPT'
@@ -200,7 +201,7 @@ log "claude 返回 ${#REPORT} 字符的报告"
 log "创建飞书文档..."
 
 # 将报告写入临时文件（用 @file 传参避免 shell 转义问题）
-REPORT_FILE=$(mktemp /tmp/daily-insights-report-XXXXXX.md)
+REPORT_FILE=$(mktemp ./daily-insights-report-XXXXXX.md)
 echo "$REPORT" > "$REPORT_FILE"
 
 DOC_DATE=$(date '+%Y-%m-%d')
