@@ -129,3 +129,15 @@ When adding new dotfile configs:
 1. Add the config file to this repo
 2. Add a symlink entry to the `link` section in `install.conf.yaml`
 3. If platform-specific, wrap in a shell condition: `test "$(uname)" = "Darwin" && ...`
+
+## Shell Scripting Rules
+
+When writing or modifying shell scripts in this dotfiles repo: (1) Never use ANSI-C quoting (`$'...'`) inside double-quoted strings — it causes silent syntax corruption with odd-numbered quote counts. (2) All shared functions in `common_shell_setup.sh` must be compatible with both bash and zsh. Test with both shells before committing changes.
+
+## Commit Conventions
+
+Always use the smart-commit workflow for staged changes: analyze diffs, group related files into logical commits, use conventional commit format (feat/fix/chore/docs), and get user approval before executing. Push to master after committing unless told otherwise.
+
+## Built-in Commands
+
+`/insights` is a built-in Claude Code command for generating usage analytics reports. Do not attempt to recreate it as a custom command or skill — just invoke it directly.
