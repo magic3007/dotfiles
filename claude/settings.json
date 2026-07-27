@@ -52,6 +52,15 @@
             "command": "bash ~/.claude/scripts/check_dangerous_ops.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[[ \"$CLAUDE_FILE\" == *.sh ]] && shellcheck --shell=bash \"$CLAUDE_FILE\" 2>/dev/null || true"
+          }
+        ]
       }
     ],
     "PostToolUse": [

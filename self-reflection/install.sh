@@ -11,7 +11,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT_PATH="$SCRIPT_DIR/daily-insights.sh"
 CRON_MARKER="# daily-self-reflection (managed by install.sh)"
-CRON_ENTRY="7 22 * * * /bin/zsh -l '$SCRIPT_PATH' $CRON_MARKER"
+CRON_ENTRY="7 22 * * * LARKSUITE_CLI_NO_UPDATE_NOTIFIER=1 LARKSUITE_CLI_NO_SKILLS_NOTIFIER=1 /bin/zsh -l '$SCRIPT_PATH' $CRON_MARKER"
 
 # ---- 颜色 ----
 RED='\033[0;31m'
@@ -35,6 +35,10 @@ check_prereqs() {
     if [[ ! -x "$SCRIPT_PATH" ]]; then
         msg_error "脚本不可执行: $SCRIPT_PATH (运行 chmod +x $SCRIPT_PATH)"
         ok=false
+    fi
+
+    if ! command -v lark-cli &>/dev/null; then
+        msg_warn "lark-cli 不可用，请先安装: lark-cli update"
     fi
 
     if ! command -v crontab &>/dev/null; then
@@ -107,6 +111,10 @@ install_cron() {
         echo ""
         msg_warn "macOS 用户: 如果 cron 不执行，请确保终端/iTerm2 有「完全磁盘访问权限」"
         msg_warn "系统设置 → 隐私与安全性 → 完全磁盘访问权限 → 添加终端"
+        echo ""
+        msg_warn "同时确认已设置环境变量（在 ~/.zshenv 中）:"
+        msg_warn "  DEEPSEEK_API_KEY"
+        msg_warn "  SELF_REFLECTION_LARK_CHAT_ID (可选)"
     fi
 }
 
