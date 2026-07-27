@@ -340,6 +340,15 @@
       ]
 
 # ---------------------------------------------------------------------------
+# Lark/Feishu CLI (official CLI for Lark/Feishu platform)
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+        "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v lark-cli >/dev/null || npx @larksuite/cli@latest install || true",
+        Installing Lark/Feishu CLI (lark-cli),
+      ]
+
+# ---------------------------------------------------------------------------
 # WeChat Reminder (inlined, no longer fetched from gitee)
 # ---------------------------------------------------------------------------
 - shell:

@@ -40,6 +40,7 @@ echo "  1. 🔑 SSH Key    - Check or generate SSH key for GitHub"
 echo "  2. 🛠️  Install   - Install Node.js + Claude Code CLI"
 echo "  3. ⚙️  Configure - Set up Claude Code API (VolcEngine by default)"
 echo "  4. 🚀 Dotfiles  - Clone repo and run full dotfiles installation"
+echo "                   (includes Lark/Feishu CLI)"
 echo "  5. ✅ Verify    - Launch Claude Code to verify and troubleshoot"
 echo ""
 echo "Default API Settings:"
@@ -257,7 +258,7 @@ fi
 cd "$DOTFILES_DIR"
 echo ""
 warn "Running full dotfiles installation..."
-warn "  - This includes: Homebrew (macOS), oh-my-zsh, fzf, GitHub CLI, wechat-reminder, etc."
+warn "  - This includes: Homebrew (macOS), oh-my-zsh, fzf, GitHub CLI, Lark CLI, wechat-reminder, etc."
 warn "  - Depending on your network speed, this takes **3-10 minutes**"
 warn "  - Failed network operations won't block the installation\n"
 
@@ -328,7 +329,7 @@ Follow these steps:
 4. Verify critical components work:
    - ls ~/.oh-my-zsh/custom/plugins/
    - command -v fzf
-   - command -v claude codex gemini opencode
+   - command -v claude codex gemini opencode lark-cli
    - command -v wechat-reminder
 
 5. Report what you found and what you fixed.
