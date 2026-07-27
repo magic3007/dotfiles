@@ -1,0 +1,6 @@
+[Unit]
+Description=Sync dotfiles (git pull + dotbot cross-platform configs)
+
+[Service]
+Type=oneshot
+ExecStart=%h/dotfiles/sync.sh
