@@ -8,7 +8,15 @@
         create: true
         relink: true
 
-- clean: ["~"]
+- clean:
+    - "~/.config/"
+    - "~/.claude/"
+    - "~/.codex/"
+    - "~/.gemini/"
+    - "~/.local/bin/"
+    - "~/.cursor/"
+    - "~/.pi/"
+    - "~/.kimi-code/"
 
 - create:
     - ~/.vim/undo-history
