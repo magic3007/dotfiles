@@ -6,3 +6,4 @@ vim/undo-history
 .claude/
 **/*.pyc
 fish/conf.d/local.fish
+.worktrees/
