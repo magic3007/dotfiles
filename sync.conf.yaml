@@ -1,0 +1,98 @@
+# =============================================================================
+# sync.conf.yaml — Cross-platform dotfiles sync (no network required)
+# Used by sync.sh for automatic 15-min sync across all machines
+# =============================================================================
+
+- defaults:
+    link:
+        create: true
+        relink: true
+
+- clean:
+    - "~/.config/"
+    - "~/.claude/"
+    - "~/.codex/"
+    - "~/.gemini/"
+    - "~/.local/bin/"
+    - "~/.cursor/"
+    - "~/.pi/"
+    - "~/.kimi-code/"
+
+- create:
+    - ~/.vim/undo-history
+    - ~/.wastebasket
+    - ~/.config/ghostty
+    - ~/.config/cmux
+    - ~/.config/bat
+
+- link:
+    # ---- Shell ----
+    ~/.zshenv: oh-my-zsh/zshenv
+    ~/.zshrc: oh-my-zsh/zshrc
+    ~/.zshrc.d: oh-my-zsh/zshrc.d
+    ~/.bashrc: bash/bashrc
+    ~/.common_shell_setup.sh: common_shell_setup.sh
+
+    # ---- Git ----
+    ~/.gitconfig: git/gitconfig
+
+    # ---- Terminal multiplexer ----
+    ~/.tmux.conf: tmux.conf
+
+    # ---- Editors ----
+    ~/.vimrc: vim/vimrc/vimrc
+    ~/.vim_runtime: vim/vimrc
+    ~/.ideavimrc: ideavimrc
+    ~/.config/nvim: neovim/nvim-basic-ide
+
+    # ---- File managers ----
+    ~/.config/ranger: ranger
+    ~/.config/joshuto: joshuto
+    ~/.config/yazi: yazi
+
+    # ---- CLI tools ----
+    ~/.config/lsd: lsd
+    ~/.config/starship.toml: starship/starship.toml
+    ~/.config/bat/config: bat/config
+
+    # ---- Debugger ----
+    ~/.gdb: gdb
+    ~/.gdbinit: gdb/gdbinit
+
+    # ---- Package managers (CN mirrors) ----
+    ~/.condarc: condarc
+    ~/.mambarc: mambarc
+    ~/.npmrc: npmrc
+    ~/.config/pip/pip.conf: pip.conf
+    ~/.cargo/config.toml: cargo/config.toml
+
+    # ---- Language config ----
+    ~/.Rprofile: Rprofile
+
+    # ---- AI tools ----
+    ~/.claude/settings.json: claude/settings.json
+    ~/.claude/config.json: claude/config.json
+    ~/.claude/skills: claude/skills
+    ~/.claude/commands: claude/commands
+    ~/.claude/hooks: claude/hooks
+    ~/.claude/scripts: claude/scripts
+    ~/.codex/config.json: codex/config.json
+    ~/.codex/settings.json: codex/settings.json
+    ~/.codex/codex_env.sh: codex/codex_env.sh
+    ~/.codex/skills: codex/skills
+    ~/.gemini/settings.json: gemini/settings.json
+    ~/.gemini/skills: gemini/skills
+    ~/.pi/agent/settings.json: pi/settings.json
+    ~/.pi/agent/models.json: pi/models.json
+    ~/.chatgpt.sh: chatgpt/chatgpt.sh
+    ~/.config/opencode/opencode.json: opencode/opencode.json
+    ~/.config/opencode/package.json: opencode/package.json
+    ~/.kimi-code/config.toml: kimi-code/config.toml
+    ~/.local/bin/yolo: scripts/yolo-generic.sh
+    ~/.cursor/skills: claude/skills
+
+    # ---- Ghostty (cross-platform) ----
+    ~/.config/ghostty/config: ghostty/config
+
+    # ---- cmux ----
+    ~/.config/cmux/cmux.json: cmux/cmux.json

@@ -11,6 +11,8 @@ Dotfiles repository using [Dotbot](https://github.com/anishathalye/dotbot) for i
 ```bash
 ./install              # Full installation (idempotent, safe to re-run)
 ./install -n           # Dry run — preview what would be installed
+./sync.sh              # Quick sync (git pull + cross-platform symlinks only)
+./sync.sh --install    # Install auto-sync scheduler (every 15 minutes)
 git submodule update --init --recursive  # Update Vim plugins
 ```
 
@@ -28,6 +30,21 @@ git submodule update --init --recursive  # Update Vim plugins
 ### Symlink Model
 
 All configs live in this repo and are symlinked to `~` via Dotbot. The `link` section in `install.conf.yaml` is the single source of truth for what gets symlinked where. When adding new configs: add files to the repo, then add symlink entries to `install.conf.yaml`.
+
+### Auto-Sync System
+
+`sync.sh` provides automatic 15-minute cross-platform sync across all machines (macOS, Linux):
+
+- **`./sync.sh`** — Git pull + apply only cross-platform symlinks (via `sync.conf.yaml`)
+- **`./sync.sh --install`** — Install scheduler: macOS LaunchAgent or Linux systemd timer
+- **Auto-enabled** — `sync.sh --install` runs automatically during `./install`, no manual setup needed
+- **Error notification** — On failure, sends alert via wechat-reminder (Feishu/WeChat)
+
+`sync.conf.yaml` is a Dotbot config containing only cross-platform, non-sensitive symlinks. It is a subset of `install.conf.yaml`, excluding:
+- macOS-specific tools (yabai, skhd, karabiner, iTerm2, Warp)
+- Network install steps (oh-my-zsh, Homebrew, npm, fzf)
+- Unmaintained configs (fish shell)
+- Platform install scripts
 
 ### Local Customization Pattern
 

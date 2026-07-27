@@ -206,6 +206,15 @@
           Setting execute permission for RTK hook,
       ]
 
+# ---------------------------------------------------------------------------
+# Enable auto-sync (every 15 minutes)
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          bash sync.sh --install || true,
+          Enabling automatic dotfiles sync (every 15 minutes),
+      ]
+
 # ===========================================================================
 # Phase 2: Network-Dependent Operations
 # ===========================================================================
