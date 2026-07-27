@@ -392,27 +392,20 @@ _claude_with_api() {
     "$binary" "$@" --dangerously-skip-permissions
 }
 
-dscc()    { _claude_with_api "deepseek-v4-flash[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
-dsccpro() { _claude_with_api "deepseek-v4-pro[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
-dsccpro2()    { _claude_with_api "deepseek-v4-pro[1m]" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+
+dscc()    { _claude_with_api "deepseek-v4-flash" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+dsccpro()    { _claude_with_api "deepseek-v4-pro[1m]" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+dsccx()    { _claude_with_api "deepseek-v4-flash[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
+dsccprox() { _claude_with_api "deepseek-v4-pro[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
 
 autocc()  { _claude_with_api "ark-code-latest" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 sdcc()    { _claude_with_api "doubao-seed-2.0-lite" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
-sdccmini(){ _claude_with_api "doubao-seed-2-0-mini-260215" "https://ark.cn-beijing.volces.com/api/compatible" "${SD2MINI_API_KEY}" claude "$@"; }
 sdccpro() { _claude_with_api "doubao-seed-2.0-pro" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
 kmcc()    { _claude_with_api "kimi-k3" "https://api.kimi.com/coding/" "${KIMI_CODE_API_KEY}" claude "$@"; }
 kmcc2()   { _claude_with_api "kimi-k3" "https://api.moonshot.cn/anthropic" "${KIMI_API_KEY}" claude "$@"; }
-kmcc3()   { _claude_with_api "kimi-k3" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
-mxcc()    { _claude_with_api "MiniMax-M2.7" "https://api.minimaxi.com/anthropic" "${MM_CODE_API_KEY}" claude "$@"; }
-mmcc()    { _claude_with_api "mimo-v2-pro" "https://token-plan-cn.xiaomimimo.com/anthropic" "${MIMO_CODE_API_KEY}" claude "$@"; }
-
-glmcc()   { _claude_with_api "glm-5.1" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
-glmcc2()  { _claude_with_api "Pro/zai-org/GLM-5.1" "https://api.siliconflow.cn/" "${SLFLOW_API_KEY}" claude "$@"; }
-
-hglmcc()  { _claude_with_api "glm-5.1" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" happy "$@"; }
-hglmcc2() { _claude_with_api "Pro/zai-org/GLM-5.1" "https://api.siliconflow.cn/" "${SLFLOW_API_KEY}" happy "$@"; }
+glmcc()   { _claude_with_api "glm-5.2" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
 
 # uv - Python package manager
