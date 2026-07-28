@@ -32,11 +32,19 @@ do_sync() {
 }
 
 install_launchagent() {
+    if [[ "$(id -u)" -eq 0 ]] && [[ -n "${SUDO_USER:-}" ]]; then
+        echo "❌ Do not run with sudo. Use: ./sync.sh --install" >&2
+        exit 1
+    fi
+
     local plist_src="$DOTFILES_DIR/com.dotfiles.sync.plist"
     local plist_dest="$HOME/Library/LaunchAgents/com.dotfiles.sync.plist"
 
     mkdir -p "$HOME/Library/LaunchAgents"
     sed "s|__HOME__|$HOME|g" "$plist_src" > "$plist_dest"
+
+    # Unload first if already loaded, then reload
+    launchctl unload "$plist_dest" 2>/dev/null || true
     launchctl load "$plist_dest"
     echo "✅ Installed LaunchAgent at $plist_dest"
 }
