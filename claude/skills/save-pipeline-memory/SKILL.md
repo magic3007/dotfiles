@@ -1,130 +1,108 @@
 ---
 name: save-pipeline-memory
 description: |
-  Capture the current session's workflow pipeline memory into a timestamped
-  markdown file inside a user-specified folder. The core output is the final
-  working pipeline written as clean, reproducible steps; the detours, failed
-  attempts and pitfalls hit along the way are recorded separately as lessons.
-  Timestamped snapshots stay in pipeline_memory/ (not auto-loaded); when a
-  pipeline is mature it can be promoted into pipeline_memory/PIPELINE.md and
-  imported by the project CLAUDE.md via @pipeline_memory/PIPELINE.md so future
-  sessions load it automatically. Use when the user wants to checkpoint or
-  persist a working pipeline so a future session can reproduce it, when
-  finishing a stage of a multi-step task, or when the user says things like
-  "保存工作流记忆", "save pipeline memory", "记录一下当前进展",
-  "让 CLAUDE.md 能看到 pipeline", "/save-pipeline-memory". Takes an optional
-  folder path as argument.
+  Capture a multi-step workflow into a timestamped pipeline memory after trial-and-error
+  sessions. The core output is: (1) the final working commands saved as executable scripts
+  (not bare shell commands), and (2) a structured markdown document separating the clean
+  reproducible pipeline from the detours and pitfalls. Timestamped snapshots live in
+  pipeline_memory/; mature pipelines can be promoted to PIPELINE.md and auto-loaded.
+  Fully environment-agnostic — works for any project, any toolset, any domain. Use when
+  the user finishes a multi-step task, says "保存工作流记忆", "save pipeline memory",
+  "记录一下当前进展", or "/save-pipeline-memory". Takes an optional folder path.
 ---
 
 # Save Pipeline Memory
 
-在 session 运行过程中，把当前工作流的"记忆"整理成一个带时间戳的 Markdown 文件，
-保存到用户指定的文件夹，供未来的 session 续接或回顾。
+在经历多轮试错之后，把最终跑通的工作流固化下来。核心产出两样东西：
+1. **可执行的脚本** — 最终能跑通的命令，封装为接受参数的脚本，别人拿到就能跑
+2. **Pipeline Memory 文档** — 干净的可复现步骤 + 弯路经验的分离记录
 
-这是**手动触发**的 skill：由用户调用（`/save-pipeline-memory [文件夹路径]`）或在
-完成阶段性工作时使用。它依赖 Claude 对当前会话的理解来智能归纳，不做机械 dump。
+本 skill 是**通用方案**，不绑定任何特定项目、工具或环境。
 
-## 核心理念：主角与配角
+## 核心理念
 
-- **主角 = 最终能跑通的 pipeline**：把成功路径提炼成干净、有序、可直接复现的步骤，
-  剔除所有试错。读者照着这一节就能重新跑通，不必趟坑。
-- **配角 = 弯路与经验**：中间试过但没走通的方案、踩过的坑，单独记录，作为
-  "为什么最终方案长这样"的注脚，帮未来避免重走弯路。
+```
+试错过程                    最终产出
+─────────                  ────────
+手拼命令 → 失败             ✅ 脚本（可重复运行）
+改参数   → 失败              📝 Pipeline Memory（可复现步骤）
+再试     → 成功             💡 弯路经验（避免重蹈覆辙）
+```
 
-两者严格分开——绝不把失败的命令混进最终 pipeline。
+- **脚本化是终点**：最终 pipeline 里的每一步必须是一个脚本调用，不是手拼的裸命令。
+  脚本接受参数、不硬编码路径、从配置文件自动读取可推导值。
+- **主角与配角分离**：成功路径放进 "✅ Pipeline"，试错过程放进 "💡 弯路与经验"。
 
-保存的记忆文件包含这几节：会话概览、✅ 最终可跑通的 Pipeline（主角）、
-💡 弯路与经验（配角）、关键决策、产出与指标、下一步。
+## 两层存储
 
-## 两层存储：探索快照 vs 定稿 pipeline
-
-Claude Code 每个 session **只自动加载 `CLAUDE.md`**（及其用 `@路径` 导入的文件），
-不会自动扫描 `pipeline_memory/`。据此分两层：
-
-- **探索快照（不自动加载）**：带时间戳的 `pipeline_memory/YYYY-MM-DD_HHMM_*.md`，
-  含弯路经验，是过程档案。故意不自动加载，避免每个 session 都被试错档案塞满上下文。
-- **定稿 pipeline（自动加载）**：当某条 pipeline 探索成熟、确认跑通后，把那条**干净的
-  最终 pipeline** 提炼进 `pipeline_memory/PIPELINE.md`（单一真相源、无弯路），并在项目
-  `CLAUDE.md` 里加一行 `@pipeline_memory/PIPELINE.md` 导入，使每个新 session 自动带上它。
-
-普通保存只产出探索快照（第 1-4 步）。当 pipeline 确认成熟时，额外执行第 5 步提炼定稿。
+| 层级 | 文件 | 何时加载 | 内容 |
+|------|------|---------|------|
+| 探索快照 | `pipeline_memory/YYYY-MM-DD_HHMM_<描述>.md` | 不自动加载 | 完整记录（含弯路） |
+| 定稿 pipeline | `pipeline_memory/PIPELINE.md` | 通过 `CLAUDE.md` 自动加载 | 只含干净的最终步骤 |
 
 ## 工作流程
 
-### 第 1 步：确定保存文件夹
+### 第 1 步：确定保存位置
 
-按以下优先级确定目标文件夹：
+1. 用户传入的路径参数（如 `/save-pipeline-memory ~/my-project`）
+2. 若未传参，检查当前目录下是否已有 `pipeline_memory/`
+3. 都没有，用 `<cwd>/pipeline_memory/`，先告知用户
 
-1. 用户调用时传入的路径参数（`args`），如 `/save-pipeline-memory ~/pipeline-memory`。
-2. 若无参数，检查当前工作目录下是否已有 `pipeline_memory/` 目录，有则用它。
-3. 都没有，则默认用 `<cwd>/pipeline_memory/`，并**在创建前明确告知用户将要创建的路径**。
+### 第 2 步：提取脚本（核心步骤）
 
-确定后用 `mkdir -p <目标文件夹>` 确保目录存在。
+回顾 session 中最终跑通的命令，将其**改写为可执行脚本**，保存到合适的位置（项目 `scripts/` 或 `pipeline_memory/scripts/`）：
 
-### 第 2 步：区分主角与配角，收集记忆
+- 脚本接受 CLI 参数，不硬编码路径或值
+- 从配置文件（JSON/YAML/meta 文件）自动读取可推导的参数
+- 复制已验证成功的配置作为模板，只 patch 必要字段
+- 确保另一人拿到脚本 + 数据就能复现，无需从 memory 里复制粘贴
 
-回顾**当前整个 session** 的上下文，做一次关键的分拣：
+**不要在 memory 里记录手拼的裸命令**（如 `tool submit --flag1 --flag2 ...`），除非该步骤确实无法脚本化。
 
-1. **先还原最终跑通的路径**：哪些步骤、命令、配置是真正让事情成功的？把它们排成
-   一条干净、有序、可复现的序列，剔除中途的失败尝试。这是主角。
-2. **再收集弯路**：过程中试过但没走通的方案、踩过的坑、报过的错——归入配角，
-   每条都要落到"教训"或"因此选择了 X"，不要只记流水账。
+### 第 3 步：写入 Pipeline Memory
 
-收集时：
-- 优先从已发生的工具调用、命令输出、文件改动中提取事实，不要凭空编造。
-- 若本 session 尚未跑通，如实把状态标为"部分跑通/未跑通"，最终 pipeline 一节
-  只写已确认有效的部分，剩余写进"下一步"。
-- 对运行时状态、验证结果这类断言，只写你实际验证过的；没验证的标注清楚。
+按 `references/memory-template.md` 模板写入时间戳文件：
 
-如需查证当前环境状态，可运行只读命令（如 `git status`、`git log --oneline -5`、
-`git rev-parse --abbrev-ref HEAD`）来填充分支/commit 等元信息。
+- `YYYY-MM-DD_HHMM_<kebab-case-描述>.md`
+- 必填：会话概览、✅ Pipeline（脚本调用形式）、💡 弯路与经验
+- Pipeline 一节里不放失败命令，不放裸 shell 命令
+- 未跑通的步骤写进「下一步」
 
-### 第 3 步：按模板写入文件
+### 第 4 步：同步飞书文档（如项目配置了飞书文档）
 
-读取 `references/memory-template.md` 获取完整的文件结构和填写要点，然后：
+检查 `CLAUDE.md` 或用户指定是否有关联的飞书文档。如果有，将以下信息同步过去：
 
-- 文件名格式：`YYYY-MM-DD_HHMM_<kebab-case-任务描述>.md`
-- 用 `date +%Y-%m-%d_%H%M` 获取时间戳前缀，避免手写出错。
-- 必填"会话概览"和"✅ 最终可跑通的 Pipeline"两节；有弯路则填"💡 弯路与经验"。
-- 最终 pipeline 一节里绝不放失败的命令；失败尝试一律进"弯路与经验"。
-- 若任务未跑通，"下一步 / 未解决"一节必须写清楚，这是续接的关键。
+**必须更新的内容**：
 
-### 第 4 步：确认
+1. **全链路状态表** — 每个步骤的 Job ID（带可点击链接）、状态、输入/输出绝对路径
+2. **数据组成表** — 每个数据源的绝对路径、样本数、Token 占比
+3. **训练/评测结果表** — 关键指标（avg_pass1、train_iters 等）
+4. **向上管理摘要** — 当前阶段、阻塞项、下一步，方便管理者一眼看懂进展
 
-写完后向用户报告：保存到了哪个文件、最终 pipeline 有几步、记了几条弯路经验、
-文件行数。不要复述全文。
+**格式要求**：
 
-### 第 5 步（可选）：提炼定稿 pipeline 到 CLAUDE.md
+- **表格优先**：多步骤状态、参数配置、数据源 → Markdown 表格
+- **链接强制**：每个 Job/Task/Model ID 必须带可点击链接，不写裸 ID
+- **绝对路径**：每个文件/脚本/数据一律写完整绝对路径
+- **描述性文字**：每个章节加一段"目的/背景"说明，让人不需要翻代码就能读懂
+- **图表尽可能多**：状态、占比、对比都用表格呈现，不写纯文字列表
 
-仅当 pipeline **确认成熟、稳定跑通**，且用户希望它对未来 session 自动可见时执行。
-判断标准：状态为"已跑通"，且这条 pipeline 会被反复使用/续接。
+### 第 5 步：确认
 
-1. 把这次（及历史快照里）**干净的最终 pipeline** 提炼、合并进
-   `<保存文件夹>/PIPELINE.md`。这是单一真相源：只保留可复现的成功步骤，
-   不含弯路，不带时间戳文件名那套命名。若已存在则**就地更新对应小节**，
-   而非追加重复内容。
-2. 确保项目 `CLAUDE.md` 里有导入行。检查是否已存在，没有才追加：
-   ```
-   @pipeline_memory/PIPELINE.md
-   ```
-   （路径按 `PIPELINE.md` 相对于 `CLAUDE.md` 的实际位置调整。若保存文件夹在项目外，
-   `@` 导入需用相对/绝对路径，且要提醒用户该文件在仓库外、他人 clone 后看不到。）
-3. 向用户说明：探索快照仍留在 `pipeline_memory/` 供回溯，定稿已进 `PIPELINE.md`
-   并通过 `CLAUDE.md` 自动加载。
+报告保存位置、Pipeline 步数、弯路条数、产出的脚本文件、飞书文档更新情况。
 
-修改 `CLAUDE.md` 前先读它，确认导入行不重复；这是对项目共享文件的改动，动作要克制。
+### 第 6 步（可选）：提炼 PIPELINE.md
 
-## 安全与质量约束
+当 pipeline 成熟稳定后：
+1. 将干净步骤提炼进 `PIPELINE.md`（单一真相源，无弯路）
+2. 在项目入口文件（如 `CLAUDE.md`）中添加 `@pipeline_memory/PIPELINE.md` 导入
+3. 探索快照保留供回溯
 
-- **不泄密**：遇到密钥、token、`.env` 内容，用键名引用（`API_KEY=<redacted>`），
-  绝不把明文值写进记忆文件。
-- **诚实记录**：最终 pipeline 只写确认跑通的；没跑通就如实标状态并把缺口写进下一步。
-- **弯路要有结论**：每条弯路都要落到教训或"因此选择了 X"，否则不值得记。
-- **精炼**：只记非显而易见、对未来有用的信息。
-- **不覆盖**：每次生成新的时间戳文件，绝不覆盖已有记忆文件。
+## 质量约束
 
-## 与其他 skill 的关系
-
-本 skill 关注"把跑通的工作流现场固化下来"。若目标是为项目搭建**长期调试知识库体系**
-（规则文件 + 目录规范 + 团队流程），那是 `debug-experience-system` 的职责。
-两者可配合：本 skill "弯路与经验"里的坑可沉淀进调试知识库。
+- **脚本化优先**：最终 pipeline 每一步是脚本调用，不是裸命令
+- **环境无关**：不假定特定工具名（如 mmctl/vela），用通用描述替代
+- **不泄密**：密钥/token 用键名引用（`API_KEY=<redacted>`）
+- **弯路有结论**：每条弯路落到教训或"因此选择了 X"
+- **诚实标注**：未跑通的如实标状态
+- **文档可复现**：飞书文档中的每一步都要有链接+绝对路径，另一个人照着就能操作
