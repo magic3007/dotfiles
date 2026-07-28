@@ -135,6 +135,9 @@ main() {
     # Install jnv (interactive JSON viewer with jq/fzf-like features)
     install_jnv
 
+    # Install mgrep (semantic grep tool)
+    install_mgrep
+
     info "Package installation complete"
 }
 
@@ -695,6 +698,25 @@ install_jnv() {
         warn "Failed to download jnv from ${download_url}"
     fi
     \rm -rf "${tmp_dir}"
+}
+
+install_mgrep() {
+    if command -v mgrep >/dev/null 2>&1; then
+        info "mgrep already installed"
+        return 0
+    fi
+
+    if ! command -v npm >/dev/null 2>&1; then
+        warn "npm not found, cannot install mgrep"
+        return 1
+    fi
+
+    info "Installing mgrep via npm..."
+    if npm install -g @mixedbread/mgrep; then
+        info "mgrep installed globally via npm"
+    else
+        warn "Failed to install mgrep via npm"
+    fi
 }
 
 main "$@"

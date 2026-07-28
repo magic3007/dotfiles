@@ -100,6 +100,25 @@ install_rtk() {
     fi
 }
 
+install_mgrep() {
+    if command -v mgrep >/dev/null 2>&1; then
+        info "mgrep already installed"
+        return 0
+    fi
+
+    if ! command -v npm >/dev/null 2>&1; then
+        warn "npm not found, cannot install mgrep"
+        return 1
+    fi
+
+    info "Installing mgrep via npm..."
+    if npm install -g @mixedbread/mgrep; then
+        info "mgrep installed globally via npm"
+    else
+        warn "Failed to install mgrep via npm"
+    fi
+}
+
 main() {
     if [ "$(uname)" != "Darwin" ]; then
         echo "Not macOS, skipping"
@@ -112,6 +131,7 @@ main() {
     install_neovim
     install_ghostty
     install_rtk
+    install_mgrep
 
     info "macOS package installation complete"
 }

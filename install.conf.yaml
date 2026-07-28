@@ -340,6 +340,10 @@
           Installing Kimi Code CLI,
       ]
     - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v mgrep >/dev/null || npm install -g @mixedbread/mgrep@latest || true",
+          Installing mgrep (semantic grep tool),
+      ]
+    - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v happy >/dev/null || npm install -g happy@latest || true",
           Installing happy git workflow helper,
       ]
