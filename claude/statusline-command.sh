@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Status line for Claude Code
-# Derived from shell PS1: \u@\h:\w (green user@host, blue directory)
+# Derived from the user's Starship prompt (gruvbox theme, ~/.config/starship.toml)
 # This script processes JSON input from stdin and outputs a status line.
-# Colors: using dimmed ANSI colors (Claude Code renders them dimmed)
+# Colors use the gruvbox palette: orange=#d65d0e, yellow=#d79921, aqua=#689d6a,
+# blue=#458588, bg3=#665c54, bg1=#3c3836, fg0=#fbf1c7, green=#98971a
 
 set -euo pipefail
 
@@ -21,47 +22,70 @@ session_name=$(echo "$input" | jq -r '.session_name // empty')
 vim_mode=$(echo "$input" | jq -r '.vim.mode // empty')
 rate_5h=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
 rate_7d=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+repo=$(echo "$input" | jq -r '.workspace.repo | if . then .owner + "/" + .name else empty end')
+pr_number=$(echo "$input" | jq -r '.pr.number // empty')
+pr_review=$(echo "$input" | jq -r '.pr.review_state // empty')
+time=$(date +%R)
 
-# Color codes (dimmed as Claude Code renders them dimmed)
-green='\033[32m'
-blue='\033[34m'
-yellow='\033[33m'
-cyan='\033[36m'
-magenta='\033[35m'
+# Gruvbox color codes (ANSI 256 to match gruvbox palette)
+# Claude Code renders colors as dimmed, so we use bright variants
+orange='\033[38;5;214m'      # gruvbox orange #d65d0e
+yellow='\033[38;5;220m'      # gruvbox yellow #d79921
+aqua='\033[38;5;108m'        # gruvbox aqua #689d6a
+blue='\033[38;5;68m'         # gruvbox blue #458588
+gray='\033[38;5;242m'        # gruvbox bg3 #665c54
+darkgray='\033[38;5;239m'    # gruvbox bg1 #3c3836
+green='\033[38;5;142m'       # gruvbox green #98971a
 reset='\033[0m'
 bold='\033[1m'
 dim='\033[2m'
 
-# Build the output
-out=""
+# Build the output in Starship-inspired segments
 
-# user@host in green (matching PS1's \u@\h)
-out="${out}${green}${user}@${host}${reset}"
+# (1) OS icon + username (orange, matching Starship $os + $username)
+printf "${orange}${reset} " 2>/dev/null  # Linux icon (falls back to nothing)
+printf "${orange}%s${reset}" "${user}@${host}"
 
-# directory in blue (matching PS1's \w)
-# Shorten home directory to ~
+# (2) Directory (yellow, matching Starship $directory)
 dir_display="${dir/#$HOME/~}"
-out="${out}:${blue}${dir_display}${reset}"
+printf " ${yellow}%s${reset}" "$dir_display"
 
-# Git branch info (optional, skip locks)
+# (3) Git branch + status (aqua, matching Starship $git_branch + $git_status)
 if [ -n "$dir" ] && [ -d "$dir/.git" ]; then
   branch=$(git --git-dir="$dir/.git" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -n "$branch" ]; then
-    out="${out} ${magenta}(${branch})${reset}"
+    status=$(git --git-dir="$dir/.git" --no-optional-locks status --porcelain --ignore-submodules=dirty 2>/dev/null || true)
+    dirty=""
+    [ -n "$status" ] && dirty="*"
+    printf " ${aqua} %s%s${reset}" "$branch" "$dirty"
   fi
 fi
 
-# Context window
+# (4) Repo owner/name (dimmed, when available from workspace)
+if [ -n "$repo" ]; then
+  printf " ${dim}${gray}(%s)${reset}" "$repo"
+fi
+
+# (5) PR number (when available)
+if [ -n "$pr_number" ] && [ "$pr_number" != "null" ]; then
+  review_info=""
+  if [ -n "$pr_review" ] && [ "$pr_review" != "null" ]; then
+    review_info="[${pr_review}]"
+  fi
+  printf " ${blue}PR#%s%s${reset}" "$pr_number" "${review_info}"
+fi
+
+# (6) Context window (dimmed, red when low)
 if [ -n "$context_remaining" ] && [ "$context_remaining" != "null" ]; then
   pct=$(printf "%.0f" "$context_remaining")
   if [ "$pct" -lt 20 ]; then
-    out="${out} ${yellow}ctx:${pct}%${reset}"
+    printf " ${orange}ctx:%d%%${reset}" "$pct"
   else
-    out="${out} ${dim}ctx:${pct}%${reset}"
+    printf " ${dim}ctx:%d%%${reset}" "$pct"
   fi
 fi
 
-# Claude.ai rate limits
+# (7) Claude.ai rate limits (dimmed)
 rate_out=""
 if [ -n "$rate_5h" ] && [ "$rate_5h" != "null" ]; then
   rate_out="5h:$(printf '%.0f' "$rate_5h")%"
@@ -71,25 +95,25 @@ if [ -n "$rate_7d" ] && [ "$rate_7d" != "null" ]; then
   rate_out="${rate_out}7d:$(printf '%.0f' "$rate_7d")%"
 fi
 if [ -n "$rate_out" ]; then
-  out="${out} ${dim}${rate_out}${reset}"
+  printf " ${dim}${gray}%s${reset}" "$rate_out"
 fi
 
-# Vim mode indicator
+# (8) Vim mode indicator (bold yellow for NORMAL mode)
 if [ -n "$vim_mode" ] && [ "$vim_mode" != "null" ]; then
   if [ "$vim_mode" = "NORMAL" ]; then
-    out="${out} ${bold}${yellow}NORMAL${reset}"
+    printf " ${bold}${yellow}NORMAL${reset}"
   fi
 fi
 
-# Session name
+# (9) Session name (cyan)
 if [ -n "$session_name" ] && [ "$session_name" != "null" ]; then
-  out="${out} ${cyan}\"${session_name}\"${reset}"
+  printf " ${blue}\"%s\"${reset}" "$session_name"
 fi
 
-# Model
+# (10) Time (gray, matching Starship $time)
+printf " ${gray}%s${reset}" "$time"
+
+# (11) Model (dimmed, at the end)
 if [ -n "$model" ] && [ "$model" != "null" ]; then
-  out="${out} ${dim}${model}${reset}"
+  printf " ${dim}%s${reset}" "$model"
 fi
-
-# Print the result (no trailing $ or > as per instructions)
-printf "%b" "$out"

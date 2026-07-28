@@ -76,6 +76,7 @@
     ~/.claude/commands: claude/commands
     ~/.claude/hooks: claude/hooks
     ~/.claude/scripts: claude/scripts
+    ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.codex/config.json: codex/config.json
     ~/.codex/settings.json: codex/settings.json
     ~/.codex/codex_env.sh: codex/codex_env.sh
