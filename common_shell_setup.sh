@@ -408,6 +408,26 @@ kmcc2()   { _claude_with_api "kimi-k3" "https://api.moonshot.cn/anthropic" "${KI
 glmcc()   { _claude_with_api "glm-5.2" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
 
+# pi coding-agent equivalents of the *cc API aliases above.
+# Providers (URLs + model ids) live in the tracked pi/models.json; only the
+# API keys stay as env vars ($VE_CODE_API_KEY etc.) referenced by those providers.
+# Note: pi sends the model id verbatim — if a gateway rejects a "[1m]" suffix
+# (as api.appintheloop.com did for opus), drop it in pi/models.json.
+dspi()     { pi --provider arkcoding --model 'deepseek-v4-flash[1m]' "$@"; }
+dspipro()  { pi --provider arkcoding --model 'deepseek-v4-pro[1m]' "$@"; }
+dspix()    { pi --provider dspro     --model 'deepseek-v4-flash[1m]' "$@"; }
+dspiprox() { pi --provider dspro     --model 'deepseek-v4-pro[1m]' "$@"; }
+
+autopi()   { pi --provider arkcoding --model 'ark-code-latest' "$@"; }
+sdpi()     { pi --provider arkcoding --model 'doubao-seed-2.0-lite' "$@"; }
+sdpipro()  { pi --provider arkcoding --model 'doubao-seed-2.0-pro' "$@"; }
+
+kmpi()     { pi --provider kimicode  --model 'kimi-k3' "$@"; }
+kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
+
+glmpi()    { pi --provider arkcoding --model 'glm-5.2' "$@"; }
+
+
 # uv - Python package manager
 # uv installs to ~/.local/bin by default
 export PATH="$HOME/.local/bin:$PATH"

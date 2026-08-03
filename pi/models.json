@@ -11,9 +11,109 @@
                     "reasoning": true,
                     "input": ["text"],
                     "contextWindow": 1000000
+                },
+                {
+                    "id": "deepseek-v4-flash[1m]",
+                    "name": "DeepSeek V4 Flash 1M",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 1000000
+                }
+            ]
+        },
+        "arkcoding": {
+            "baseUrl": "https://ark.cn-beijing.volces.com/api/coding",
+            "api": "anthropic-messages",
+            "apiKey": "$VE_CODE_API_KEY",
+            "models": [
+                {
+                    "id": "deepseek-v4-flash[1m]",
+                    "name": "DeepSeek V4 Flash 1M (Ark)",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 1000000
+                },
+                {
+                    "id": "deepseek-v4-pro[1m]",
+                    "name": "DeepSeek V4 Pro 1M (Ark)",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 1000000
+                },
+                {
+                    "id": "ark-code-latest",
+                    "name": "Ark Code Latest",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 256000
+                },
+                {
+                    "id": "doubao-seed-2.0-lite",
+                    "name": "Doubao Seed 2.0 Lite",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 256000
+                },
+                {
+                    "id": "doubao-seed-2.0-pro",
+                    "name": "Doubao Seed 2.0 Pro",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 256000
+                },
+                {
+                    "id": "glm-5.2",
+                    "name": "GLM 5.2 (Ark)",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 256000
+                }
+            ]
+        },
+        "kimicode": {
+            "baseUrl": "https://api.kimi.com/coding/",
+            "api": "anthropic-messages",
+            "apiKey": "$KIMI_CODE_API_KEY",
+            "models": [
+                {
+                    "id": "kimi-k3",
+                    "name": "Kimi K3 (Coding)",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 256000
+                }
+            ]
+        },
+        "moonshot": {
+            "baseUrl": "https://api.moonshot.cn/anthropic",
+            "api": "anthropic-messages",
+            "apiKey": "$KIMI_API_KEY",
+            "models": [
+                {
+                    "id": "kimi-k3",
+                    "name": "Kimi K3 (Moonshot)",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 256000
+                }
+            ]
+        },
+        "appintheloop": {
+            "baseUrl": "https://api.appintheloop.com/",
+            "api": "anthropic-messages",
+            "apiKey": "$MAFIA_API_KEY",
+            "headers": {
+                "X-Sub-Module": "claude-code-internal"
+            },
+            "models": [
+                {
+                    "id": "claude-opus-4-8",
+                    "name": "Opus 4.8 (appintheloop)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
                 }
             ]
         }
     }
 }
-
