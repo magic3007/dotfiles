@@ -1,7 +1,21 @@
 # Pipeline Memory 模板
 
-核心理念：**最终能跑通的 pipeline 写成脚本调用**；中间的试错、弯路单独记录。
+核心理念：**最终能跑通的 pipeline 每一步必须是脚本调用，不允许裸命令。**
 读者应该只看"✅ Pipeline"一节就能复现，不必趟坑。
+
+> ⚠️ **脚本强制规则**：Pipeline 节里如果出现了裸命令（如 `vela submit --flag1 ...`），说明工作没做完——先去把命令封装成脚本，再回来写 Pipeline Memory。
+
+## 什么算"脚本调用" vs "裸命令"
+
+```bash
+# ❌ 裸命令 — 不允许出现在 Pipeline 节
+vela submit --model-id 204737 --snippet-id 7047 --data /path/to/data.jsonl
+python -c "import json; ..."
+
+# ✅ 脚本调用 — 这才是 Pipeline 节应该有的形式
+bash scripts/submit_eval.sh --config exprs/v1/config.yaml
+python scripts/process_data.py --input ./data.jsonl --output ./results/
+```
 
 文件命名：`YYYY-MM-DD_HHMM_<简短任务描述>.md`
 
@@ -63,7 +77,7 @@ bash scripts/step2_yyy.sh --config <path>
 
 ## 填写要点
 
-- **脚本化**：Pipeline 每一步写成 `python script.py --arg val` 形式，不写裸 `tool submit --flag1 ... --flag2 ...`
+- **脚本化（硬约束，不可跳过）**：Pipeline 每一步写成 `bash scripts/xxx.sh --arg val` 或 `python scripts/xxx.py --arg val` 形式。**裸命令是完成前的中间状态，不是最终产出。** 如果你发现自己在 Pipeline 节里写裸命令，停下来，先去写脚本。
 - **可复现**：命令和路径要具体，别人拿到脚本+数据就能跑
 - **主配分明**：成功路径进 Pipeline，失败尝试进弯路
 - **诚实**：没跑通就标注"部分跑通"，缺口写进下一步
