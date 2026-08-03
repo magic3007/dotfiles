@@ -526,7 +526,10 @@
         "magic_dev2": "linux",
         "lyqhd": "linux",
         "alish": "linux",
-        "alsh": "linux"
+        "alsh": "linux",
+        "dev": "linux",
+        "axe": "linux",
+        "cm": "linux"
     },
     "security.workspace.trust.untrustedFiles": "open",
     "settingsSync.ignoredExtensions": [
@@ -11223,5 +11226,7 @@
     "terminal.integrated.fontFamily": "monospace",
     "cursor.rpcFileLogger.enabled": true,
     "window.commandCenter": true,
-    "terminal.integrated.macOptionIsMeta": true
+    "terminal.integrated.macOptionIsMeta": true,
+    "window.autoDetectColorScheme": true,
+    "workbench.preferredLightColorTheme": "Cursor Dark"
 }
