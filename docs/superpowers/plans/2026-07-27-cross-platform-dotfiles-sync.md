@@ -429,9 +429,29 @@ git commit -m "feat: add systemd timer for Linux auto-sync"
 
 ---
 
-### Task 5: Install scheduler on macOS
+### Task 5: Integrate with install.conf.yaml and install on macOS
 
-- [ ] **Step 1: Run `--install` on this machine**
+**Files:**
+- Modify: `install.conf.yaml`
+
+The sync scheduler should be auto-enabled when `./install` runs. Add a shell command in Phase 1 of `install.conf.yaml` that calls `bash sync.sh --install`.
+
+- [ ] **Step 1: Add sync enable step to install.conf.yaml**
+
+Add to the Phase 1 `Local post-link setup` section in `install.conf.yaml`:
+
+```yaml
+# ---------------------------------------------------------------------------
+# Enable auto-sync (every 15 minutes)
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          bash sync.sh --install || true,
+          Enabling automatic dotfiles sync (every 15 minutes),
+      ]
+```
+
+- [ ] **Step 2: Run `--install` on this machine**
 
 ```bash
 cd ~/dotfiles && ./sync.sh --install
