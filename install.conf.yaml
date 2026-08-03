@@ -314,7 +314,7 @@
 #   Claude Code:  npm install -g @anthropic-ai/claude-code
 #   OpenAI Codex: npm install -g @openai/codex
 #   Gemini CLI:   npm install -g @google/gemini-cli
-#   Pi:           npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+#   Pi:           curl -fsSL https://pi.dev/install.sh | sh
 #   Opencode:     curl -fsSL https://opencode.ai/install | bash
 - shell:
     - [
@@ -330,8 +330,8 @@
           Installing Google Gemini CLI,
       ]
     - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null || npm install -g --ignore-scripts @earendil-works/pi-coding-agent@latest || true",
-          Installing Pi coding agent,
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null || (yes | curl --connect-timeout 30 -fsSL https://pi.dev/install.sh | sh) || true",
+          Installing Pi coding agent via pi.dev,
       ]
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-powerline-footer@0.7.0 || true",
