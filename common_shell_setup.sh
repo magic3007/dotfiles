@@ -393,7 +393,7 @@ _claude_with_api() {
 }
 
 
-dscc()    { _claude_with_api "deepseek-v4-flash" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+dscc()    { _claude_with_api "deepseek-v4-flash[1m]" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 dsccpro()    { _claude_with_api "deepseek-v4-pro[1m]" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 dsccx()    { _claude_with_api "deepseek-v4-flash[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
 dsccprox() { _claude_with_api "deepseek-v4-pro[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
