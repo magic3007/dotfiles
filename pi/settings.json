@@ -1,6 +1,14 @@
 {
-  "theme": "dark",
+  "theme": "gruvbox-dark",
   "defaultProvider": "dsccpro",
   "defaultModel": "deepseek-v4-pro[1m]",
-  "lastChangelogVersion": "0.80.6"
+  "lastChangelogVersion": "0.80.6",
+  "packages": [
+    "my-pi-plugins",
+    "npm:pi-powerline-footer@0.7.0",
+    "npm:pi-web-access"
+  ],
+  "terminal": {
+    "showTerminalProgress": true
+  }
 }

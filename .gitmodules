@@ -19,3 +19,6 @@
 [submodule "dotbot-git"]
 	path = dotbot-git
 	url = https://github.com/DrDynamic/dotbot-git.git
+[submodule "pi/my-pi-plugins"]
+	path = pi/my-pi-plugins
+	url = https://github.com/magic3007/my-pi-plugins.git

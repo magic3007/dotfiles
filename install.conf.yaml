@@ -161,6 +161,7 @@
     ~/.gemini/skills: gemini/skills
     ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
+    ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
@@ -331,6 +332,14 @@
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null || npm install -g --ignore-scripts @earendil-works/pi-coding-agent@latest || true",
           Installing Pi coding agent,
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-powerline-footer@0.7.0 || true",
+          Installing pi-powerline-footer (companion for my-pi-plugins gruvbox theme),
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-web-access || true",
+          Installing pi-web-access (companion for my-pi-plugins),
       ]
     - [
           "command -v opencode >/dev/null || curl --connect-timeout 10 -fsSL https://opencode.ai/install | bash || true",
