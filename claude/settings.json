@@ -40,7 +40,7 @@
       "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": [],
-    "defaultMode": "auto"
+    "defaultMode": "default"
   },
   "hooks": {
     "PreToolUse": [
