@@ -92,6 +92,7 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 - `codex/` → `~/.codex/` — OpenAI Codex config and env
 - `gemini/` → `~/.gemini/` — Gemini CLI settings
 - `opencode/` → `~/.config/opencode/` — Opencode config
+- `pi/` → `~/.pi/agent/` — Pi coding-agent settings, models, and bundled package (see below)
 
 **Tool-specific skills**: Claude, Codex, and Gemini use independent skill directories:
 - `claude/skills/` -> `~/.claude/skills`
@@ -109,6 +110,12 @@ Add a skill to each tool's own directory when it should be available there. Curs
 **Safe directories**: `output/`, `test_output/`, `debug_output/` are whitelisted in `check_dangerous_ops.sh` — Claude can freely write/delete within these without prompts.
 
 **Plugins** (in `settings.json`): superpowers (official), feishu, humanize — installed via marketplace system with `extraKnownMarketplaces` config.
+
+**Pi package** (`pi/my-pi-plugins/`): the [magic3007/my-pi-plugins](https://github.com/magic3007/my-pi-plugins) pi package is vendored as a **git submodule** and symlinked to `~/.pi/agent/my-pi-plugins`. It bundles 5 extensions (`tmux-bash`, `fuzzy-file-finder`, `tree-nav`, `afang-subagent`, `todo`) and the `gruvbox-dark` theme (pure TypeScript, no build/deps). Registration lives in `pi/settings.json`:
+- `packages` array declares the local package by **relative path** (`"my-pi-plugins"`, resolved from `~/.pi/agent/`) plus two npm companions (`npm:pi-powerline-footer@0.7.0`, `npm:pi-web-access`). Relative path keeps it portable across machines.
+- `theme` is set to `gruvbox-dark` (a package cannot force a theme, so it must be selected explicitly).
+
+Install flow: Dotbot symlinks the submodule (Phase 1); Phase 2 runs `pi install npm:...` to fetch the npm companions' bits. `pi install` is **idempotent** against already-declared entries, so it never mutates the tracked symlinked `settings.json`. Update the vendored package with `git submodule update --remote pi/my-pi-plugins`. Both `install.conf.yaml` and `sync.conf.yaml` carry the `~/.pi/agent/my-pi-plugins` symlink so it syncs cross-platform.
 
 ### Chinese Mirrors
 
