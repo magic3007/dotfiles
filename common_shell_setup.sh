@@ -428,6 +428,10 @@ kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
 glmpi()    { pi --provider arkcoding --model 'glm-5.2' "$@"; }
 
 
+# lark-cli - Lark/Feishu CLI tool
+alias lark='lark-cli'
+
+
 # uv - Python package manager
 # uv installs to ~/.local/bin by default
 export PATH="$HOME/.local/bin:$PATH"
@@ -472,6 +476,57 @@ fi
 
 # better color for claude code
 export COLORTERM=truecolor
+
+# ============================================================
+# Global npm packages version check
+# ============================================================
+# Automatically detects when node version changes (via nvm) and
+# warns if globally installed npm packages are missing.
+# Manages a manifest file ~/.npm-global-packages as the expected list.
+NPM_MANIFEST="$HOME/.npm-global-packages"
+NPM_VERCHECK="$HOME/.npm-global-version-check"
+
+_npm_check_global_packages() {
+  command -v npm >/dev/null 2>&1 || return 0
+
+  local current_node_ver
+  current_node_ver="$(node --version 2>/dev/null)"
+
+  # Skip if already checked for this node version
+  if [ -f "$NPM_VERCHECK" ]; then
+    read -r saved_ver < "$NPM_VERCHECK"
+    [ "$saved_ver" = "$current_node_ver" ] && return 0
+  fi
+  echo "$current_node_ver" > "$NPM_VERCHECK"
+
+  # Auto-create manifest from current installs if missing
+  if [ ! -f "$NPM_MANIFEST" ]; then
+    npm list -g --depth=0 --parseable 2>/dev/null \
+      | grep node_modules \
+      | sed 's|.*/node_modules/||' \
+      | sort > "$NPM_MANIFEST"
+    return 0
+  fi
+
+  # Compare manifest against current global installs
+  local missing=""
+  while IFS= read -r pkg; do
+    [ -z "$pkg" ] && continue
+    if ! npm list -g --depth=0 "$pkg" >/dev/null 2>&1; then
+      missing="${missing} ${pkg}"
+    fi
+  done < "$NPM_MANIFEST"
+
+  if [ -n "$missing" ]; then
+    echo ""
+    echo "⚠️  Node.js 版本已切换 ($(node --version))，以下全局 npm 包缺失:${missing}"
+    echo "   自动修复: npm install -g${missing}"
+    echo "   更新清单: rm ~/.npm-global-packages  # 下次启动自动重建"
+    echo ""
+  fi
+}
+
+_npm_check_global_packages
 
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
 
