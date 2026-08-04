@@ -8,6 +8,9 @@
     "npm:pi-powerline-footer@0.7.0",
     "npm:pi-web-access"
   ],
+  "skills": [
+    "~/.claude/skills"
+  ],
   "terminal": {
     "showTerminalProgress": true
   },
