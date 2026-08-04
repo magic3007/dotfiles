@@ -64,13 +64,26 @@ Shell aliases and wrapper functions in `common_shell_setup.sh`:
 - `mxcc()` — Codex with MiniMax via OpenRouter
 - `qwcc()` — Codex with Qwen3.5 via Aliyun
 
-### AI Tool Configurations (`Codex/`, `codex/`, `gemini/`, `opencode/`)
+### Skills tool (`skills` CLI) — do NOT use `-g`
+
+`npx skills add <pkg> -g` (global) writes symlinks into `~/.claude/skills`, `~/.cursor/skills`, `~/.pi/agent/skills`, etc. Since `~/.claude/skills` and `~/.cursor/skills` are symlinks into this repo's `claude/skills/`, the relative symlinks it creates are **broken** (e.g. `lark-apps -> ../../.agents/skills/lark-apps` resolves to the repo root instead of `~`). This previously replaced the tracked `claude/skills/lark-*` files and showed up as mass deletions in git.
+
+Rules:
+- **Never run `npx skills add <pkg> -g`** — it corrupts `claude/skills/`.
+- lark-* skills are **not tracked** in this repo anymore (see `.gitignore`). They live in `~/.agents/skills/` (source) and `~/.pi/agent/skills/` (working symlinks); they're also embedded in lark-cli (`lark-cli skills read`).
+- To add a skill from a package: copy the skill dir into this repo manually and track it, or install it only into the agent that uses it (project-scope, not `-g`).
+
+### AI Tool Configurations (`Codex/`, `codex/`, `gemini/`, `opencode/`, `pi/`)
 
 Each AI coding tool has its own config directory symlinked to `~/`:
 - `Codex/` → `~/.Codex/` — Codex settings, hooks, skills, rules, commands, agents
 - `codex/` → `~/.codex/` — OpenAI Codex config and env
 - `gemini/` → `~/.gemini/` — Gemini CLI settings
 - `opencode/` → `~/.config/opencode/` — Opencode config
+- `pi/` → `~/.pi/agent/` — Pi agent settings, models, extensions
+
+**Pi extensions** (`pi/extensions/` → `~/.pi/agent/extensions/`): TypeScript 扩展，通过 `pi.on()` 订阅生命周期事件。现有扩展：
+- `pi-end-reminder.ts` — 监听 `agent_settled` 事件，任务完成后通过 `~/.local/bin/wechat-reminder` 发送飞书/微信通知（对应 Claude Code 的 `claude-end-reminder.sh`）。新扩展加到 `pi/extensions/` 即可自动被发现（`/reload` 热加载）。
 
 **Tool-specific skills**: Codex, Codex, and Gemini use independent skill directories:
 - `Codex/skills/` -> `~/.Codex/skills`
