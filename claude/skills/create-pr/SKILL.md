@@ -1,0 +1,344 @@
+---
+name: create-pr
+description: Rebase from the latest `origin/main`, squash the commits from it, and then create a PR on github with intelligent commit messages based on staged changes.
+---
+
+# Create Pull Request
+
+Rebase from the latest `origin/main`, squash commits, and create a PR on GitHub with an
+intelligent title and description.
+
+## Usage
+
+Invoke with `/create-pr` or when the task matches.
+
+**Arguments:**
+
+- `--draft`: Create as draft PR
+- `--base <branch>`: Target branch (default: `main`)
+
+## Workflow
+
+### Step 1: Verify Prerequisites
+
+```bash
+# Check current branch
+git branch --show-current
+
+# Check if on main/master (should NOT be)
+if [[ $(git branch --show-current) == "main" || $(git branch --show-current) == "master" ]]; then
+  echo "ERROR: Cannot create PR from main/master branch"
+  exit 1
+fi
+
+# Check for uncommitted changes
+git status --short
+
+# Ensure gh CLI is available
+gh --version
+```
+
+**Action:** If there are uncommitted changes, stop, and then ask user to commit or stash
+them first.
+
+### Step 2: Check for Existing PR
+
+```bash
+# Check if PR already exists for current branch
+gh pr view --json number,title,url 2>/dev/null || echo "No existing PR"
+```
+
+**Handle Existing PR:**
+
+- If PR exists, inform user and ask permission to force-update it
+- Warn that this will rewrite the commit history and PR description
+- If user declines, abort the process
+
+### Step 3: Fetch and Rebase
+
+```bash
+# Fetch latest from origin
+git fetch origin main
+
+# Check divergence
+git log --oneline HEAD ^origin/main
+
+# Non-interactive rebase onto origin/main
+git rebase origin/main
+```
+
+**Handle Conflicts:** If rebase fails due to conflicts, abort and let user handle rebase
+manually:
+
+```bash
+# On rebase failure, abort automatically
+git rebase --abort
+
+# Inform user to resolve conflicts manually
+echo "Rebase failed due to conflicts. Please resolve manually and retry /create-pr"
+exit 1
+```
+
+### Step 4: Squash Commits into Single Commit
+
+After successful rebase, squash all commits since `origin/main` into a single commit:
+
+```bash
+# Count commits to squash
+git rev-list --count origin/main..HEAD
+
+# Soft reset to origin/main (keeps changes staged)
+git reset --soft origin/main
+
+# Generate commit message using gen-commit-msg logic
+```
+
+**Generate Commit Message** (following gen-commit-msg format):
+
+1. Analyze staged changes:
+
+   ```bash
+   git diff --cached --name-only
+   git diff --cached
+   ```
+
+1. Categorize changes (feat/fix/docs/refactor/test/chore/perf)
+
+1. Determine scope from changed files (workflow/engine/reward/dataset/api/docs/etc.)
+
+1. Generate message in format:
+
+   ```
+   <type>(<scope>): <subject>
+
+   <body>
+
+   [Optional sections:]
+   Key changes:
+   - change 1
+   - change 2
+
+   Refs: #123, #456
+   ```
+
+1. Commit with generated message:
+
+   ```bash
+   git commit -m "$(cat <<'EOF'
+   <generated commit message>
+   EOF
+   )"
+   ```
+
+### Step 5: Analyze Combined Changes
+
+After squashing into a single commit:
+
+```bash
+# Get all changes since origin/main
+git diff origin/main...HEAD --name-only
+
+# Get full diff content
+git diff origin/main...HEAD
+
+# Check commit history
+git log --oneline origin/main..HEAD
+```
+
+**Categorize Changes:**
+
+| Type       | When to Use                     |
+| ---------- | ------------------------------- |
+| `feat`     | New feature or capability       |
+| `fix`      | Bug fix                         |
+| `docs`     | Documentation only              |
+| `refactor` | Code change without feature/fix |
+| `test`     | Adding or fixing tests          |
+| `chore`    | Build, deps, config changes     |
+| `perf`     | Performance improvement         |
+
+**Determine Scope:**
+
+Infer from changed files:
+
+- `src/workflow/` → `workflow`
+- `src/engine/` → `engine`
+- `src/reward/` → `reward`
+- `src/dataset/` → `dataset`
+- `src/api/` → `api`
+- `src/utils/` → `utils`
+- `src/infra/` → `infra`
+- `docs/` → `docs`
+- `examples/` → `examples`
+- Multiple areas → omit scope or use broader term
+
+### Step 6: Generate PR Title and Description
+
+**PR Title Format:**
+
+```
+<type>(<scope>): <brief description>
+```
+
+**Rules:**
+
+- Keep under 70 characters
+- Use imperative mood
+- No period at end
+- Mirror commit message style
+
+**PR Description Format:**
+
+MUST strictly follow the [GitHub PR template](../../.github/PULL_REQUEST_TEMPLATE.md):
+
+```markdown
+## Description
+
+<!-- Clear and concise description of what this PR does -->
+
+## Related Issue
+
+<!-- Link to the issue this PR addresses -->
+Fixes #(issue)
+
+## Type of Change
+
+<!-- Mark the relevant option with an 'x' -->
+
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Documentation update
+- [ ] Code refactoring (no functional changes)
+- [ ] Performance improvement
+- [ ] Test coverage improvement
+
+## Checklist
+
+<!-- Mark with 'x' what you've done -->
+
+- [ ] I have read the [Contributing Guide](../CONTRIBUTING.md)
+- [ ] I have run formatting tools (pre-commit or manual)
+- [ ] I have run relevant unit tests and they pass
+- [ ] I have added tests for new functionality
+- [ ] I have updated documentation if needed
+- [ ] My branch is up to date with main
+- [ ] This PR introduces breaking changes (if yes, fill out details below)
+- [ ] If this PR changes documentation, I have built and previewed it locally with `jb build docs`
+- [ ] No critical issues raised by AI reviewers
+
+**Breaking Change Details (if applicable):**
+
+<!-- Describe what breaks and how users should migrate -->
+
+## Additional Context
+
+<!-- Add any other context, screenshots, logs, or explanations here -->
+```
+
+**How to Fill the Template:**
+
+1. **Description**: 2-4 sentences explaining what this PR does and why
+1. **Related Issue**: Link to issue (search for related issues if exists)
+1. **Type of Change**: Mark ONE primary type with `[x]`
+1. **Checklist**: Mark completed items with `[x]`, leave uncompleted as `[ ]`
+1. **Breaking Change Details**: Only if breaking changes checkbox is marked
+1. **Additional Context**: Any extra info, related PRs, performance numbers, etc.
+
+### Step 7: Push and Create/Update PR
+
+Show preview to user, then execute:
+
+```bash
+# Force push branch to remote (required after squash)
+git push -f -u origin $(git branch --show-current)
+
+# Create or edit PR using gh CLI with GitHub template format
+# If PR exists, use 'gh pr edit' instead of 'gh pr create'
+if gh pr view &>/dev/null; then
+  # Update existing PR
+  gh pr edit \
+    --title "<PR title>" \
+    --body "<PR description>"
+else
+  # Create new PR
+  gh pr create \
+    --base main \
+    --title "<PR title>" \
+    --body "<PR description>"
+fi
+```
+
+Add `--draft` flag if requested.
+
+**Capture PR URL** and display to user.
+
+## Error Handling
+
+### Rebase Conflicts
+
+If rebase fails:
+
+1. Show conflict files
+1. Provide resolution instructions
+1. Wait for user to resolve
+1. After resolution, continue with squashing step
+1. Offer to abort rebase if needed: `git rebase --abort`
+
+### Squash Failures
+
+If squash/commit fails:
+
+1. Check if there are changes to commit: `git status`
+1. Verify no conflicts remain: `git diff --cached`
+1. If needed, abort and return to pre-rebase state
+
+### Push Failures
+
+If force push fails:
+
+1. Verify remote branch exists
+1. Check GitHub authentication: `gh auth status`
+1. Confirm branch protection rules allow force push
+1. Provide manual push instructions if needed
+
+### PR Creation/Update Failures
+
+If `gh pr create` or `gh pr edit` fails:
+
+1. Check if PR already exists: `gh pr view`
+1. Verify GitHub authentication: `gh auth status`
+1. Check for branch protection rules
+1. Provide manual PR creation/update link
+
+## Safety Checks
+
+**Before Starting:**
+
+- Confirm no uncommitted changes
+- Confirm not on main/master branch
+- Check for existing PR and get user permission to overwrite if exists
+- Backup branch: `git branch backup/$(git branch --show-current)-$(date +%s)`
+
+**Before Rebase:**
+
+- Fetch latest from origin
+- Show divergence summary
+
+**Before Squash:**
+
+- Show commits that will be squashed
+- Confirm user wants to proceed
+
+**Before Force Push:**
+
+- **CRITICAL**: Warn user that force push will rewrite history
+- Show current commit that will replace remote history
+- Confirm branch name
+- If PR exists, emphasize that PR history will be rewritten
+
+**Before PR Creation/Update:**
+
+- Show full preview of title/description
+- Confirm target branch
+- If updating existing PR, show what will change
