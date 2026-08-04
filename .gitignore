@@ -8,3 +8,8 @@ vim/undo-history
 fish/conf.d/local.fish
 .worktrees/
 fish/fish_variables
+
+# Tool-managed skills (installed by `npx skills add <pkg> -g` into ~/.agents/skills),
+# no longer tracked — the skills tool owns these and overwrites them on each install.
+claude/skills/lark-*
+codex/skills/lark-*
