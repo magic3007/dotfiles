@@ -11,109 +11,123 @@ set -euo pipefail
 input=$(cat)
 
 # Extract fields
-user=$(whoami)
-host=$(hostname -s)
 dir=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty')
-project_dir=$(echo "$input" | jq -r '.workspace.project_dir // empty')
 model=$(echo "$input" | jq -r '.model.display_name // empty')
 context_used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
 context_remaining=$(echo "$input" | jq -r '.context_window.remaining_percentage // empty')
-session_name=$(echo "$input" | jq -r '.session_name // empty')
-vim_mode=$(echo "$input" | jq -r '.vim.mode // empty')
-rate_5h=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
-rate_7d=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
-repo=$(echo "$input" | jq -r '.workspace.repo | if . then .owner + "/" + .name else empty end')
-pr_number=$(echo "$input" | jq -r '.pr.number // empty')
-pr_review=$(echo "$input" | jq -r '.pr.review_state // empty')
-time=$(date +%R)
+cost_usd=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
 
-# Gruvbox color codes (ANSI 256 to match gruvbox palette)
-# Claude Code renders colors as dimmed, so we use bright variants
-orange='\033[38;5;214m'      # gruvbox orange #d65d0e
-yellow='\033[38;5;220m'      # gruvbox yellow #d79921
-aqua='\033[38;5;108m'        # gruvbox aqua #689d6a
-blue='\033[38;5;68m'         # gruvbox blue #458588
-gray='\033[38;5;242m'        # gruvbox bg3 #665c54
-darkgray='\033[38;5;239m'    # gruvbox bg1 #3c3836
-green='\033[38;5;142m'       # gruvbox green #98971a
-reset='\033[0m'
-bold='\033[1m'
-dim='\033[2m'
+# pi-powerline-footer replica (preset "default", separator "powerline-thin")
+# Colors below mirror pi-powerline-footer's theme.ts DEFAULT_COLORS resolved
+# against the gruvbox-dark theme; model/path are hardcoded pink/teal in pi
+# itself (colors.ts THEME), independent of the active theme.
+rgb() { printf '\033[38;2;%d;%d;%dm' "$1" "$2" "$3"; }
 
-# Build the output in Starship-inspired segments
+model_c=$(rgb 215 135 175)    # #d787af pink/mauve — pi hardcodes this, not gruvbox
+path_c=$(rgb 0 175 175)       # #00afaf teal/cyan  — pi hardcodes this, not gruvbox
+success_c=$(rgb 184 187 38)   # #b8bb26 gruvbox-dark bright green  (git clean / staged)
+warning_c=$(rgb 250 189 47)   # #fabd2f gruvbox-dark bright yellow (git dirty / unstaged / ctx warn)
+error_c=$(rgb 251 73 52)      # #fb4934 gruvbox-dark bright red    (ctx error)
+muted_c=$(rgb 146 131 116)    # #928374 gruvbox-dark gray          (untracked / ctx dim)
+text_c=$(rgb 235 219 178)     # #ebdbb2 gruvbox-dark fg             (cost)
+sep_c=$(printf '\033[38;5;244m') # ANSI256 244 — pi's fixed separator color (colors.ts THEME.sep)
+reset=$(printf '\033[0m')
 
-# (1) OS icon + username (orange, matching Starship $os + $username)
-printf "${orange}${reset} " 2>/dev/null  # Linux icon (falls back to nothing)
-printf "${orange}%s${reset}" "${user}@${host}"
+# Nerd Font icons (matching pi-powerline-footer's icons.ts NERD_ICONS)
+icon_model=$''    # nf-md-chip
+icon_folder=$''   # nf-fa-folder_open
+icon_branch=$''   # nf-fa-code_fork
+icon_context=$''  # nf-fa-database
+icon_cost=$''     # nf-fa-dollar
+sep=$''           # nf powerline-thin separator (chars.powerlineThinLeft)
 
-# (2) Directory (yellow, matching Starship $directory)
-dir_display="${dir/#$HOME/~}"
-printf " ${yellow}%s${reset}" "$dir_display"
+# ─────────────────────────────────────────────────────────────────────────
+# pi-powerline-footer "default" preset segment order:
+#   model, thinking, shell_mode, path, git, context_pct, cache_read, cost
+# thinking / shell_mode / cache_read have no Claude Code statusline JSON
+# equivalent (extended-thinking level, bash-mode toggle, prompt-cache-read
+# tokens aren't exposed here) — skipped.
+# ─────────────────────────────────────────────────────────────────────────
 
-# (3) Git branch + status (aqua, matching Starship $git_branch + $git_status)
+parts=()
+
+# (1) model — pi modelSegment: icon+name, both colored (hardcoded pink #d787af)
+if [ -n "$model" ] && [ "$model" != "null" ]; then
+  parts+=("${model_c}${icon_model} ${model}${reset}")
+fi
+
+# (2) path — pi pathSegment, mode "basename" (default preset): icon+name, both colored (hardcoded teal #00afaf)
+if [ -n "$dir" ]; then
+  base=$(basename "$dir")
+  parts+=("${path_c}${icon_folder} ${base}${reset}")
+fi
+
+# (3) git — pi gitSegment: branch (icon+name) colored by clean/dirty, then per-indicator colors
 if [ -n "$dir" ] && [ -d "$dir/.git" ]; then
   branch=$(git --git-dir="$dir/.git" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || true)
   if [ -n "$branch" ]; then
     status=$(git --git-dir="$dir/.git" --no-optional-locks status --porcelain --ignore-submodules=dirty 2>/dev/null || true)
-    dirty=""
-    [ -n "$status" ] && dirty="*"
-    printf " ${aqua} %s%s${reset}" "$branch" "$dirty"
+    staged=0; unstaged=0; untracked=0
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      case "$line" in
+        \?\?*) untracked=$((untracked + 1)) ;;
+        *)
+          [ "${line:0:1}" != " " ] && staged=$((staged + 1))
+          [ "${line:1:1}" != " " ] && unstaged=$((unstaged + 1))
+          ;;
+      esac
+    done <<< "$status"
+
+    if [ "$staged" -gt 0 ] || [ "$unstaged" -gt 0 ] || [ "$untracked" -gt 0 ]; then
+      branch_c="$warning_c"
+    else
+      branch_c="$success_c"
+    fi
+    git_seg="${branch_c}${icon_branch} ${branch}${reset}"
+    indicators=""
+    [ "$unstaged" -gt 0 ] && indicators="${indicators}${warning_c}*${unstaged}${reset} "
+    [ "$staged" -gt 0 ] && indicators="${indicators}${success_c}+${staged}${reset} "
+    [ "$untracked" -gt 0 ] && indicators="${indicators}${muted_c}?${untracked}${reset} "
+    [ -n "$indicators" ] && git_seg="${git_seg} ${indicators% }"
+    parts+=("$git_seg")
   fi
 fi
 
-# (4) Repo owner/name (dimmed, when available from workspace)
-if [ -n "$repo" ]; then
-  printf " ${dim}${gray}(%s)${reset}" "$repo"
-fi
-
-# (5) PR number (when available)
-if [ -n "$pr_number" ] && [ "$pr_number" != "null" ]; then
-  review_info=""
-  if [ -n "$pr_review" ] && [ "$pr_review" != "null" ]; then
-    review_info="[${pr_review}]"
-  fi
-  printf " ${blue}PR#%s%s${reset}" "$pr_number" "${review_info}"
-fi
-
-# (6) Context window (dimmed, red when low)
-if [ -n "$context_remaining" ] && [ "$context_remaining" != "null" ]; then
-  pct=$(printf "%.0f" "$context_remaining")
-  if [ "$pct" -lt 20 ]; then
-    printf " ${orange}ctx:%d%%${reset}" "$pct"
+# (4) context_pct — pi contextPctSegment: icon uncolored, pct text colored by threshold
+#     (>90% error, >70% warn, else dim). pi shows "{used}/{window} (pct%)"; Claude's
+#     statusline JSON only exposes percentages here (no raw token/window counts),
+#     so this is an approximation with percentage only.
+if [ -n "$context_used" ] && [ "$context_used" != "null" ]; then
+  pct=$(printf '%.1f' "$context_used")
+  pct_i=$(printf '%.0f' "$context_used")
+  if [ "$pct_i" -gt 90 ]; then
+    ctx_c="$error_c"
+  elif [ "$pct_i" -gt 70 ]; then
+    ctx_c="$warning_c"
   else
-    printf " ${dim}ctx:%d%%${reset}" "$pct"
+    ctx_c="$muted_c"
   fi
+  parts+=("${icon_context} ${ctx_c}${pct}%${reset}")
 fi
 
-# (7) Claude.ai rate limits (dimmed)
-rate_out=""
-if [ -n "$rate_5h" ] && [ "$rate_5h" != "null" ]; then
-  rate_out="5h:$(printf '%.0f' "$rate_5h")%"
-fi
-if [ -n "$rate_7d" ] && [ "$rate_7d" != "null" ]; then
-  [ -n "$rate_out" ] && rate_out="${rate_out} "
-  rate_out="${rate_out}7d:$(printf '%.0f' "$rate_7d")%"
-fi
-if [ -n "$rate_out" ]; then
-  printf " ${dim}${gray}%s${reset}" "$rate_out"
+# (5) cost — pi costSegment: "$X.XX", color "text", NO icon (pi's costSegment
+#     doesn't call withIcon despite icons.cost existing). usingSubscription has
+#     no Claude Code equivalent, so only the reported-cost branch applies.
+if [ -n "$cost_usd" ] && [ "$cost_usd" != "null" ] && awk -v c="$cost_usd" 'BEGIN{exit !(c>0)}' 2>/dev/null; then
+  cost_fmt=$(printf '%.2f' "$cost_usd")
+  parts+=("${text_c}\$${cost_fmt}${reset}")
 fi
 
-# (8) Vim mode indicator (bold yellow for NORMAL mode)
-if [ -n "$vim_mode" ] && [ "$vim_mode" != "null" ]; then
-  if [ "$vim_mode" = "NORMAL" ]; then
-    printf " ${bold}${yellow}NORMAL${reset}"
-  fi
-fi
-
-# (9) Session name (cyan)
-if [ -n "$session_name" ] && [ "$session_name" != "null" ]; then
-  printf " ${blue}\"%s\"${reset}" "$session_name"
-fi
-
-# (10) Time (gray, matching Starship $time)
-printf " ${gray}%s${reset}" "$time"
-
-# (11) Model (dimmed, at the end)
-if [ -n "$model" ] && [ "$model" != "null" ]; then
-  printf " ${dim}%s${reset}" "$model"
+# ─────────────────────────────────────────────────────────────────────────
+# Join with pi's powerline-thin separator, replicating buildContentFromParts
+# in pi-powerline-footer/segments.ts:
+#   " " + parts.join(` ${sepAnsi}${sep}${reset} `) + reset + " "
+# ─────────────────────────────────────────────────────────────────────────
+if [ "${#parts[@]}" -gt 0 ]; then
+  out="${parts[0]}"
+  for ((i = 1; i < ${#parts[@]}; i++)); do
+    out="${out} ${sep_c}${sep}${reset} ${parts[$i]}"
+  done
+  printf ' %s%s ' "$out" "$reset"
 fi
