@@ -427,6 +427,11 @@ kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
 
 glmpi()    { pi --provider arkcoding --model 'glm-5.2' "$@"; }
 
+# Opus 5 主模型（appintheloop 路由）+ subagent 走 dspix 配置（dspro/deepseek-v4-flash[1m]）。
+# subagent 的 provider/model 通过 PI_SUBAGENT_PROVIDER/MODEL 环境变量传给
+# afang-subagent 扩展（见 my-pi-plugins/extensions/afang-subagent）。
+opuspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider appintheloop --model 'claude-opus-5' "$@"; }
+
 
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
