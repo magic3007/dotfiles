@@ -121,6 +121,27 @@
                     "contextWindow": 1000000
                 }
             ]
+        },
+        "openz": {
+            "baseUrl": "https://z.open-api.ai",
+            "api": "anthropic-messages",
+            "apiKey": "$OPENZ_ANTHROPIC_KEY",
+            "models": [
+                {
+                    "id": "claude-opus-4-8[1m]",
+                    "name": "Opus 4.8 1M (OpenZ)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
+                },
+                {
+                    "id": "claude-opus-5",
+                    "name": "Opus 5 (OpenZ)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
+                }
+            ]
         }
     }
 }

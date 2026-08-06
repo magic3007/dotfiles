@@ -427,7 +427,7 @@ kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
 
 glmpi()    { pi --provider arkcoding --model 'glm-5.2' "$@"; }
 
-odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider appintheloop --model 'claude-opus-5' "$@"; }
+odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
 
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
