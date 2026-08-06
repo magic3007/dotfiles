@@ -2,10 +2,10 @@
   "theme": "gruvbox-dark",
   "defaultProvider": "dspro",
   "defaultModel": "deepseek-v4-pro[1m]",
-  "lastChangelogVersion": "0.83.0",
+  "lastChangelogVersion": "0.84.0",
   "packages": [
     "my-pi-plugins",
-    "npm:pi-powerline-footer@0.7.0",
+    "npm:pi-powerline-footer@0.12.1",
     "npm:pi-web-access"
   ],
   "skills": [
