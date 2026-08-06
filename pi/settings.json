@@ -1,6 +1,6 @@
 {
   "theme": "gruvbox-dark",
-  "defaultProvider": "dsccpro",
+  "defaultProvider": "dspro",
   "defaultModel": "deepseek-v4-pro[1m]",
   "lastChangelogVersion": "0.83.0",
   "packages": [
