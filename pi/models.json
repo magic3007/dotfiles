@@ -112,6 +112,13 @@
                     "reasoning": true,
                     "input": ["text", "image"],
                     "contextWindow": 1000000
+                },
+                {
+                    "id": "claude-opus-5",
+                    "name": "Opus 5 (appintheloop)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
                 }
             ]
         }
