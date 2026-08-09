@@ -5,7 +5,7 @@
   "lastChangelogVersion": "0.84.1",
   "packages": [
     "my-pi-plugins",
-    "npm:pi-powerline-footer@0.7.0",
+    "npm:pi-powerline-footer@0.12.2",
     "npm:pi-web-access",
     "git:github.com/obra/superpowers"
   ],

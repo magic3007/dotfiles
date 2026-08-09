@@ -336,7 +336,7 @@
           Installing Pi coding agent via npm (non-interactive, fallback pi.dev script),
       ]
     - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-powerline-footer@0.7.0 || true",
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-powerline-footer@0.12.2 || true",
           Installing pi-powerline-footer (companion for my-pi-plugins gruvbox theme),
       ]
     - [

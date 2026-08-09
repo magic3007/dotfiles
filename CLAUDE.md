@@ -112,10 +112,10 @@ Add a skill to each tool's own directory when it should be available there. Curs
 **Plugins** (in `settings.json`): superpowers (official), feishu, humanize — installed via marketplace system with `extraKnownMarketplaces` config.
 
 **Pi package** (`pi/my-pi-plugins/`): the [magic3007/my-pi-plugins](https://github.com/magic3007/my-pi-plugins) pi package is vendored as a **git submodule** and symlinked to `~/.pi/agent/my-pi-plugins`. It bundles 5 extensions (`tmux-bash`, `fuzzy-file-finder`, `tree-nav`, `afang-subagent`, `todo`) and the `gruvbox-dark` theme (pure TypeScript, no build/deps). Registration lives in `pi/settings.json`:
-- `packages` array declares the local package by **relative path** (`"my-pi-plugins"`, resolved from `~/.pi/agent/`) plus two npm companions (`npm:pi-powerline-footer@0.7.0`, `npm:pi-web-access`). Relative path keeps it portable across machines.
+- `packages` array declares the local package by **relative path** (`"my-pi-plugins"`, resolved from `~/.pi/agent/`) plus two npm companions (`npm:pi-powerline-footer@0.12.2`, `npm:pi-web-access`). Relative path keeps it portable across machines.
 - `theme` is set to `gruvbox-dark` (a package cannot force a theme, so it must be selected explicitly).
 
-Install flow: Dotbot symlinks the submodule (Phase 1); Phase 2 runs `pi install npm:...` to fetch the npm companions' bits. `pi install` is **idempotent** against already-declared entries, so it never mutates the tracked symlinked `settings.json`. Update the vendored package with `git submodule update --remote pi/my-pi-plugins`. Both `install.conf.yaml` and `sync.conf.yaml` carry the `~/.pi/agent/my-pi-plugins` symlink so it syncs cross-platform.
+Install flow: Dotbot symlinks the submodule (Phase 1); Phase 2 runs `pi install npm:...` to fetch the npm companions' bits. `pi install` is idempotent only against the **exact same spec string** — `pi install npm:foo@1.0.0` when `settings.json` declares `npm:foo@2.0.0` silently **rewrites the tracked symlinked `settings.json`** back to `1.0.0`. So the `pi-powerline-footer` version pin lives in **two places that must be bumped together**: `install.conf.yaml` (the `pi install` step) and `pi/settings.json` (the `packages` array). Bumping only one lets the next `./install` revert the other. Update the vendored package with `git submodule update --remote pi/my-pi-plugins`. Both `install.conf.yaml` and `sync.conf.yaml` carry the `~/.pi/agent/my-pi-plugins` symlink so it syncs cross-platform.
 
 ### Chinese Mirrors
 
