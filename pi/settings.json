@@ -1,11 +1,11 @@
 {
   "theme": "gruvbox-dark",
-  "defaultProvider": "dspro",
+  "defaultProvider": "arkcoding",
   "defaultModel": "deepseek-v4-pro[1m]",
-  "lastChangelogVersion": "0.84.0",
+  "lastChangelogVersion": "0.84.1",
   "packages": [
     "my-pi-plugins",
-    "npm:pi-powerline-footer@0.12.1",
+    "npm:pi-powerline-footer@0.7.0",
     "npm:pi-web-access",
     "git:github.com/obra/superpowers"
   ],
