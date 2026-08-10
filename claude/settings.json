@@ -136,8 +136,7 @@
     "humanize@PolyArch": true,
     "notion@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "ecc@ecc": true
+    "frontend-design@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "minimax-matrix-plugins": {
@@ -162,12 +161,6 @@
       "source": {
         "source": "github",
         "repo": "PolyArch/humanize"
-      }
-    },
-    "ecc": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/affaan-m/ECC.git"
       }
     }
   },
