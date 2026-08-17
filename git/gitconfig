@@ -120,6 +120,7 @@
 	smudge = git-lfs smudge -- %f
 	required = true
 	clean = git-lfs clean -- %f
+	process = git-lfs filter-process
 [safe]
 	directory = *
 [credential "https://github.com"]
