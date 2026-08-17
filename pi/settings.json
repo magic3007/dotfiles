@@ -1,7 +1,7 @@
 {
   "theme": "gruvbox-dark",
-  "defaultProvider": "arkcoding",
-  "defaultModel": "deepseek-v4-pro[1m]",
+  "defaultProvider": "dspro",
+  "defaultModel": "deepseek-v4-flash[1m]",
   "lastChangelogVersion": "0.84.1",
   "packages": [
     "my-pi-plugins",
@@ -15,5 +15,6 @@
   "terminal": {
     "showTerminalProgress": true
   },
-  "defaultThinkingLevel": "off"
+  "defaultThinkingLevel": "off",
+  "hideThinkingBlock": true
 }

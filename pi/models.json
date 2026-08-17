@@ -128,8 +128,8 @@
             "apiKey": "$OPENZ_ANTHROPIC_KEY",
             "models": [
                 {
-                    "id": "claude-opus-4-8[1m]",
-                    "name": "Opus 4.8 1M (OpenZ)",
+                    "id": "claude-fable-5",
+                    "name": "Fable 5 (OpenZ)",
                     "reasoning": true,
                     "input": ["text", "image"],
                     "contextWindow": 1000000
