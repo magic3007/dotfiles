@@ -366,6 +366,11 @@ oc() {
 }
 export PATH="$PATH:$HOME/.opencode/bin"
 
+# codex (openai codex cli) with full-auto mode
+cx() {
+  codex -a never -s danger-full-access --search "$@"
+}
+
 # google gemini cli (override oh-my-zsh git plugin's gm='git merge')
 unalias gm 2>/dev/null
 gm() {
