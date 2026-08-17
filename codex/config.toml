@@ -1,0 +1,33 @@
+# OpenAI Codex shared configuration.
+# Modern codex CLI reads ~/.codex/config.toml (config.json / settings.json are deprecated).
+
+model = "gpt-5.6-sol"
+model_reasoning_effort = "low"
+
+model_provider = "openai_http"
+
+[model_providers.openai_http]
+name = "OpenAI HTTP only"
+wire_api = "responses"
+requires_openai_auth = true
+supports_websockets = false
+base_url = "https://chatgpt.com/backend-api/codex"
+
+[features]
+js_repl = false
+
+# Keep startup fast: cap how long codex waits for MCP servers before giving up
+# (the previous value of 120s could block startup for up to 2 minutes).
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+startup_timeout_sec = 10
+
+[shell_environment_policy]
+inherit = "core"
+
+[desktop]
+conversationDetailMode = "STEPS_COMMANDS"
+show-context-window-usage = true
+followUpQueueMode = "queue"
+selected-avatar-id = "hoots"

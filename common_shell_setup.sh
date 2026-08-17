@@ -445,9 +445,6 @@ if [ -d "$HOME/.venv" ]; then
     source "$HOME/.venv/bin/activate"
 fi
 
-# codex environment setup
-[ -f ~/.codex/codex_env.sh ] && source ~/.codex/codex_env.sh
-
 # zoxide - smart cd
 if command -v zoxide &> /dev/null; then
   if [ -n "$ZSH_VERSION" ]; then
