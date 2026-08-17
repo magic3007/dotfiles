@@ -36,6 +36,16 @@ _dotfiles_precmd_timer() {
   fi
 }
 
+# Single vertical-line (bar) cursor. Set once at startup, and keep it whenever
+# the line editor is entered (bell/EOF events can reset cursor shape).
+#   \e[5 q = beam/bar  \e[1 q = block  \e[3 q = underline
+_zsh_cursor_bar() {
+  [[ $TERM == (xterm*|screen*|tmux*|rxvt*) ]] && printf '\e[5 q'
+}
+zle-line-init() { _zsh_cursor_bar; zle reset-prompt }
+zle -N zle-line-init
+_zsh_cursor_bar
+
 add-zsh-hook preexec _dotfiles_preexec_timer
 add-zsh-hook precmd _dotfiles_precmd_timer
 
