@@ -15,6 +15,10 @@ base_url = "https://chatgpt.com/backend-api/codex"
 
 [features]
 js_repl = false
+# Disable the built-in Apps/Sites MCP server (codex_apps). It tries to reach
+# OpenAI's App Garden backend at startup, adding ~5s+ latency. Turn back on by
+# setting `apps = true` if you use Codex's website deployment (Sites) feature.
+apps = false
 
 # Keep startup fast: cap how long codex waits for MCP servers before giving up
 # (the previous value of 120s could block startup for up to 2 minutes).
