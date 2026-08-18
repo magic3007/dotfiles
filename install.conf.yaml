@@ -153,6 +153,7 @@
     ~/.claude/hooks: claude/hooks
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    ~/.codex/AGENTS.md: codex/AGENTS.md
     ~/.codex/config.toml: codex/config.toml
     ~/.codex/skills: codex/skills
     ~/.gemini/settings.json: gemini/settings.json
