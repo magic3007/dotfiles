@@ -366,9 +366,10 @@ oc() {
 }
 export PATH="$PATH:$HOME/.opencode/bin"
 
-# codex (openai codex cli) with full-auto mode
+# Codex with full-auto mode. Disable cmux's per-invocation hooks: older cmux
+# wrappers run lifecycle hooks synchronously, delaying both startup and exit.
 cx() {
-  codex -a never -s danger-full-access --search "$@"
+  CMUX_CODEX_HOOKS_DISABLED=1 codex -a never -s danger-full-access --search "$@"
 }
 
 # google gemini cli (override oh-my-zsh git plugin's gm='git merge')
