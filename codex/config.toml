@@ -19,6 +19,8 @@ js_repl = false
 # OpenAI's App Garden backend at startup, adding ~5s+ latency. Turn back on by
 # setting `apps = true` if you use Codex's website deployment (Sites) feature.
 apps = false
+memories = true
+chronicle = true
 
 # Keep startup fast: cap how long codex waits for MCP servers before giving up
 # (the previous value of 120s could block startup for up to 2 minutes).
@@ -35,3 +37,15 @@ conversationDetailMode = "STEPS_COMMANDS"
 show-context-window-usage = true
 followUpQueueMode = "queue"
 selected-avatar-id = "hoots"
+keepRemoteControlAwakeWhilePluggedIn = true
+
+[projects."/Users/magic/dotfiles"]
+trust_level = "trusted"
+
+[tui.model_availability_nux]
+"gpt-5.6-sol" = 3
+
+[hooks.state]
+
+[hooks.state."/Users/magic/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:e8dd3827a3cec0a1a3ac965d2b5c330121e396370e63f309cb6646d33e405c03"
