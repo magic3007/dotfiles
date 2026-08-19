@@ -180,6 +180,9 @@
     # ---- cmux ----
     ~/.config/cmux/cmux.json: cmux/cmux.json
 
+    # ---- Herdr (agent-aware terminal multiplexer) ----
+    ~/.config/herdr/config.toml: herdr/config.toml
+
     # ---- Warp ----
     ~/.warp: warp
 
