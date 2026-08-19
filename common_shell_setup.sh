@@ -534,6 +534,7 @@ _npm_check_global_packages
 
 [ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
 
-
 # Added by Antigravity
 [ -f ~/.antigravity/antigravity/bin/antigravity ] && export PATH="$PATH:$HOME/.antigravity/antigravity/bin"
+
+alias hd=herdr
