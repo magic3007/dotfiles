@@ -406,6 +406,15 @@
       ]
 
 # ---------------------------------------------------------------------------
+# Herdr - agent-aware terminal multiplexer
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "command -v herdr >/dev/null || curl --connect-timeout 10 -fsSL https://herdr.dev/install.sh | sh || true",
+          Installing Herdr (agent-aware terminal multiplexer),
+      ]
+
+# ---------------------------------------------------------------------------
 # iTerm2 configuration
 # ---------------------------------------------------------------------------
 - shell:
