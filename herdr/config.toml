@@ -9,13 +9,14 @@
 [theme]
 # Built-in themes: catppuccin, terminal, tokyo-night, dracula, nord,
 #                  gruvbox, one-dark, solarized, kanagawa, rose-pine, vesper
-name = "catppuccin"
+name = "gruvbox-light"
 
 # Follow host terminal light/dark appearance and switch Herdr UI themes.
 # auto_switch = false
 # dark_name = "catppuccin"
 # light_name = "catppuccin-latte"
 
+auto_switch = false
 [terminal]
 # Executable used for new interactive panes.
 # Empty means $SHELL, then /bin/sh.
@@ -55,3 +56,12 @@ channel = "stable"
 
 # Uncomment keys above only when overriding a default.
 # Apply changes to a running server with: herdr server reload-config
+
+[ui.toast]
+delivery = "system"
+
+[ui.sound]
+enabled = true
+
+[ui]
+show_agent_labels_on_pane_borders = true
