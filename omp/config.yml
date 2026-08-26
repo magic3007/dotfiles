@@ -1,0 +1,7 @@
+theme:
+  dark: titanium
+  light: light
+symbolPreset: nerd
+composer:
+  shape: box
+setupVersion: 2

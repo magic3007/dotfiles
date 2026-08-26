@@ -168,6 +168,12 @@
     ~/.kimi-code/config.toml: kimi-code/config.toml
     ~/.local/bin/yolo: scripts/yolo-generic.sh
 
+    # ---- omp (Stencil coding agent harness) ----
+    # Only the static config.yml is symlinked. The rest of ~/.omp/agent
+    # (agent.db, history.db, models.db, sessions/, cache/, ...) is runtime
+    # state and must stay local/machine-specific.
+    ~/.omp/agent/config.yml: omp/config.yml
+
     # ---- Cursor skills ----
     ~/.cursor/skills: claude/skills
 
@@ -403,6 +409,22 @@
     - [
           "command -v uv >/dev/null && uv venv --python 3.12 --prompt base --seed ~/.venv || true",
           Creating global Python venv at ~/.venv with pip,
+      ]
+
+# ---------------------------------------------------------------------------
+# omp - coding agent harness (Stencil / oh-my-pi)
+# NOTE: https://omp.sh/install is the OFFICIAL installer for the `omp` coding
+#       agent (npm/bun pkg @oh-my-pi/pi-coding-agent). It is NOT the prompt
+#       theme tool Oh My Posh (ohmyposh.dev). `omp` is an AI coding agent
+#       harness, not a prompt engine - it does NOT touch PROMPT.
+#       It installs via bun into ~/.bun/bin/omp.
+#       Config lives in ~/.omp/agent/config.yml (not symlinked by default;
+#       see comments below re: file-lock requirement).
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "command -v omp >/dev/null || curl --connect-timeout 30 -fsSL https://omp.sh/install | sh || true",
+          Installing omp (Stencil coding agent harness),
       ]
 
 # ---------------------------------------------------------------------------
