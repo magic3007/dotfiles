@@ -1,3 +1,4 @@
+onboarding = false
 # Herdr configuration
 # Place this file at ~/.config/herdr/config.toml
 # Full reference: https://herdr.dev/docs/configuration/
@@ -9,7 +10,7 @@
 [theme]
 # Built-in themes: catppuccin, terminal, tokyo-night, dracula, nord,
 #                  gruvbox, one-dark, solarized, kanagawa, rose-pine, vesper
-name = "gruvbox-light"
+name = "tokyo-night-day"
 
 # Follow host terminal light/dark appearance and switch Herdr UI themes.
 # auto_switch = false
@@ -65,3 +66,5 @@ enabled = true
 
 [ui]
 show_agent_labels_on_pane_borders = true
+agent_panel_sort = "priority"
+status_indicators = "symbols"
