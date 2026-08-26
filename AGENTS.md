@@ -85,6 +85,8 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 **Pi extensions** (`pi/extensions/` → `~/.pi/agent/extensions/`): TypeScript 扩展，通过 `pi.on()` 订阅生命周期事件。现有扩展：
 - `pi-end-reminder.ts` — 监听 `agent_settled` 事件，任务完成后通过 `~/.local/bin/wechat-reminder` 发送飞书/微信通知（对应 Claude Code 的 `claude-end-reminder.sh`）。新扩展加到 `pi/extensions/` 即可自动被发现（`/reload` 热加载）。
 
+**omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Only `~/.omp/agent/config.yml -> omp/config.yml` is symlinked; the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, ...) is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file; (3) never commit `auth.*`/provider tokens/secrets. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`).
+
 **Tool-specific skills**: Codex, Codex, and Gemini use independent skill directories:
 - `Codex/skills/` -> `~/.Codex/skills`
 - `codex/skills/` -> `~/.codex/skills`
