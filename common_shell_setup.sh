@@ -411,7 +411,7 @@ sdccpro() { _claude_with_api "doubao-seed-2.0-pro" "https://ark.cn-beijing.volce
 kmcc()    { _claude_with_api "kimi-k3" "https://api.kimi.com/coding/" "${KIMI_CODE_API_KEY}" claude "$@"; }
 kmcc2()   { _claude_with_api "kimi-k3" "https://api.moonshot.cn/anthropic" "${KIMI_API_KEY}" claude "$@"; }
 
-glmcc()   { _claude_with_api "glm-5.2" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
+glmcc()   { _claude_with_api "glm-5.3" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 
 
 # pi coding-agent equivalents of the *cc API aliases above.
@@ -431,7 +431,7 @@ sdpipro()  { pi --provider arkcoding --model 'doubao-seed-2.0-pro' "$@"; }
 kmpi()     { pi --provider kimicode  --model 'kimi-k3' "$@"; }
 kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
 
-glmpi()    { pi --provider arkcoding --model 'glm-5.2' "$@"; }
+glmpi()    { pi --provider arkcoding --model 'glm-5.3' "$@"; }
 
 odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
 
