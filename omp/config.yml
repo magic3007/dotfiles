@@ -5,3 +5,5 @@ symbolPreset: nerd
 composer:
   shape: box
 setupVersion: 2
+modelRoles:
+  default: deepseek/deepseek-v4-flash
