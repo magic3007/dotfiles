@@ -94,11 +94,11 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 
 Add a skill to each tool's own directory when it should be available there. Cursor currently keeps using `Codex/skills/` via `~/.cursor/skills`.
 
-**Codex hooks** (`Codex/hooks/`):
+**Codex hooks** (`~/.codex/hooks/`，本地文件未入库):
 - `check_dangerous_ops.sh` (PreToolUse) — blocks destructive git commands (`reset --hard`, `push --force`, `clean -f`, etc.), prevents writes to `/tmp/`, and intercepts file deletions outside safe directories
 - `check-expert-update.sh` (PostToolUse) — reminds to update docs when editing configs/scripts
 - `claudeception-activator.sh` (UserPromptSubmit) — triggers knowledge extraction evaluation
-- `Codex-end-reminder.sh` (Stop/StopFailure/TaskCompleted) — sends Feishu notifications on task completion via wechat-reminder
+- `claude-end-reminder.sh` (Stop) — sends Feishu notifications on task completion via wechat-reminder; gated by `END_REMINDER_ENABLE` (default off)
 
 **Safe directories**: `output/`, `test_output/`, `debug_output/` are whitelisted in `check_dangerous_ops.sh` — Codex can freely write/delete within these without prompts.
 
@@ -127,9 +127,9 @@ When adding new platform packages, edit the relevant `install-scripts/{linux,mac
 
 ### wechat-reminder (`wechat-reminder/`)
 
-通知工具，支持 WeChat (PushDeer) 和飞书双通道。通过 Claude Code hook（Stop/StopFailure/TaskCompleted）和 Pi 扩展（`agent_settled`）自动发送任务完成通知。
+通知工具，支持 WeChat (PushDeer) 和飞书双通道。通过 Claude Code hook（Stop/StopFailure/TaskCompleted）、Codex hook（Stop）和 Pi 扩展（`agent_settled`）自动发送任务完成通知。
 
-**开关（默认关闭）**：环境变量 `END_REMINDER_ENABLE` 控制 Claude Code（`claude/hooks/claude-end-reminder.sh`）和 Pi（`pi/extensions/pi-end-reminder.ts`）两个发送端。未设置 / 空 / `0` / `false` / `no` / `off` → 不发送；设置为 `1` / `yes` / `true` / `on` → 发送。启用示例：`END_REMINDER_ENABLE=1 claude` 或 `export END_REMINDER_ENABLE=1`。
+**开关（默认关闭）**：环境变量 `END_REMINDER_ENABLE` 控制 Claude Code（`claude/hooks/claude-end-reminder.sh`）、Codex（`~/.codex/hooks/claude-end-reminder.sh`，本地未入库）和 Pi（`pi/extensions/pi-end-reminder.ts`）三个发送端。未设置 / 空 / `0` / `false` / `no` / `off` → 不发送；设置为 `1` / `yes` / `true` / `on` → 发送。启用示例：`END_REMINDER_ENABLE=1 claude` 或 `export END_REMINDER_ENABLE=1`。
 
 - `install.conf.yaml` 只复制 `wechat-reminder` 和 `wechat-reminder_main.py` 到 `~/.wechat-reminder/`，新增功能必须放在这两个文件内
 - 飞书 `lark_md` **不支持** Markdown 表格语法（`| col | col |`），`wechat-reminder_main.py` 中的 `parse_content_segments()` 会自动将 Markdown 表格转换为飞书原生 `table` 卡片元素
