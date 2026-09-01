@@ -83,7 +83,7 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 - `pi/` → `~/.pi/agent/` — Pi agent settings, models, extensions
 
 **Pi extensions** (`pi/extensions/` → `~/.pi/agent/extensions/`): TypeScript 扩展，通过 `pi.on()` 订阅生命周期事件。现有扩展：
-- `pi-end-reminder.ts` — 监听 `agent_settled` 事件，任务完成后通过 `~/.local/bin/wechat-reminder` 发送飞书/微信通知（对应 Claude Code 的 `claude-end-reminder.sh`）。新扩展加到 `pi/extensions/` 即可自动被发现（`/reload` 热加载）。
+- `pi-end-reminder.ts` — 监听 `agent_settled` 事件，任务完成后通过 `~/.local/bin/wechat-reminder` 发送飞书/微信通知（对应 Claude Code 的 `claude-end-reminder.sh`）。默认通过环境变量 `END_REMINDER_ENABLE` 开关（默认关闭，见 wechat-reminder 节）。新扩展加到 `pi/extensions/` 即可自动被发现（`/reload` 热加载）。
 
 **omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Only `~/.omp/agent/config.yml -> omp/config.yml` is symlinked; the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, ...) is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file; (3) never commit `auth.*`/provider tokens/secrets. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`).
 
@@ -127,7 +127,9 @@ When adding new platform packages, edit the relevant `install-scripts/{linux,mac
 
 ### wechat-reminder (`wechat-reminder/`)
 
-通知工具，支持 WeChat (PushDeer) 和飞书双通道。通过 Codex hook（Stop/StopFailure/TaskCompleted）自动发送任务完成通知。
+通知工具，支持 WeChat (PushDeer) 和飞书双通道。通过 Claude Code hook（Stop/StopFailure/TaskCompleted）和 Pi 扩展（`agent_settled`）自动发送任务完成通知。
+
+**开关（默认关闭）**：环境变量 `END_REMINDER_ENABLE` 控制 Claude Code（`claude/hooks/claude-end-reminder.sh`）和 Pi（`pi/extensions/pi-end-reminder.ts`）两个发送端。未设置 / 空 / `0` / `false` / `no` / `off` → 不发送；设置为 `1` / `yes` / `true` / `on` → 发送。启用示例：`END_REMINDER_ENABLE=1 claude` 或 `export END_REMINDER_ENABLE=1`。
 
 - `install.conf.yaml` 只复制 `wechat-reminder` 和 `wechat-reminder_main.py` 到 `~/.wechat-reminder/`，新增功能必须放在这两个文件内
 - 飞书 `lark_md` **不支持** Markdown 表格语法（`| col | col |`），`wechat-reminder_main.py` 中的 `parse_content_segments()` 会自动将 Markdown 表格转换为飞书原生 `table` 卡片元素
