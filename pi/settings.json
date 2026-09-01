@@ -15,6 +15,5 @@
   "terminal": {
     "showTerminalProgress": true
   },
-  "defaultThinkingLevel": "off",
   "hideThinkingBlock": true
 }
