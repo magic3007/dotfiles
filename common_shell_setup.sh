@@ -428,10 +428,10 @@ autopi()   { pi --provider arkcoding --model 'ark-code-latest' "$@"; }
 sdpi()     { pi --provider arkcoding --model 'doubao-seed-2.0-lite' "$@"; }
 sdpipro()  { pi --provider arkcoding --model 'doubao-seed-2.0-pro' "$@"; }
 
-kmpi()     { pi --provider kimicode  --model 'kimi-k3' "$@"; }
-kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
+kmpi()     { pi --provider kimicode  --model 'kimi-k3[1m]' "$@"; }
+kmpi2()    { pi --provider moonshot  --model 'kimi-k3[1m]' "$@"; }
 
-glmpi()    { pi --provider arkcoding --model 'glm-5.3' "$@"; }
+glmpi()    { pi --provider arkcoding --model 'glm-5.3[1m]' "$@"; }
 
 odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
 
