@@ -7,6 +7,10 @@
  * 依赖：
  *   - ~/.local/bin/wechat-reminder 二进制（来自 dotfiles wechat-reminder 包）
  *   - 环境变量 FEISHU_WEBHOOK_URL 或 PUSHDEER_KEY
+ *
+ * 开关：环境变量 END_REMINDER_ENABLE（默认关闭）。
+ *   未设置 / 空 / 0 / false / no  -> 不发送通知
+ *   设置为 1（或任意非零真值，如 yes/true/on）-> 发送通知
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -79,8 +83,17 @@ function getLastAssistantReply(entries: any[]): string {
   return "";
 }
 
+// 开关守卫：默认关闭，仅当 END_REMINDER_ENABLE 为非零真值时启用
+function isEnabled(): boolean {
+  const v = process.env.END_REMINDER_ENABLE || "";
+  if (!v) return false;
+  if (/^(0|false|no|off)$/i.test(v.trim())) return false;
+  return true;
+}
+
 export default function (pi: ExtensionAPI) {
   pi.on("agent_settled", async (_event, ctx) => {
+    if (!isEnabled()) return; // 默认关闭，未启用则直接跳过
     const cwd = ctx.cwd;
     const projectDir = cwd;
     const projectName = projectDir.split("/").pop() || "unknown";

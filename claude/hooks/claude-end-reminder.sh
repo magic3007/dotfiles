@@ -1,6 +1,19 @@
 #!/bin/bash
 # Claude Code 任务完成后发送飞书提醒
 # 此脚本在 Claude Code Stop/StopFailure/TaskCompleted 事件时被调用
+#
+# 开关：环境变量 END_REMINDER_ENABLE（默认关闭）。
+#   未设置 / 空 / 0 / false / no  -> 不发送通知（直接退出）
+#   设置为 1（或任意非空且非上述值时按真值处理，如 yes/true/on）-> 发送通知
+# 启用方式示例：END_REMINDER_ENABLE=1
+
+# ---- 开关守卫：默认关闭，设置不为空的非零/启用值时打开 ----
+if [ -z "${END_REMINDER_ENABLE:-}" ]; then
+    exit 0
+fi
+case "$END_REMINDER_ENABLE" in
+    [0FfNn]*|"false"|"no"|"off") exit 0 ;;
+esac
 
 # 读取 stdin JSON 输入（包含 hook 事件数据）
 INPUT=$(cat)
