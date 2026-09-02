@@ -94,6 +94,18 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 
 Add a skill to each tool's own directory when it should be available there. Cursor currently keeps using `Codex/skills/` via `~/.cursor/skills`.
 
+`claude/skills/ask-for-help/` is intentionally shared with Pi because
+`pi/settings.json` loads `~/.claude/skills`. It stops repeated recovery after
+five distinct failed attempts and prepares a Codex escalation packet.
+
+**Codex native toil team**: `codex/config.toml` registers the Responses API
+providers and a flat native team capped at 50 concurrent threads. Role files
+live in `codex/agents/{dspix,glmpi}.toml`; orchestration policy lives in
+`codex/skills/toil-offloading/`. Keep credentials in `DEEPSEEK_API_KEY` and
+`VE_CODE_API_KEY`, never in tracked TOML. The skill treats configured native
+roles as runtime-provided options and sends useful assignments directly without
+role-availability or model/provider probes.
+
 **Codex hooks** (`~/.codex/hooks/`，本地文件未入库):
 - `check_dangerous_ops.sh` (PreToolUse) — blocks destructive git commands (`reset --hard`, `push --force`, `clean -f`, etc.), prevents writes to `/tmp/`, and intercepts file deletions outside safe directories
 - `check-expert-update.sh` (PostToolUse) — reminds to update docs when editing configs/scripts

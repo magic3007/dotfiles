@@ -1,5 +1,35 @@
 {
     "providers": {
+        "dspro-responses": {
+            "baseUrl": "https://api.deepseek.com",
+            "api": "openai-responses",
+            "apiKey": "$DEEPSEEK_API_KEY",
+            "models": [
+                {
+                    "id": "deepseek-v4-flash",
+                    "name": "DeepSeek V4 Flash (Responses)",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 1000000,
+                    "maxTokens": 128000
+                }
+            ]
+        },
+        "arkcoding-responses": {
+            "baseUrl": "https://ark.cn-beijing.volces.com/api/coding/v3",
+            "api": "openai-responses",
+            "apiKey": "$VE_CODE_API_KEY",
+            "models": [
+                {
+                    "id": "glm-5.3",
+                    "name": "GLM 5.3 (Ark Responses)",
+                    "reasoning": true,
+                    "input": ["text"],
+                    "contextWindow": 256000,
+                    "maxTokens": 128000
+                }
+            ]
+        },
         "dspro": {
             "baseUrl": "https://api.deepseek.com/anthropic",
             "api": "anthropic-messages",

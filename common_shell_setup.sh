@@ -421,7 +421,7 @@ glmcc()   { _claude_with_api "glm-5.3" "https://ark.cn-beijing.volces.com/api/co
 # (as api.appintheloop.com did for opus), drop it in pi/models.json.
 dspi()     { pi --provider arkcoding --model 'deepseek-v4-flash[1m]' "$@"; }
 dspipro()  { pi --provider arkcoding --model 'deepseek-v4-pro[1m]' "$@"; }
-dspix()    { pi --provider dspro     --model 'deepseek-v4-flash[1m]' "$@"; }
+dspix()    { pi --provider dspro-responses --model 'deepseek-v4-flash' "$@"; }
 dspiprox() { pi --provider dspro     --model 'deepseek-v4-pro[1m]' "$@"; }
 
 autopi()   { pi --provider arkcoding --model 'ark-code-latest' "$@"; }
@@ -431,7 +431,7 @@ sdpipro()  { pi --provider arkcoding --model 'doubao-seed-2.0-pro' "$@"; }
 kmpi()     { pi --provider kimicode  --model 'kimi-k3[1m]' "$@"; }
 kmpi2()    { pi --provider moonshot  --model 'kimi-k3[1m]' "$@"; }
 
-glmpi()    { pi --provider arkcoding --model 'glm-5.3[1m]' "$@"; }
+glmpi()    { pi --provider arkcoding-responses --model 'glm-5.3' "$@"; }
 
 odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
 
