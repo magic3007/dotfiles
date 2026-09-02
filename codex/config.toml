@@ -3,6 +3,13 @@
 
 model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
+plan_mode_reasoning_effort = "high"
+
+# Match the local Codex workflow: run without interactive approval prompts or
+# filesystem sandboxing, and opt into the faster service tier.
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+service_tier = "fast"
 
 model_provider = "openai_http"
 
@@ -50,6 +57,8 @@ js_repl = false
 apps = false
 memories = true
 chronicle = true
+hooks = true
+prevent_idle_sleep = true
 
 # Cross-provider workers cannot decrypt ChatGPT's encrypted collaboration
 # arguments. Keep this opt-in scoped to this native DeepSeek/Ark team setup.
@@ -75,6 +84,11 @@ keepRemoteControlAwakeWhilePluggedIn = true
 
 [projects."/Users/magic/dotfiles"]
 trust_level = "trusted"
+
+[tui]
+status_line = ["model-with-reasoning", "context-used", "weekly-limit", "thread-id", "current-dir"]
+status_line_use_colors = true
+theme = "coldark-dark"
 
 [tui.model_availability_nux]
 "gpt-5.6-sol" = 3
