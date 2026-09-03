@@ -432,6 +432,7 @@ kmpi()     { pi --provider kimicode  --model 'kimi-k3[1m]' "$@"; }
 kmpi2()    { pi --provider moonshot  --model 'kimi-k3[1m]' "$@"; }
 
 glmpi()    { pi --provider arkcoding-responses --model 'glm-5.3' "$@"; }
+glmpix()   { pi --provider zai-responses --model 'glm-5.3-flash' "$@"; }
 
 odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
 

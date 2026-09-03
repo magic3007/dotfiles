@@ -1,5 +1,35 @@
 {
     "providers": {
+        "zai-responses": {
+            "baseUrl": "https://open.bigmodel.cn/api/v1",
+            "api": "openai-responses",
+            "apiKey": "$ZAI_API_KEY",
+            "models": [
+                {
+                    "id": "glm-5.3-flash",
+                    "name": "GLM-5.3-Flash (ZAI Responses)",
+                    "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "low": "low",
+                        "medium": null,
+                        "high": "high",
+                        "xhigh": null,
+                        "max": "max"
+                    },
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000,
+                    "maxTokens": 131072,
+                    "compat": {
+                        "supportsStore": false,
+                        "supportsDeveloperRole": false,
+                        "supportsReasoningEffort": true,
+                        "maxTokensField": "max_output_tokens"
+                    }
+                }
+            ]
+        },
         "dspro-responses": {
             "baseUrl": "https://api.deepseek.com",
             "api": "openai-responses",

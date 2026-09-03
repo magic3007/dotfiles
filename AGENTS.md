@@ -100,9 +100,9 @@ five distinct failed attempts and prepares a Codex escalation packet.
 
 **Codex native toil team**: `codex/config.toml` registers the Responses API
 providers and a flat native team capped at 50 concurrent threads. Role files
-live in `codex/agents/{dspix,glmpi}.toml`; orchestration policy lives in
+live in `codex/agents/{dspix,glmpix}.toml`; orchestration policy lives in
 `codex/skills/toil-offloading/`. Keep credentials in `DEEPSEEK_API_KEY` and
-`VE_CODE_API_KEY`, never in tracked TOML. The skill treats configured native
+`ZAI_API_KEY`, never in tracked TOML. The skill treats configured native
 roles as runtime-provided options and sends useful assignments directly without
 role-availability or model/provider probes.
 

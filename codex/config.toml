@@ -28,10 +28,10 @@ base_url = "https://api.deepseek.com"
 env_key = "DEEPSEEK_API_KEY"
 wire_api = "responses"
 
-[model_providers.glmpi]
-name = "Ark Coding Responses"
-base_url = "https://ark.cn-beijing.volces.com/api/coding/v3"
-env_key = "VE_CODE_API_KEY"
+[model_providers.glmpix]
+name = "ZAI Responses"
+base_url = "https://open.bigmodel.cn/api/v1"
+env_key = "ZAI_API_KEY"
 wire_api = "responses"
 
 # Native Codex team. Keep delegation flat so workers cannot recursively fan
@@ -45,9 +45,9 @@ max_depth = 1
 description = "Low-cost worker for simple, mechanical, independent toil."
 config_file = "../dotfiles/codex/agents/dspix.toml"
 
-[agents.glmpi]
+[agents.glmpix]
 description = "Stronger worker for tasks needing non-trivial reasoning, diagnosis, or review."
-config_file = "../dotfiles/codex/agents/glmpi.toml"
+config_file = "../dotfiles/codex/agents/glmpix.toml"
 
 [features]
 js_repl = false
