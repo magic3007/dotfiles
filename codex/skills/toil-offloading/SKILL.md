@@ -1,12 +1,22 @@
 ---
 name: toil-offloading
-description: Orchestrate large, decomposable workloads with native Codex team agents. Use when the user asks for toil offloading, broad parallel delegation, multi-project fan-out, or many independent agent tasks; do not use for a small task that is faster to complete directly.
+description: "Orchestrate decomposable workloads with native Codex team agents: the root agent analyzes, decides, partitions, integrates, and accepts while subagents execute bounded investigation, implementation, testing, and repetitive work. Use when the user asks for toil offloading, broad delegation, multi-project fan-out, or substantial work that can be split; do not use for a small task that is faster to complete directly."
 ---
 
 # Toil Offloading
 
-Keep the root agent as controller: understand the goal, split work, assign
-ownership, integrate results, resolve conflicts, and verify the final outcome.
+Keep the root agent as orchestrator, not the default implementer. The root owns
+goal clarification, decomposition, cross-cutting analysis, architectural and
+priority decisions, assignment boundaries, conflict resolution, integration,
+and final acceptance. Delegate the bounded execution work: repository searches,
+diagnosis, implementation, refactoring, data extraction, artifact generation,
+and focused verification.
+
+Subagents are not read-only by default. Give them the write scope and local
+validation needed to finish their assignments. Use read-only assignments only
+when the work is genuinely inspection-only, the user requested it, or write
+isolation cannot be made safe.
+
 Use only the native collaboration tools exposed by the current Codex runtime.
 Do not launch agent CLIs or `codex exec` as shell subprocesses.
 
@@ -27,20 +37,26 @@ remain explicit; never replace a native worker with a shell subprocess.
   extraction, formatting, repetitive validation, focused test execution, and
   small independent edits with an obvious acceptance condition.
 - Prefer stronger reasoning roles for cross-file analysis, ambiguous diagnosis,
-  implementation judgment, conflict analysis, or independent review.
+  non-trivial implementation, conflict analysis, or independent review.
 - Keep architectural decisions, destructive or externally mutating actions,
   conflict resolution, final integration, and acceptance with the root agent.
+- Let workers make ordinary implementation decisions inside their assignment
+  contract. Ask them to return cross-cutting choices or scope changes to the
+  root instead of silently expanding the assignment.
 - If an assignment exposes materially different complexity, finish or close it
   and create a new bounded assignment with a suitable agent type. Do not
   silently change roles or scope.
 
 ## Build the batch
 
-Delegate only tasks that are independently useful. Give every worker:
+Delegate work that has a clear boundary and remains useful on its own. Prefer
+assigning the actual implementation or validation, not a read-only report that
+leaves the root to repeat the same work. Give every worker:
 
 - one concrete objective and an observable done condition;
 - the exact project root or paths in scope;
-- whether it is read-only or may edit;
+- explicit ownership of the files, directories, or output artifacts it may edit;
+- permission to inspect dependencies and run safe, relevant local validation;
 - required evidence and output format;
 - relevant constraints from the user and `AGENTS.md`;
 - a reminder that other agents may be working in the same checkout, so it must
@@ -52,12 +68,19 @@ Prefer a few well-partitioned assignments over duplicate investigations.
 
 ## Protect shared work
 
-- Read-only workers may inspect the same project concurrently.
-- Never assign overlapping writes in one checkout. Partition ownership by
-  project or disjoint path, or create isolated worktrees when that is already
+- Inspect the existing worktree before assigning writes so user changes and
+  concurrent ownership are visible.
+- Multiple workers may inspect the same project, and may write concurrently
+  when ownership is partitioned by project, disjoint paths, or distinct output
+  artifacts.
+- Never assign overlapping writes in one checkout. If overlap is unavoidable,
+  serialize the assignments or use isolated worktrees when that is already
   authorized and appropriate.
 - Workers must not commit, submit, deploy, delete, or perform other external or
   destructive actions unless the user explicitly authorized that action.
+- Do not redo a worker's assignment in the root while it is running. Continue
+  orchestration, dependency analysis, or integration work that does not
+  duplicate its ownership.
 - Do not treat a worker's success message as acceptance evidence. Inspect the
   materialized changes or outputs and run proportionate verification.
 
@@ -65,5 +88,8 @@ Prefer a few well-partitioned assignments over duplicate investigations.
 
 Track each assignment through completion. Follow up with the same worker when
 its context is valuable; use a separate reviewer when independence adds value.
+Integrate worker outputs, make the remaining cross-cutting decisions, and fix
+only small integration gaps directly; delegate substantial rework back with a
+revised boundary and acceptance condition.
 Before reporting completion, account for every assignment as accepted,
 superseded, failed, or cancelled, then give one root-level conclusion.
