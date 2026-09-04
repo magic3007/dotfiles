@@ -11228,5 +11228,6 @@
     "window.commandCenter": true,
     "terminal.integrated.macOptionIsMeta": true,
     "window.autoDetectColorScheme": true,
-    "workbench.preferredLightColorTheme": "Cursor Dark"
+    "workbench.preferredLightColorTheme": "Cursor Dark",
+    "workbench.startupEditor": "none"
 }
