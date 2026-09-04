@@ -11203,7 +11203,6 @@
         "editor.lineHighlightBackground": "#1073cf2d",  // 当前行背景色
         "editor.lineHighlightBorder": "#9fced11f"       // 当前行边框色
     },
-    "cursor.cpp.enablePartialAccepts": true,
     "editor.mouseWheelScrollSensitivity": 3,
     "workbench.list.mouseWheelScrollSensitivity": 3,
     "terminal.integrated.mouseWheelScrollSensitivity": 3,
@@ -11217,17 +11216,11 @@
     "git.blame.editorDecoration.enabled": false,
     "diffEditor.ignoreTrimWhitespace": true,
     "terminal.integrated.altClickMovesCursor": false,
-    "cursor.cpp.disabledLanguages": [
-        "scminput"
-    ],
-    "cursor.terminal.usePreviewBox": true,
     "claudeCode.preferredLocation": "panel",
     "claudeCode.selectedModel": "default",
     "terminal.integrated.fontFamily": "monospace",
-    "cursor.rpcFileLogger.enabled": true,
     "window.commandCenter": true,
     "terminal.integrated.macOptionIsMeta": true,
     "window.autoDetectColorScheme": true,
-    "workbench.preferredLightColorTheme": "Cursor Dark",
     "workbench.startupEditor": "none"
 }

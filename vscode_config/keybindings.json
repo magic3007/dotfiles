@@ -331,10 +331,6 @@
   "command": "workbench.action.createTerminalEditor"
 },
 {
-  "key": "cmd+i",
-  "command": "composerMode.agent"
-},
-{
   "key": "cmd+k",
   "command": "-workbench.action.terminal.clear",
   "when": "terminalFocus && terminalHasBeenCreated && !accessibilityModeEnabled || terminalFocus && terminalProcessSupported && !accessibilityModeEnabled || accessibilityModeEnabled && accessibleViewIsShown && terminalHasBeenCreated && accessibleViewCurrentProviderId == 'terminal' || accessibilityModeEnabled && accessibleViewIsShown && terminalProcessSupported && accessibleViewCurrentProviderId == 'terminal'"
@@ -386,21 +382,6 @@
         "text": "\u001b\r"
     },
     "when": "terminalFocus"
-},
-{
-  "key": "alt+cmd+s",
-  "command": "workbench.action.toggleUnifiedSidebarFromKeyboard",
-  "when": "cursor.agentIdeUnification.enabled == true && !isAuxiliaryWindowFocusedContext"
-},
-{
-  "key": "cmd+k",
-  "command": "-glass.openSettingsSearchPalette",
-  "when": "glassNoModalOpen && isGlassEmptyWorkspace && isSettingsPaneFocused"
-},
-{
-  "key": "cmd+k",
-  "command": "-glass.openPalette",
-  "when": "glassNoModalOpen && isGlassEmptyWorkspace && !isSettingsPaneOpen || isGlassEmptyWorkspace && !isSettingsPaneOpen && glassActiveModal == 'palette'"
 },
 {
   "key": "cmd+k cmd+r",
