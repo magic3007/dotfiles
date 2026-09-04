@@ -52,6 +52,10 @@
           Creating Cursor config directory on macOS,
       ]
     - [
+          test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Code/User || true,
+          Creating VS Code config directory on macOS,
+      ]
+    - [
           test "$(uname)" = "Darwin" && mkdir -p ~/.config/iterm2 || true,
           Creating iTerm2 config directory,
       ]
@@ -140,6 +144,8 @@
 
     # ---- IDE / Editor config ----
     ~/.vscoderc: vscode/vscoderc
+    ~/Library/Application Support/Code/User/keybindings.json: vscode_config/keybindings.json
+    ~/Library/Application Support/Code/User/settings.json: vscode_config/settings.json
     ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
     ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
     ~/Library/Application Support/Antigravity/User/keybindings.json: antigravity_config/keybindings.json

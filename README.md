@@ -52,7 +52,7 @@ cd ~/dotfiles
 |------|--------|
 | **neovim** | NvChad (full IDE) + nvim-basic-ide (lightweight), LSP, treesitter |
 | **vim** | vimrc with plugin management, undo history, extensive settings |
-| **VSCode** | Settings sync via `vscoderc` |
+| **VSCode** | macOS — key repeat + independent keybindings and settings |
 | **ideavim** | JetBrains Vim emulation |
 | **Cursor** | macOS — keybindings + settings |
 | **Antigravity** | macOS — keybindings + settings |
@@ -174,6 +174,7 @@ dotfiles/
 ├── karabiner/       → ~/.config/karabiner/   (macOS)
 ├── skhd/            → ~/.skhdrc + ~/.skhd/   (macOS)
 ├── cursor_config/   → Cursor settings        (macOS)
+├── vscode_config/   → VS Code settings       (macOS)
 ├── antigravity_config/ → Antigravity settings (macOS)
 ├── iterm2/          → iTerm2 plist          (macOS)
 ├── obsidian/        → Obsidian vault settings
