@@ -12,9 +12,7 @@
       "warningAcknowledged": true
     }
   },
-  "tools": {
-    "approvalMode": "auto_edit"
-  },
+  "tools": {},
   "privacy": {
     "usageStatisticsEnabled": false
   },
