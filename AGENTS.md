@@ -87,6 +87,8 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 
 **omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Only `~/.omp/agent/config.yml -> omp/config.yml` is symlinked; the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, ...) is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file; (3) never commit `auth.*`/provider tokens/secrets. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`).
 
+**codex config.toml is platform-conditional**: `~/.codex/config.toml` is only symlinked on non-macOS. In `install.conf.yaml` that link entry carries `if: '[ "$(uname)" != "Darwin" ]'`. Reason: on macOS Codex rewrites `config.toml` natively at runtime (writes `[hooks.state]` etc.), so it must stay a real local writable file — never symlink it into the repo on macOS (that would pollute `codex/config.toml` with every run). Other platforms (Linux) keep the symlink so the tracked file stays the single source of truth.
+
 **Tool-specific skills**: Codex, Codex, and Gemini use independent skill directories:
 - `Codex/skills/` -> `~/.Codex/skills`
 - `codex/skills/` -> `~/.codex/skills`
