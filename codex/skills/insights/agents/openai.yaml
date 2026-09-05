@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Insights"
+  short_description: "Analyze local Codex sessions and generate a private report"
+  default_prompt: "Use $insights to analyze my local Codex sessions and generate an insights report."
