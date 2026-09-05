@@ -62,8 +62,8 @@ prevent_idle_sleep = true
 
 # Cross-provider workers cannot decrypt ChatGPT's encrypted collaboration
 # arguments. Keep this opt-in scoped to this native DeepSeek/Ark team setup.
-[features.multi_agent_v2]
-encrypted_messages = false
+# [features.multi_agent_v2]
+# encrypted_messages = false
 
 # Keep startup fast: cap how long codex waits for MCP servers before giving up
 # (the previous value of 120s could block startup for up to 2 minutes).
