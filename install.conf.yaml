@@ -160,7 +160,11 @@
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.codex/AGENTS.md: codex/AGENTS.md
-    ~/.codex/config.toml: codex/config.toml
+    # macOS: Codex rewrites config.toml natively (hooks state etc.); keep it a
+    # real local file and do NOT symlink it into the repo. Link only on other platforms.
+    ~/.codex/config.toml:
+        if: '[ "$(uname)" != "Darwin" ]'
+        path: codex/config.toml
     ~/.codex/skills: codex/skills
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
