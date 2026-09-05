@@ -9,10 +9,11 @@ description: |
   (5) 需要更新数据库schema添加新选项，
   (6) 开发需要集成Notion数据的自动化工作流，
   (7) query_data_sources/query-database-view返回Business Plan要求错误，
-  (8) 需要在无Business Plan的情况下枚举数据库所有条目。
+  (8) 需要在无Business Plan的情况下枚举数据库所有条目，
+  (9) 需要在SQL查询中随机选择条目（RANDOM()函数不被支持）。
 author: Claude Code
-version: 1.4.0
-date: 2026-07-10
+version: 1.5.0
+date: 2026-08-17
 ---
 
 # MCP Notion工具使用指南
@@ -132,6 +133,27 @@ This tool requires a Business plan or higher with Notion AI. Upgrade your plan t
 - `query_data_sources` 的SQL模式在Free/Plus计划完全不可用（直接报Business Plan错误），不是"返回空数据"
 - 这与早期版本的`notion-fetch` SQL查询限制（仅返回schema）是**两个不同的问题**
 
+### 7. SQL随机选择限制（RANDOM()不被支持）
+当需要从数据库中随机选择条目时（例如每日随机推荐一位研究者），不能使用SQLite的`RANDOM()`函数：
+
+```sql
+SELECT * FROM "collection://..." ORDER BY RANDOM() LIMIT 1
+```
+
+会返回错误（已验证 2026-08-17）：
+```
+Failed to execute query: Only a single SELECT query against the provided collection views is permitted. Reason: function "random" is not allowed.
+```
+
+**注意**：错误信息中的"Only a single SELECT query"是误导性的，真正原因是`RANDOM()`函数被禁用（非标准函数均不可用）。
+
+**解决方案**：先查询全部条目，再在客户端随机选择：
+1. 用SQL查询获取所有条目的`url`、`Name`等字段（`ORDER BY "Name"`等确定性排序可用，仅`RANDOM()`被禁用）
+2. 在客户端生成随机索引，如Bash `echo $((RANDOM % N + 1))`
+3. 按索引取对应条目，再用`notion-fetch`获取该页面的完整内容
+
+**已验证（2026-08-17）**：当前账户的`query_data_sources`（SQL模式）已能返回实际行数据（约100条），说明早期"仅返回表结构"的限制已不再适用（或账户已升级到Business Plan）；但`RANDOM()`等非标准SQL函数仍被禁用。
+
 ## Verification
 1. 调用`mcp__notion__notion-fetch`传入数据库页面URL，能够正常返回包含schema和表结构的信息
 2. 使用data source URL和SQL查询，能够获取到数据库中的条目内容
@@ -166,7 +188,7 @@ for researcher in researchers:
 - 对于大型数据库，建议添加LIMIT限制查询结果数量，避免响应过大
 - 敏感数据库需要确保Claude Code有访问权限，否则会返回权限错误
 - 定期检查MCP官方文档获取最新功能和API变化
-- **重要限制**：当前版本MCP Notion工具的SQL查询功能仅支持获取表结构和schema信息，不支持查询数据库中的实际数据记录，相关功能可能会在未来版本中实现
+- **重要限制（已过时）**：早期版本MCP Notion工具的SQL查询仅支持获取表结构；自2026-08-17起已验证`query_data_sources`（SQL模式）能返回实际行数据，但`RANDOM()`等非标准SQL函数仍被禁用（见第7节）
 - **Business Plan限制**：`query_data_sources`和`query-database-view`工具在Free/Plus计划不可用。如需枚举数据库条目，使用第6节的多关键词语义搜索枚举法
 - **搜索枚举覆盖率**：对于大型数据库（100条+），多轮语义搜索可能无法100%覆盖，需要更多的关键词轮次和更大的page_size。如确实需要完整数据，建议升级到Business计划
 
