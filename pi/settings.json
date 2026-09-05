@@ -2,7 +2,7 @@
   "theme": "gruvbox-dark",
   "defaultProvider": "dspro",
   "defaultModel": "deepseek-v4-flash[1m]",
-  "lastChangelogVersion": "0.84.1",
+  "lastChangelogVersion": "0.84.4",
   "packages": [
     "my-pi-plugins",
     "npm:pi-powerline-footer@0.12.2",
