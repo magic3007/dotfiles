@@ -15,5 +15,9 @@
   "terminal": {
     "showTerminalProgress": true
   },
-  "hideThinkingBlock": true
+  "hideThinkingBlock": true,
+  "defaultThinkingLevel": "high",
+  "images": {
+    "blockImages": false
+  }
 }

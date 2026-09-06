@@ -93,6 +93,277 @@ theme = "coldark-dark"
 [tui.model_availability_nux]
 "gpt-5.6-sol" = 3
 
+# Keep infrequently used skills installed but out of the model-visible catalog.
+# Re-enable an individual skill by changing its entry to `enabled = true` or
+# removing that entry.
+[[skills.config]]
+name = "ppw-abstract"
+enabled = false
+
+[[skills.config]]
+name = "ppw-caption"
+enabled = false
+
+[[skills.config]]
+name = "ppw-cover-letter"
+enabled = false
+
+[[skills.config]]
+name = "ppw-de-ai"
+enabled = false
+
+[[skills.config]]
+name = "ppw-experiment"
+enabled = false
+
+[[skills.config]]
+name = "ppw-literature"
+enabled = false
+
+[[skills.config]]
+name = "ppw-logic"
+enabled = false
+
+[[skills.config]]
+name = "ppw-polish"
+enabled = false
+
+[[skills.config]]
+name = "ppw-repo-to-paper"
+enabled = false
+
+[[skills.config]]
+name = "ppw-reviewer-simulation"
+enabled = false
+
+[[skills.config]]
+name = "ppw-team"
+enabled = false
+
+[[skills.config]]
+name = "ppw-translation"
+enabled = false
+
+[[skills.config]]
+name = "ppw-update"
+enabled = false
+
+[[skills.config]]
+name = "ppw-visualization"
+enabled = false
+
+[[skills.config]]
+name = "nature-citation"
+enabled = false
+
+[[skills.config]]
+name = "nature-data"
+enabled = false
+
+[[skills.config]]
+name = "nature-polishing"
+enabled = false
+
+[[skills.config]]
+name = "nature-response"
+enabled = false
+
+[[skills.config]]
+name = "nature-writing"
+enabled = false
+
+[[skills.config]]
+name = "check-claude-code-config"
+enabled = false
+
+[[skills.config]]
+name = "claude-code-custom-skill-development"
+enabled = false
+
+[[skills.config]]
+name = "project-starter"
+enabled = false
+
+[[skills.config]]
+name = "setup-harness"
+enabled = false
+
+[[skills.config]]
+name = "debug-experience-system"
+enabled = false
+
+[[skills.config]]
+name = "machine-onboarding"
+enabled = false
+
+[[skills.config]]
+name = "android-16kb-alignment"
+enabled = false
+
+[[skills.config]]
+name = "android-dev-loop"
+enabled = false
+
+[[skills.config]]
+name = "android-ui-review"
+enabled = false
+
+[[skills.config]]
+name = "harness-generate-android"
+enabled = false
+
+[[skills.config]]
+name = "harness-generate-ios"
+enabled = false
+
+[[skills.config]]
+name = "harness-generate-app-next-h5"
+enabled = false
+
+[[skills.config]]
+name = "autoskill"
+enabled = true
+
+[[skills.config]]
+name = "claudeception"
+enabled = true
+
+[[skills.config]]
+name = "nextjs-server-side-error-debugging"
+enabled = false
+
+[[skills.config]]
+name = "prisma-connection-pool-exhaustion"
+enabled = false
+
+[[skills.config]]
+name = "typescript-circular-dependency"
+enabled = false
+
+[[skills.config]]
+name = "continuous-learning"
+enabled = true
+
+[[skills.config]]
+name = "consciousness-council"
+enabled = true
+
+[[skills.config]]
+name = "vela-session-debugger"
+enabled = false
+
+[[skills.config]]
+name = "tide-add-managed-stream"
+enabled = false
+
+[[skills.config]]
+name = "tide-circus-config-checker"
+enabled = false
+
+[[skills.config]]
+name = "tide-cluster-info"
+enabled = false
+
+[[skills.config]]
+name = "tide-context-forwarder"
+enabled = false
+
+[[skills.config]]
+name = "tide-dc-quota-query"
+enabled = false
+
+[[skills.config]]
+name = "tide-dc-quota-setter"
+enabled = false
+
+[[skills.config]]
+name = "tide-limit-query"
+enabled = false
+
+[[skills.config]]
+name = "tide-limit-setter"
+enabled = false
+
+[[skills.config]]
+name = "tide-podbatch-query"
+enabled = false
+
+[[skills.config]]
+name = "tide-podbatch-setter"
+enabled = false
+
+[[skills.config]]
+name = "tide-queue-checker"
+enabled = false
+
+[[skills.config]]
+name = "tide-ratio-quota-query"
+enabled = false
+
+[[skills.config]]
+name = "tide-ratio-quota-setter"
+enabled = false
+
+[[skills.config]]
+name = "tide-resource-checker"
+enabled = false
+
+[[skills.config]]
+name = "tide-scheduling-checker"
+enabled = false
+
+[[skills.config]]
+name = "tide-scheduling-config-query"
+enabled = false
+
+[[skills.config]]
+name = "tide-scheduling-config-setter"
+enabled = false
+
+[[skills.config]]
+name = "tide-stream-dispatch-checker"
+enabled = false
+
+[[skills.config]]
+name = "tide-success-rate-checker"
+enabled = false
+
+[[skills.config]]
+name = "tide-traffic-checker"
+enabled = false
+
+[[skills.config]]
+name = "tide-whitelist-query"
+enabled = false
+
+[[skills.config]]
+name = "tide-whitelist-setter"
+enabled = false
+
+[[skills.config]]
+name = "hlog"
+enabled = false
+
+[[skills.config]]
+name = "atm-log-tracer"
+enabled = false
+
+[[skills.config]]
+name = "atm-apollo-reader"
+enabled = false
+
+[[skills.config]]
+name = "t2a-large-log-tracer"
+enabled = false
+
+[[skills.config]]
+name = "vulcan-job-monitor"
+enabled = false
+
+[[skills.config]]
+name = "vulcan2-info"
+enabled = false
+
 [hooks.state]
 
 [hooks.state."/Users/magic/.codex/hooks.json:stop:0:0"]

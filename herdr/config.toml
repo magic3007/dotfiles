@@ -66,5 +66,5 @@ enabled = true
 
 [ui]
 show_agent_labels_on_pane_borders = false
-agent_panel_sort = "priority"
+agent_panel_sort = "spaces"
 status_indicators = "symbols"

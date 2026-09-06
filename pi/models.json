@@ -167,6 +167,13 @@
             },
             "models": [
                 {
+                    "id": "claude-fable-5",
+                    "name": "Fable 5 (appintheloop)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
+                },
+                {
                     "id": "claude-opus-4-8",
                     "name": "Opus 4.8 (appintheloop)",
                     "reasoning": true,
