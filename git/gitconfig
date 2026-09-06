@@ -110,7 +110,6 @@
 
 [core]
 	excludesfile = ~/.gitignore_global
-	hooksPath = /Users/minimax/.git-hooks
 	quotepath = false
 
 # Allow local customizations in the .gitconfig_local file
@@ -122,6 +121,12 @@
 	clean = git-lfs clean -- %f
 	process = git-lfs filter-process
 [safe]
+	directory = *
+	directory = *
+	directory = *
+	directory = *
+	directory = *
+	directory = *
 	directory = *
 [credential "https://github.com"]
 	helper = 
