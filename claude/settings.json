@@ -182,5 +182,6 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "verbose": true,
-  "teammateMode": "tmux"
+  "teammateMode": "tmux",
+  "tui": "fullscreen"
 }

@@ -16,7 +16,7 @@
     "showTerminalProgress": true
   },
   "hideThinkingBlock": true,
-  "defaultThinkingLevel": "high",
+  "defaultThinkingLevel": "off",
   "images": {
     "blockImages": false
   }
