@@ -401,7 +401,7 @@ _claude_with_api() {
 
 dscc()    { _claude_with_api "deepseek-v4-flash[1m]" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
 dsccpro()    { _claude_with_api "deepseek-v4-pro[1m]" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
-dsccx()    { _claude_with_api "deepseek-v4-flash[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
+dsccx()    { _claude_with_api "deepseek-flash[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
 dsccprox() { _claude_with_api "deepseek-v4-pro[1m]" "https://api.deepseek.com/anthropic" "${DEEPSEEK_API_KEY}" claude "$@"; }
 
 autocc()  { _claude_with_api "ark-code-latest" "https://ark.cn-beijing.volces.com/api/coding" "${VE_CODE_API_KEY}" claude "$@"; }
@@ -421,7 +421,7 @@ glmcc()   { _claude_with_api "glm-5.3" "https://ark.cn-beijing.volces.com/api/co
 # (as api.appintheloop.com did for opus), drop it in pi/models.json.
 dspi()     { pi --provider arkcoding --model 'deepseek-v4-flash[1m]' "$@"; }
 dspipro()  { pi --provider arkcoding --model 'deepseek-v4-pro[1m]' "$@"; }
-dspix()    { pi --provider dspro-responses --model 'deepseek-v4-flash' "$@"; }
+dspix()    { pi --provider dspro-responses --model 'deepseek-flash' "$@"; }
 dspiprox() { pi --provider dspro     --model 'deepseek-v4-pro[1m]' "$@"; }
 
 autopi()   { pi --provider arkcoding --model 'ark-code-latest' "$@"; }
@@ -434,7 +434,7 @@ kmpi2()    { pi --provider moonshot  --model 'kimi-k3[1m]' "$@"; }
 glmpi()    { pi --provider arkcoding-responses --model 'glm-5.3' "$@"; }
 glmpix()   { pi --provider zai-responses --model 'glm-5.3-flash' "$@"; }
 
-odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-v4-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
+odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
 
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
