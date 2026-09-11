@@ -1,6 +1,6 @@
 name = "dspix"
 description = "Low-cost worker for simple, mechanical, independent toil."
-model = "deepseek-v4-flash"
+model = "deepseek-flash"
 model_provider = "dspix"
 model_reasoning_effort = "low"
 

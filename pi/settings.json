@@ -10,7 +10,8 @@
     "git:github.com/obra/superpowers"
   ],
   "skills": [
-    "~/.claude/skills"
+    "~/.claude/skills",
+    "~/.codex/skills"
   ],
   "terminal": {
     "showTerminalProgress": true

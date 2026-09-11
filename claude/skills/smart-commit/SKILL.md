@@ -178,13 +178,10 @@ For each commit in order:
    git add <file1> <file2> ...
    ```
 
-   If a file has both related and unrelated changes (i.e., partial staging needed), use:
-
-   ```bash
-   git add -p <file>
-   ```
-
-   and guide the user through hunk selection, OR stage the whole file if all changes belong to this commit.
+   If a file has both related and unrelated changes (i.e., partial staging needed),
+   use `git add -p <file>` when it is interactive, otherwise stage hunk by hunk with
+   the bundled helper (see [Hunk-level staging](#hunk-level-staging)). Stage the whole
+   file when every change in it belongs to this commit.
 
 3. **Create the commit:**
 
@@ -236,6 +233,42 @@ If all staged changes belong to ONE logical concern, create a single commit. Don
 
 ### Partial File Staging Needed
 When a file contains changes for multiple commits, use `git add -p` for patch-level staging. Explain to the user which hunks belong to which commit.
+
+### Hunk-level staging
+`git add -p` needs an interactive TTY and cannot select *within* a hunk. When it is
+unavailable, or when one hunk mixes two concerns, drive the index directly with
+`scripts/stage_hunks.py` (bundled with this skill):
+
+```bash
+# 1. The diff must still be staged (or already reset) — inspect hunks and change groups
+python3 <skill>/scripts/stage_hunks.py --list <path>
+
+# 2. Index must equal HEAD for that path, so reset once before the first commit
+git reset
+
+# 3. Stage whole hunks, and within a mixed hunk only its 2nd change group
+python3 <skill>/scripts/stage_hunks.py --take 0,1,2,4,5 <path>
+python3 <skill>/scripts/stage_hunks.py --take 1,2,3 --split 5:1 <path>
+```
+
+The helper reads the file's full diff (working tree vs HEAD), rewrites the chosen
+subset into a patch — downgrading unselected `-`/`+` pairs inside a split hunk into
+context lines and recomputing every `@@ -a,n +b,m @@` — and applies it with
+`git apply --cached`. It refuses to run when the path already has staged changes.
+
+Verify each intermediate commit actually builds/runs before creating it; a
+broken intermediate tree is worse than one large commit:
+
+```bash
+git stash push --keep-index -m verify   # working tree drops to the staged state
+<run the affected tests>
+git stash pop                           # bring back the rest of the changes
+git commit ...                          # then commit the staged subset
+git add -A                              # the remainder becomes the next commit
+```
+
+One file may only be handed to the helper once per commit — the index must start
+at HEAD, and later commits pick up the remainder with `git add -A`.
 
 ### Pre-commit Hook Failures
 If a commit fails due to pre-commit hooks:

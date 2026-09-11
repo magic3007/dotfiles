@@ -36,8 +36,8 @@
             "apiKey": "$DEEPSEEK_API_KEY",
             "models": [
                 {
-                    "id": "deepseek-v4-flash",
-                    "name": "DeepSeek V4 Flash (Responses)",
+                    "id": "deepseek-flash",
+                    "name": "DeepSeek Flash (Responses)",
                     "reasoning": true,
                     "input": ["text"],
                     "contextWindow": 1000000,
@@ -73,8 +73,8 @@
                     "contextWindow": 1000000
                 },
                 {
-                    "id": "deepseek-v4-flash[1m]",
-                    "name": "DeepSeek V4 Flash 1M",
+                    "id": "deepseek-flash[1m]",
+                    "name": "DeepSeek Flash 1M",
                     "reasoning": true,
                     "input": ["text"],
                     "contextWindow": 1000000

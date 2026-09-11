@@ -179,9 +179,9 @@
   "language": "Chinese",
   "skipWebFetchPreflight": true,
   "autoUpdatesChannel": "latest",
+  "tui": "default",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "verbose": true,
-  "teammateMode": "tmux",
-  "tui": "fullscreen"
+  "teammateMode": "tmux"
 }
