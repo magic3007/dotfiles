@@ -38,8 +38,10 @@ The description field is critical—it determines when the skill surfaces during
 
 ## Installation Paths
 
-- **User-level**: `~/.claude/skills/[skill-name]/`
-- **Project-level**: `.claude/skills/[skill-name]/`
+Extracted skills are project-local by default: `.claude/skills/[skill-name]/`.
+Use `~/.claude/skills/[skill-name]/` only when the user explicitly requests a
+user-wide/global skill or confirms cross-project reuse. Never silently fall back
+to the user-level directory when the project path is unavailable.
 
 ## Quality Criteria for Skills
 

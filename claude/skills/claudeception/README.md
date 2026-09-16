@@ -8,23 +8,28 @@ This skill fixes that. When Claude Code discovers something non-obvious (a debug
 
 ### Step 1: Clone the skill
 
-**User-level (recommended)**
-
-```bash
-git clone https://github.com/blader/Claudeception.git ~/.claude/skills/claudeception
-```
-
-**Project-level**
+**Project-level (default)**
 
 ```bash
 git clone https://github.com/blader/Claudeception.git .claude/skills/claudeception
 ```
 
+**User-level (only for intentional cross-project use)**
+
+```bash
+git clone https://github.com/blader/Claudeception.git ~/.claude/skills/claudeception
+```
+
+The skill's learned outputs are project-local by default: save them under
+`.claude/skills/[skill-name]/`. Use `~/.claude/skills/[skill-name]/` only when
+the user explicitly requests a global/user-wide skill or confirms that it should
+be shared across projects. Do not silently fall back to the user directory.
+
 ### Step 2: Set up the activation hook (recommended)
 
 The skill can activate via semantic matching, but a hook ensures it evaluates every session for extractable knowledge.
 
-#### User-level setup (recommended)
+#### User-level setup (optional)
 
 1. Create the hooks directory and copy the script:
 
@@ -53,7 +58,7 @@ chmod +x ~/.claude/hooks/claudeception-activator.sh
 }
 ```
 
-#### Project-level setup
+#### Project-level setup (default)
 
 1. Create the hooks directory inside your project and copy the script:
 

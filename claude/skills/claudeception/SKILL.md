@@ -5,9 +5,10 @@ description: |
   Triggers: (1) /claudeception command to review session learnings, (2) "save this as a skill"
   or "extract a skill from this", (3) "what did we learn?", (4) After any task involving
   non-obvious debugging, workarounds, or trial-and-error discovery. Creates new Claude Code
-  skills when valuable, reusable knowledge is identified.
+  skills when valuable, reusable knowledge is identified, saving them in the current
+  project's .claude/skills/ directory by default.
 author: Claude Code
-version: 3.0.0
+version: 3.1.0
 allowed-tools:
   - Read
   - Write
@@ -68,7 +69,7 @@ Before extracting, verify the knowledge meets these criteria:
 **Goal:** Find related skills before creating. Decide: update or create new.
 
 ```sh
-# Skill directories (project-first, then user-level)
+# Skill directories for discovery (project-local first; user-level is read-only by default)
 SKILL_DIRS=(
   ".claude/skills"
   "$HOME/.claude/skills"
@@ -88,6 +89,10 @@ rg -F "exact error message" "${SKILL_DIRS[@]}" 2>/dev/null
 # Search by context markers (files, functions, config keys)
 rg -i "getServerSideProps|next.config.js|prisma.schema" "${SKILL_DIRS[@]}" 2>/dev/null
 ```
+
+Discovery may inspect user-level skills to avoid duplicating an existing skill, but
+discovery order does not grant permission to write there. The default output location
+is always the current project's skill directory.
 
 | Found                                            | Action                                                   |
 |--------------------------------------------------|----------------------------------------------------------|
@@ -212,15 +217,32 @@ description: |
   Turborepo, and npm workspaces.
 ```
 
-### Step 6: Save the Skill
+### Step 6: Save the Skill (Project-Local by Default)
 
-Save new skills to the appropriate location:
+Newly extracted skills MUST be saved in the current project's skill directory by
+default:
 
-- **Project-specific skills**: `.claude/skills/[skill-name]/SKILL.md`
-- **User-wide skills**: `~/.claude/skills/[skill-name]/SKILL.md`
+```text
+.claude/skills/[skill-name]/SKILL.md
+```
 
-Include any supporting scripts in a `scripts/` subdirectory if the skill benefits from 
-executable helpers.
+Use this decision order:
+
+1. Identify the project root (prefer the repository root containing the relevant
+   files; use the current working directory when it is already the project root).
+2. Create or update `.claude/skills/[skill-name]/` there.
+3. Keep supporting scripts and references inside that skill directory.
+4. Write to `~/.claude/skills/[skill-name]/SKILL.md` only when the user explicitly
+   asks for a user-wide/global skill or explicitly confirms cross-project reuse.
+
+Do not silently fall back to `~/.claude/skills` because a project directory is
+missing, inconvenient, or not currently linked. If the project root cannot be
+determined, ask where the skill should go before writing it. A skill that happens to
+be useful across projects is not, by itself, authorization to make it user-wide.
+
+Updating an existing user-wide skill also requires explicit user-wide intent; otherwise
+create or update the project-local counterpart. Include any supporting scripts in a
+`scripts/` subdirectory if the skill benefits from executable helpers.
 
 ## Retrospective Mode
 
