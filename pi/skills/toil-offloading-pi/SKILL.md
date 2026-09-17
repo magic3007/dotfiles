@@ -1,66 +1,94 @@
 ---
 name: toil-offloading-pi
-description: "Orchestrate decomposable workloads with pi subagents (afang-subagent extension): the root agent analyzes, decides, partitions, integrates, and accepts while subagents execute bounded investigation, implementation, testing, and repetitive work. Use when the user asks for toil offloading, broad delegation, multi-project fan-out, or substantial work that can be split; do not use for a small task that is faster to complete directly."
+description: "Orchestrate decomposable workloads with pi subagents (afang-subagent extension): the strong-but-slow root agent clarifies goals, cuts the work into contract-bearing subtasks, fans them out to cheap-and-fast subagents, grades delivery risk, runs an independent review where it pays, and accepts the result. Use when the user asks for toil offloading, broad delegation, multi-project fan-out, or substantial work that can be split; do not use for a small task that is faster to complete directly."
 ---
 
 # Toil Offloading (pi)
 
-Keep the root agent as orchestrator, not the default implementer. The root owns
-goal clarification, decomposition, cross-cutting analysis, architectural and
-priority decisions, assignment boundaries, conflict resolution, integration,
-and final acceptance. Delegate the bounded execution work: repository searches,
-diagnosis, implementation, refactoring, data extraction, artifact generation,
-and focused verification.
+The root agent is the strong, slow model. Subagents are cheap and fast. Design
+the work so the expensive model spends its budget on judgment, and the cheap
+models absorb volume.
 
-Subagents are not read-only by default. Give them the write scope and local
-validation needed to finish their assignments. Use read-only assignments only
-when the work is genuinely inspection-only, the user requested it, or write
-isolation cannot be made safe.
+The test is **not** "is this mechanical?" — it is **"can this be cut off as a
+self-contained subtask with an observable acceptance condition?"** If yes, it can
+be delegated, including implementation, refactoring, and writing tests. What
+stays with the root is the part that cannot be written down as a contract
+because it *is* the decision: which design is right, what the real requirement
+is, and whether the delivered work is acceptable.
 
 Use the `subagent` tool exposed by the `afang-subagent` extension. Do not launch
 agent CLIs (claude, codex, gemini, ...) as shell subprocesses.
 
+## The two-tier model
+
+| Tier | Model | Owns |
+|---|---|---|
+| **Root** | the session's strong/slow model | Goal clarification, decomposition, architecture and design calls, contract authorship, integration, risk grading, acceptance |
+| **Subagents** | cheap/fast (set by `PI_SUBAGENT_PROVIDER` + `PI_SUBAGENT_MODEL`) | Executing contracts: recon, implementation, refactoring, data extraction, artifact generation, test writing, verification runs, review |
+
+Delegation is the default for decomposable work because the marginal subtask
+costs a cheap model's time, not the root's. The root should be spending its
+context on the plan and the acceptance decision, not on typing out the changes.
+
+### Where the tier is declared
+
+The split is one session-wide setting, not a per-agent choice:
+
+```sh
+export PI_SUBAGENT_PROVIDER="dspro"
+export PI_SUBAGENT_MODEL="deepseek-flash[1m]"
+```
+
+It lives in `~/.common_shell_setup_local.sh` so every pi session inherits it,
+including the plain `pi` aliases. Resolution order in the `afang-subagent`
+extension: these env vars → agent frontmatter `model:` → current session model.
+Because the env vars win, do not pin models in agent frontmatter — that would be
+a second source of truth that silently loses. To change the subagent tier, change
+the env vars.
+
+### Why cheap subagents are safe here
+
+A weak model is dangerous when it must *decide* and safe when it must *execute*.
+So the contract, not the model, carries the reasoning: confirm the approach in
+the root, write it down concretely, and let the subagent do the volume. This is
+why contract quality is the single most important thing this skill governs. A
+vague contract handed to a cheap model produces a confident guess, which is
+worse than no delegation.
+
 ## pi runtime constraints
 
-These differ from the Codex native-team model and are hard limits — design the
-batch around them:
+Hard limits — design the batch around them:
 
-- **Modes**: single (`{agent, task}`), parallel (`{tasks: [...]}`, max 8 tasks,
-  4 concurrent), chain (`{chain: [...]}`, sequential with `{previous}`),
-  background (`{agent, task, background: true, topic?}`, max 4 concurrent,
-  returns `task-N` immediately).
-- **No nested delegation.** The main session is depth 0; a spawned subagent is
-  depth 1 and does **not** register the `subagent` tool. A worker cannot
-  delegate further — never write an assignment that assumes it will.
-- **Model inheritance**: a subagent with no `model:` in its frontmatter inherits
-  the current session model (`ctx.model`, including after `/model`).
-- **Built-in agents** (bundled in the extension, always available):
+- **Modes**: single (`{agent, task}`), parallel (`{tasks: [...]}`), chain
+  (`{chain: [...]}`, sequential with `{previous}`), background
+  (`{agent, task, background: true, topic?}`, returns `task-N` immediately).
+- **Fan-out width**: `PI_SUBAGENT_MAX_PARALLEL_TASKS` (default 64) tasks per
+  parallel call, `PI_SUBAGENT_MAX_CONCURRENCY` (default 16) running at once,
+  `PI_SUBAGENT_BG_MAX_TASKS` (default 16) background tasks. These are the
+  extension's current defaults; read the live tool schema if a call is rejected.
+- **No nested delegation.** The root session is depth 0; a spawned subagent is
+  depth 1 and does **not** register the `subagent` tool. A subagent cannot
+  delegate further — never write a contract that assumes it will.
+- **No per-task model override.** The subagent model is a session-wide setting,
+  declared once by the `PI_SUBAGENT_PROVIDER` / `PI_SUBAGENT_MODEL` environment
+  variables (set in `~/.common_shell_setup_local.sh`), which override every
+  subagent for the session. Agent frontmatter `model:` is the fallback when
+  those are unset; a subagent with neither inherits the current session model.
+  There is no "use a smarter model just for this one task" — choose the agent
+  type and the contract quality instead.
+- **Available agents** (builtin, shipped with the extension):
 
-  | Agent | Purpose |
-  |---|---|
-  | `scout` | Fast codebase recon returning compressed context |
-  | `planner` | Implementation plans |
-  | `reviewer` | Code review |
-  | `worker` | General-purpose, full capabilities |
-
-- **External-API agents** (installed at `~/.pi/agent/agents/`, run on other
-  providers so toil does not consume the main session's model budget):
-
-  | Agent | Backend | Route to it for |
+  | Agent | Tools | Use for |
   |---|---|---|
-  | `dspix` | DeepSeek Flash (`dspro-responses/deepseek-flash`) | mechanical / retrieval / formatting work |
-  | `glmpix` | GLM-5.3-Flash (`zai-responses/glm-5.3-flash`) | diagnosis / reasoning / review work |
+  | `scout` | read, grep, find, ls, bash | Fast recon returning compressed context |
+  | `planner` | read, grep, find, ls | Turning settled context into an ordered plan |
+  | `worker` | full | Implementation, refactoring, artifacts — has write access |
+  | `reviewer` | read, grep, find, ls, bash (read-only) | Independent review against acceptance criteria |
 
-  Both require their API keys in the environment (`DEEPSEEK_API_KEY`,
-  `ZAI_API_KEY`). Their frontmatter carries the full `provider/model-id` because
-  the pi runtime passes the value straight to `--model` and never emits
-  `--provider` separately — a bare model id would resolve against the wrong
-  provider.
-
-  Run `subagent {}` to list what is actually available at runtime (includes
-  user-level overrides); `subagent {agentScope: "both"}` adds project agents.
+  User agents in `~/.pi/agent/agents/` override same-name builtins. Run
+  `subagent {}` to list what the runtime actually exposes.
 - **Monitoring**: `/subagent` (alias `/sa`) opens a panel to watch each child's
-  trajectory and kill individuals without aborting the whole batch. The
+  trajectory and kill individuals without aborting the batch. The
   `subagent_tasks` tool (`list` / `status` / `result` / `cancel`) covers both
   foreground live and background tasks.
 - Background results land in `<task cwd>/.pi/subagent-results/<timestamp>-<task-id>-<slug>.md`
@@ -69,163 +97,164 @@ batch around them:
 ## Start with real work
 
 Do not create availability, model-identity, provider-routing, or capability
-probe assignments. Treat the agent types advertised by the runtime as the
-session contract and send the first useful assignments directly. If an
-assignment cannot start or finish, record its actual outcome and continue other
-safe, useful work. Reassign only when the task scope and acceptance condition
-remain explicit; never replace a subagent with a shell subprocess.
+probe assignments. Treat the advertised agent types as the session contract and
+send the first useful contracts directly. If a subagent cannot start or finish,
+record its actual outcome and continue other safe, useful work. Reassign only
+when the scope and acceptance condition remain explicit; never replace a
+subagent with a shell subprocess.
 
-## Route work
+## Partition
 
-### Select by task nature
+Cut by **what can stand alone**, not by what is easy.
 
-The root agent makes this call itself. Pick the first rule that matches — the
-basis is the **nature of the work**, not its size. A big-but-mechanical job
-(formatting 50 files) goes to `dspix`; a small-but-reasoning job (what is the
-root cause of this error) goes to `glmpix`.
-
-| Work | Agent |
+| Subagent | Work |
 |---|---|
-| Targeted search, file inventory, field extraction, format conversion, batch rename, repetitive checks, small independent edits, running an existing test suite | `dspix` |
-| Root-cause diagnosis, ambiguous bug, cross-file analysis, implementation trade-offs, independent code review, conflict analysis | `glmpix` |
-| Unclear, needs the full toolset or long shared context | `worker` (inherits the main session model) |
-| Fast recon returning compressed context | `scout` |
-| Producing an implementation plan | `planner` |
-| Independent review with the main model's perspective | `reviewer` |
+| `scout` | Locating code, tracing dependencies, gathering context the root has not seen |
+| `planner` | Converting settled context and requirements into an ordered plan |
+| `worker` | Implementation, refactoring, migration, batch edits, artifacts, test writing, running the focused suite |
+| `reviewer` | Independent read-only review of a delivered change against its acceptance criteria |
 
-Prefer `dspix` and `glmpix` for decomposable toil: they run on separate
-provider budgets, so offloading there preserves the main session's context and
-cost. Reach for `scout` / `planner` / `worker` / `reviewer` when the task needs
-the main model's full context or toolset, or when a second model's independent
-view adds value (`glmpix` and `reviewer` overlap deliberately — different
-models, different blind spots).
+Keep in the root:
 
-### Escalate, do not retry
+- Requirement clarification and any genuine ambiguity in the goal.
+- Architecture, interface, and design trade-off calls — the decisions a contract
+  is supposed to encode.
+- Risk grading and the accept/rework verdict.
+- Conflict resolution, destructive or externally mutating actions, final
+  integration.
 
-If `dspix` reports the task is out of mechanical scope, or fails in a way that
-shows it needs reasoning, do not retry it there. Take its evidence and re-route
-the same bounded task to `glmpix`. Likewise, if `glmpix` exposes an
-execution-shaped remainder after reaching its conclusion, split that remainder
-out and send it back to `dspix`.
+Do not delegate a decision and call it "investigation" — if the root does not
+know the answer, decide it first, then delegate execution of that decision. The
+one legitimate exception is *context gathering*: a `scout` may return facts the
+root then reasons over. That is retrieval, not judgment.
 
-### Additional routing rules
+### Choosing between parallel, chain, and background
 
-- Keep architectural decisions, destructive or externally mutating actions,
-  conflict resolution, final integration, and acceptance with the root agent.
-- Let workers make ordinary implementation decisions inside their assignment
-  contract. Ask them to return cross-cutting choices or scope changes to the
-  root instead of silently expanding the assignment.
-- If an assignment exposes materially different complexity, finish or close it
-  and create a new bounded assignment with a suitable agent type. Do not
-  silently change roles or scope.
+- **Parallel** for independent subtasks. This is the default; prefer it. With a
+  64/16 budget, a large mechanical sweep should be partitioned wide.
+- **Chain** only for a real dependency, using `{previous}` when a later step
+  consumes an earlier result the root has not yet seen. Do not chain work the
+  root can integrate itself — routing results through the root is usually better,
+  because the root is the one that must understand them.
+- **Background** when the root has independent useful work to do meanwhile.
+  Do not background a task and then idle waiting for it.
 
-## Build the batch
+## Write the contract
 
-Delegate work that has a clear boundary and remains useful on its own. Prefer
-assigning the actual implementation or validation, not a read-only report that
-leaves the root to repeat the same work. Before dispatch, prepare the detailed
-assignment contract below. This applies to initial assignments, follow-ups,
-reassignments, and any delegation by a worker.
+The root owns contract quality. This is where the skill succeeds or fails.
 
-Respect the pi concurrency limits (8 parallel tasks / 4 concurrent; 4 background).
-Start clearly independent tasks together, but reserve capacity for follow-up
-and review. Prefer a few well-partitioned assignments over duplicate
-investigations.
+A contract must be executable by a cheap model that has **none** of the root's
+context and will **not** infer missing requirements. Write it as if the reader
+will do exactly what the text says and nothing more — because it will.
 
-## Prepare detailed assignment instructions
+State the decided procedure, not options. "Consider using X or Y" is not a
+contract; "refactor `src/a.ts` to use the existing `withRetry` from
+`src/util/retry.ts`, replacing the inline loop at lines 40-70" is.
 
-The assigning agent owns instruction quality. Do not send a one-line goal such
-as "fix the tests" or "analyze this module" and expect the worker to reconstruct
-the requirements, discover hidden constraints, or make architectural decisions.
-Write a self-contained execution brief even when conversation history is forked.
-Assume the worker needs explicit guidance to execute reliably; do not rely on
-its ability to infer missing requirements. More detail should remove ambiguity,
-not bury the task in unrelated history.
+Include every applicable field, with concrete values rather than placeholders:
 
-Read enough source material to establish a sound boundary and starting point
-before assigning the task, without completing the worker's investigation.
-Distinguish verified facts, hypotheses to test, and unresolved questions. Do not
-invent file paths, APIs, commands, or expected results to make a brief look
-complete. If the implementation path is unknown, delegate a bounded investigation
-with explicit questions and evidence requirements before assigning the edit.
+1. **Objective and context.** The user-visible outcome, why this subtask exists,
+   the current behavior or evidence, and how it relates to the parent task.
+   Carry forward exact user criteria, terminology, and prior decisions.
+2. **Inputs and starting points.** Absolute working directory, input paths or
+   identifiers, relevant files and symbols, and what to read first. Name the
+   source of truth and say whether prerequisites are ready.
+3. **Ownership and limits.** Files, directories, or artifacts the subagent may
+   change; what it may only inspect; explicit exclusions. State relevant user and
+   `AGENTS.md` constraints and allowed side effects. Include: "You are not alone
+   in the codebase. Preserve unrelated changes and accommodate concurrent edits;
+   do not revert others' work." State that it cannot delegate further.
+4. **Decided procedure.** An ordered, task-specific sequence: where to start,
+   what to inspect or change, which existing APIs or patterns to reuse, how
+   dependencies connect. Record the decision the root already made instead of
+   presenting options. Call out invariants, likely pitfalls, and edge cases.
+   Leave only ordinary local choices open within these boundaries.
+5. **Input/output contract.** Required artifact paths, formats, fields, types,
+   units, stable keys, matching rules. Include a representative example, plus a
+   boundary or negative example where the rule is easy to misread. Preserve
+   exact literals when exact matching matters.
+6. **Verification and acceptance.** Observable pass/fail criteria and the
+   focused commands or inspection procedure, including working directory and
+   expected behavior. Say which checks must actually run and what evidence to
+   retain. A successful command or a completion message is not proof that the
+   requested result is correct.
+7. **Blockers and escalation.** What to do if inputs are absent, source material
+   contradicts the contract, validation fails, or completion needs changes
+   outside ownership. Require reporting the concrete evidence and the decision
+   needed, preserving completed work, and pausing dependent actions instead of
+   guessing, broadening scope, weakening checks, or claiming success.
+   Independent in-scope work may continue.
+8. **Return format.** A concise summary; changed file or artifact paths; results
+   against each acceptance criterion; checks actually run with outcomes;
+   remaining uncertainties and blockers. Separate verified facts from
+   assumptions and mark checks that were not run.
 
-Include all applicable fields in the actual assignment message, with concrete
-values rather than unfilled placeholders:
+Before sending, ask whether a subagent holding only this contract and the named
+materials can tell what to do, where, what to avoid, how to verify, and when to
+stop. Fill every gap first. Write down any command you already know it needs.
 
-1. **Objective and context:** Explain the user-visible outcome, why this subtask
-   is needed, the current behavior or evidence, and its relation to the parent
-   task. Carry forward exact user criteria, terminology, and prior decisions.
-2. **Inputs and starting points:** Supply the absolute working directory, input
-   paths or identifiers, relevant source files and symbols, and the specific
-   instructions or documentation to read first. Identify the source of truth
-   and any prerequisite artifacts; say whether they are ready.
-3. **Ownership and limits:** List the files, directories, or output artifacts
-   the worker may change, what it may only inspect, and explicit exclusions.
-   State relevant user and `AGENTS.md` constraints and allowed validation or
-   side effects. Tell it: "You are not alone in the codebase. Preserve unrelated
-   changes and accommodate concurrent edits; do not revert others' work."
-   Note that it cannot delegate further.
-4. **Execution steps:** Give an ordered, task-specific procedure: where to
-   start, what to inspect or change, which existing APIs or patterns to reuse,
-   and how dependencies connect. Resolve cross-cutting design choices in the
-   root. Specify invariants, likely pitfalls, and relevant edge cases. Leave
-   ordinary implementation choices open only within these explicit boundaries.
-5. **Input/output contract:** Define required artifact paths, formats, fields,
-   types, units, stable keys, or matching rules where relevant. Include a
-   representative example and a boundary or negative example when a rule is
-   easy to misinterpret. Preserve exact literals when exact matching matters.
-6. **Verification and acceptance:** Provide observable pass/fail criteria and
-   the focused tests, commands, or inspection procedure, including working
-   directory and expected behavior. State which checks must actually run and
-   which evidence to retain. A successful command or completion message alone
-   is not proof that the requested result is correct.
-7. **Blockers and escalation:** State what to do if inputs are absent, source
-   material contradicts the brief, validation fails, or completion requires
-   changes outside ownership. Require the worker to report the concrete
-   evidence and decision needed to the assigning agent, preserve completed
-   work, and pause dependent actions instead of guessing, broadening scope,
-   weakening checks, or claiming success. Independent in-scope work may continue.
-8. **Return format:** Require a concise summary, changed file or artifact paths,
-   results against each acceptance criterion, checks actually run with outcomes,
-   and remaining uncertainties or blockers. Separate verified facts from
-   assumptions and explicitly mark checks that were not run.
+Follow-ups may reference the existing contract in the same subagent's context,
+but must state the observed failure, the required correction, and the acceptance
+criteria that still apply. A replacement subagent needs the complete current
+contract and the relevant evidence — never just "continue" or "try again".
 
-Before sending, check whether a worker with only this brief and the referenced
-materials can determine what to do, where to do it, what to avoid, how to verify
-it, and when to stop. Fill any gap first. For lightweight workers such as
-`scout`, use smaller steps, explicit commands where known, and concrete examples
-rather than asking them to compensate for an underspecified task. A detailed
-brief does not replace routing complex work to a suitably capable agent.
+## Validate by risk, not by habit
 
-Follow-ups may reference the existing contract in the same worker's context,
-but must spell out the observed failure, required correction, and acceptance
-criteria that still apply. A replacement worker needs the complete current
-brief and relevant evidence; do not forward only "continue" or "try again".
+Cheap generation makes independent checking worth more, not less. But reviewing
+everything with a cheap reviewer is mostly wasted motion, and reviewing nothing
+is how incorrect work ships. Grade the delivery and match the check to it.
+
+| Risk | Signals | Check |
+|---|---|---|
+| **Low** | Formatting, renames, doc/index updates, mechanical sweeps, no behavior change | Root inspects the diff or artifact directly. No reviewer. |
+| **Medium** | Contained behavior change, new code behind clear tests, additive migrations | Root runs the focused suite; delegate `reviewer` when the change is large enough that the root would otherwise re-read it all. |
+| **High** | Security, auth, data mutation or deletion, concurrency, money/permissions, changes that are expensive or impossible to reverse | Always `reviewer` against the written acceptance criteria, *plus* root verification. |
+
+Verification depth should track **blast radius**, not diff size: a one-line
+permission check outranks a 500-line rename.
+
+### The reviewer's real job
+
+`reviewer` is read-only (`read, grep, find, ls, bash`) and runs on the cheap
+model. Two consequences to design around:
+
+- **It is a second pass over the acceptance criteria, not an oracle.** Give it
+  the criteria and the changed paths, and ask for specific findings with file
+  and line numbers. It is good at catching "the contract said X and the code
+  does Y", missing edge cases, and obvious defects.
+- **A cheap reviewer cannot out-reason the root.** When a high-risk change needs
+  judgment the cheap model may not be trusted with, the root does the deep
+  review itself; the `reviewer` pass is an additional sweep for concrete
+  discrepancies, not a substitute for the root's verdict.
+
+Do not treat a clean review as acceptance. The root owns the verdict.
 
 ## Protect shared work
 
-- Inspect the existing worktree before assigning writes so user changes and
-  concurrent ownership are visible.
-- Multiple workers may inspect the same project, and may write concurrently
-  when ownership is partitioned by project, disjoint paths, or distinct output
-  artifacts.
+- Inspect the worktree before assigning writes so user changes and concurrent
+  ownership are visible.
+- Partition contracts so parallel writes never overlap: by project, by disjoint
+  paths, or by distinct output artifacts.
 - Never assign overlapping writes in one checkout. If overlap is unavoidable,
-  serialize the assignments or use isolated worktrees when that is already
-  authorized and appropriate.
-- Workers must not commit, submit, deploy, delete, or perform other external or
-  destructive actions unless the user explicitly authorized that action.
-- Do not redo a worker's assignment in the root while it is running. Continue
+  serialize those contracts, or use isolated worktrees when already authorized.
+- Subagents must not commit, submit, deploy, delete, or perform other external
+  or destructive actions unless the user explicitly authorized that action.
+- Do not redo a subagent's contract in the root while it is running. Continue
   orchestration, dependency analysis, or integration work that does not
   duplicate its ownership.
-- Do not treat a worker's success message as acceptance evidence. Inspect the
+- Do not treat a subagent's success message as acceptance evidence. Inspect the
   materialized changes or outputs and run proportionate verification.
 
-## Integrate
+## Integrate and accept
 
-Track each assignment through completion. Follow up with the same worker when
-its context is valuable; use a separate reviewer when independence adds value.
-Integrate worker outputs, make the remaining cross-cutting decisions, and fix
-only small integration gaps directly; delegate substantial rework back with a
-revised boundary and acceptance condition.
-Before reporting completion, account for every assignment as accepted,
-superseded, failed, or cancelled, then give one root-level conclusion.
+Track every contract to completion. Follow up with the same subagent when its
+context is valuable. Re-read each result as **claims, not conclusions**: check
+the diff or artifacts against each acceptance criterion, and reconcile any
+report that disagrees with what is actually on disk.
+
+Fix small integration gaps directly in the root. For substantial rework, issue a
+revised contract with a new boundary and acceptance condition rather than
+patching silently.
+
+Before reporting completion, account for every contract as accepted, superseded,
+failed, or cancelled, then give one root-level conclusion.
