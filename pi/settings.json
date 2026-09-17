@@ -2,6 +2,23 @@
   "theme": "gruvbox-dark",
   "defaultProvider": "dspro",
   "defaultModel": "deepseek-v4-flash[1m]",
+  "powerline": {
+    "preset": "default",
+    "layout": {
+      "left": [
+        "model",
+        "thinking",
+        "shell_mode",
+        "path",
+        "git",
+        "session",
+        "queue",
+        "context_pct",
+        "cache_read",
+        "cost"
+      ]
+    }
+  },
   "lastChangelogVersion": "0.84.4",
   "packages": [
     "my-pi-plugins",
