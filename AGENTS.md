@@ -85,6 +85,15 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 **Pi extensions** (`pi/extensions/` → `~/.pi/agent/extensions/`): TypeScript 扩展，通过 `pi.on()` 订阅生命周期事件。现有扩展：
 - `pi-end-reminder.ts` — 监听 `agent_settled` 事件，任务完成后通过 `~/.local/bin/wechat-reminder` 发送飞书/微信通知（对应 Claude Code 的 `claude-end-reminder.sh`）。默认通过环境变量 `END_REMINDER_ENABLE` 开关（默认关闭，见 wechat-reminder 节）。新扩展加到 `pi/extensions/` 即可自动被发现（`/reload` 热加载）。
 
+**Pi skills（单一来源 `~/.pi/agent/skills`）**：`pi/settings.json` 的 `skills` 只写 `~/.pi/agent/skills`。
+**不要**再加 `~/.claude/skills` / `~/.codex/skills`：`~/.codex/skills` 是 `codex/skills/scripts/sync_from_claude.py` 从 `~/.claude/skills` 生成的副本，两个目录同载会产生 231 条 `name collision` warning（且 Codex 那份永远被跳过、从未生效）；`~/.codex/skills/AGENTS.md`、`README.md` 还会报 `description is required`。
+
+`~/.pi/agent/skills` 里是为每个 skill 建的 symlink，由 `scripts/sync-pi-skills.sh` 生成（已接入 `install.conf.yaml`，`./install` 会自动执行；也可单独跑，支持 `--dry-run`）：
+- 优先级：`~/.agents/skills` > `~/.claude/skills` > `~/.codex/skills`。`~/.agents/skills` 会被 Pi 自动加载且无法从 settings 关闭，所以同名 skill 链接到这里可避免重复。
+- 按 frontmatter 的 `name:` 去重（不是目录名），缺 `description` 的会被跳过。
+- `claudeception` / `storage-ops` / `weaver_harness_hub` 含嵌套 SKILL.md，只链接它们自己的 `SKILL.md`（生成 `<name>.md`），避免递归带出与顶层同名的子 skill。
+- 脚本幂等，且不会覆盖同名的真实文件/目录；新增 skill 后重跑即可。
+
 **omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Only `~/.omp/agent/config.yml -> omp/config.yml` is symlinked; the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, ...) is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file; (3) never commit `auth.*`/provider tokens/secrets. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`).
 
 **codex config.toml is platform-conditional**: `~/.codex/config.toml` is only symlinked on non-macOS. In `install.conf.yaml` that link entry carries `if: '[ "$(uname)" != "Darwin" ]'`. Reason: on macOS Codex rewrites `config.toml` natively at runtime (writes `[hooks.state]` etc.), so it must stay a real local writable file — never symlink it into the repo on macOS (that would pollute `codex/config.toml` with every run). Other platforms (Linux) keep the symlink so the tracked file stays the single source of truth.

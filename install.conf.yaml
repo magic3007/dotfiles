@@ -168,10 +168,17 @@
     ~/.codex/skills: codex/skills
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
+    ~/.pi/agent/AGENTS.md: pi/AGENTS.md
     ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
     ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
     ~/.pi/agent/extensions: pi/extensions
+    # pi/agents 是 pi 专属 subagent 定义（dspix / glmpix）。
+    # ~/.pi/agent/agents 不存在，故整目录链接，与 extensions 一致。
+    ~/.pi/agent/agents: pi/agents
+    # pi/skills 是 pi 专属 skill。~/.pi/agent/skills 目录同时存放 lark-* 等
+    # 指向 ~/.agents/skills 的 symlink，因此不能整体链接，只能逐 skill 链接。
+    ~/.pi/agent/skills/toil-offloading-pi: pi/skills/toil-offloading-pi
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
@@ -218,6 +225,10 @@
 # Local post-link setup
 # ---------------------------------------------------------------------------
 - shell:
+    - [
+          "bash scripts/sync-pi-skills.sh || true",
+          Symlinking all skills into ~/.pi/agent/skills (single Pi source of truth),
+      ]
     - [
           chmod +x ~/.claude/hooks/check-expert-update.sh 2>/dev/null || true,
           Setting execute permission for Claude hooks,
