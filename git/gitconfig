@@ -122,12 +122,6 @@
 	process = git-lfs filter-process
 [safe]
 	directory = *
-	directory = *
-	directory = *
-	directory = *
-	directory = *
-	directory = *
-	directory = *
 [credential "https://github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential

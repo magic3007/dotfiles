@@ -5,9 +5,10 @@ vim/undo-history
 .vscode
 .claude/
 **/*.pyc
-fish/conf.d/local.fish
+archive/fish/conf.d/local.fish
 .worktrees/
-fish/fish_variables
+archive/fish/fish_variables
+archive/fish/fish_plugins
 
 # Untracked skill dirs currently present under claude/skills and codex/skills (generated 2026-08-04).
 # Only these are ignored — newly added skills still show as untracked. Track with: git add -f <path>

@@ -31,20 +31,15 @@ Machine-specific overrides go in `*_local` files (not tracked by git):
 - `~/.gitconfig_local` — local git user/config (included via `[include]` in gitconfig)
 - `~/.zsh_local` — local zsh config
 - `~/.common_shell_setup_local.sh` — local shell setup (bash/zsh)
-- `~/.config/fish/conf.d/local.fish` — local fish config
+- `~/.config/fish/conf.d/local.fish` — local fish config (fish is archived; see below)
 
 ### Shell Setup
 
-Three shells are supported: zsh, bash, and fish.
+Two shells are actively supported and maintained: zsh and bash.
 
 **bash/zsh**: `common_shell_setup.sh` is sourced by both `.zshrc` and `.bashrc`. It contains shared aliases, functions, env vars, and AI tool wrappers.
 
-**fish**: `fish/` directory is symlinked to `~/.config/fish/`. Fish config is maintained separately (not sourced from `common_shell_setup.sh`) because fish syntax is incompatible with POSIX shell. Structure:
-- `config.fish` — tool initialization (starship, zoxide, conda, venv)
-- `conf.d/` — modular config (env vars, PATH, aliases, fzf, ssh)
-- `functions/` — lazy-loaded functions (one per file, fish best practice)
-- `fish_plugins` — Fisher plugin list
-- AI tool wrappers use `_claude_with_api` helper function to reduce duplication
+**fish (ARCHIVED — do not maintain)**: fish config was moved to `archive/fish/` and is **frozen**. `install.conf.yaml` still symlinks `~/.config/fish` to that location so an existing fish login keeps working, but no fish config, aliases, functions, completions, or Fisher install steps should be added or updated. Rationale: the config was unmaintained, and its plugin list (`fish_plugins`) was deliberately removed from tracking in f3ea88f. See `archive/fish/README.md` before touching anything fish-related.
 
 Common features across all shells:
 - Safe `rm` override: `rm` is aliased to a warning; use `rem` for reversible delete or `\rm` for real delete
@@ -143,7 +138,7 @@ Package managers are configured with Chinese mirrors for faster downloads:
 
 ### Cross-Platform
 
-- **Linux**: apt-get for zsh, tmux, vim, htop, ranger, fish (see `install-scripts/linux/`)
+- **Linux**: apt-get for zsh, tmux, vim, htop, ranger, fish (see `install-scripts/linux/`). The `fish` package is still installed so archived fish config remains usable.
 - **macOS**: Homebrew for rg, lazygit, zellij, fish (see `install-scripts/mac/`); Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 plist sync via `~/.config/iterm2`; Ghostty terminal config via `ghostty/config`
 
 When adding new platform packages, edit the relevant `install-scripts/{linux,mac}/install-packages.sh`.

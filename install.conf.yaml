@@ -118,8 +118,10 @@
     ~/.config/starship.toml: starship/starship.toml
     ~/.config/bat/config: bat/config
 
-    # ---- Fish shell ----
-    ~/.config/fish: fish
+    # ---- Fish shell (ARCHIVED - frozen, not maintained) ----
+    # Kept only so an existing fish login still works. Do not add new fish
+    # config here; see archive/fish/README.md.
+    ~/.config/fish: archive/fish
 
     # ---- Debugger ----
     ~/.gdb: gdb
@@ -308,17 +310,8 @@
     - [test -d ~/.fzf && ~/.fzf/install --all || true, Installing fzf]
 
 # ---------------------------------------------------------------------------
-# Fish shell plugins (Fisher)
+# Fish plugins (Fisher) REMOVED - fish is archived, no longer maintained.
 # ---------------------------------------------------------------------------
-- shell:
-    - [
-          "command -v fish >/dev/null && fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher' || true",
-          Installing Fisher plugin manager for fish,
-      ]
-    - [
-          "command -v fish >/dev/null && test -f ~/.config/fish/fish_plugins && fish -c 'fisher update' || true",
-          Installing fish plugins via Fisher,
-      ]
 
 # ---------------------------------------------------------------------------
 # Node.js (prerequisite for AI coding tools)

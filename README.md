@@ -3,7 +3,7 @@
 My personal dotfiles — meticulously curated configurations for the ultimate terminal-centric development environment. Managed by [Dotbot](https://github.com/anishathalye/dotbot) with a two-phase installer that works across Linux and macOS.
 
 <p align="center">
-  <b>zsh</b> · <b>bash</b> · <b>fish</b> &nbsp;|&nbsp;
+  <b>zsh</b> · <b>bash</b> &nbsp;|&nbsp; <sub>fish (archived)</sub>
   <b>Linux</b> · <b>macOS</b> &nbsp;|&nbsp;
   <b>tmux</b> · <b>neovim</b> · <b>Claude Code</b>
 </p>
@@ -34,7 +34,7 @@ cd ~/dotfiles
 |------|--------|
 | **zsh** | oh-my-zsh + autosuggestions + syntax-highlighting + vi-mode + autojump + wakatime |
 | **bash** | shared aliases, functions, and env vars via `common_shell_setup.sh` |
-| **fish** | Fisher plugins, lazy-loaded functions, modular conf.d structure |
+| **fish** | archived — frozen config kept at `archive/fish/` for existing logins |
 | **starship** | Cross-shell prompt with custom styling |
 
 ### Terminal & Multiplexer
@@ -147,7 +147,7 @@ Machine-specific overrides — gitignored:
 | `~/.zsh_local` | Zsh overrides |
 | `~/.bash_local` | Bash overrides |
 | `~/.common_shell_setup_local.sh` | API keys, webhook URLs, env vars |
-| `~/.config/fish/conf.d/local.fish` | Fish overrides |
+| `~/.config/fish/conf.d/local.fish` | Fish overrides (fish archived) |
 
 ## Architecture
 
@@ -163,7 +163,7 @@ dotfiles/
 ├── vim/             → ~/.vim_runtime/    Vim config + plugins
 ├── git/             → ~/.gitconfig       Git aliases + hooks
 ├── starship/        → ~/.config/starship.toml
-├── fish/            → ~/.config/fish/    Fish shell
+├── archive/fish/    → ~/.config/fish/    Fish shell (ARCHIVED, frozen)
 ├── ranger/          → ~/.config/ranger/  Ranger file manager
 ├── joshuto/         → ~/.config/joshuto/ Joshuto file manager
 ├── yazi/            → ~/.config/yazi/    Yazi file manager
