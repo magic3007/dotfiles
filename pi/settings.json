@@ -19,7 +19,7 @@
       ]
     }
   },
-  "lastChangelogVersion": "0.84.4",
+  "lastChangelogVersion": "0.85.1",
   "packages": [
     "my-pi-plugins",
     "npm:pi-powerline-footer@0.12.2",
