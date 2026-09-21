@@ -149,6 +149,20 @@ Machine-specific overrides — gitignored:
 | `~/.common_shell_setup_local.sh` | API keys, webhook URLs, env vars |
 | `~/.config/fish/conf.d/local.fish` | Fish overrides (fish archived) |
 
+Codex uses the default OpenAI account through `cx`. Lightweight provider/model
+switching is defined in `common_shell_setup.sh` without rewriting the shared
+config:
+
+```bash
+cxds                    # DeepSeek provider + deepseek-flash
+cxglm                   # ZAI provider + glm-5.3-flash
+cxp <provider> <model>  # any provider already defined in ~/.codex/config.toml
+```
+
+These functions apply `model_provider` and `model` only to the current Codex
+process. Provider definitions and credentials remain in the local Codex config
+and environment variables.
+
 ## Architecture
 
 ```

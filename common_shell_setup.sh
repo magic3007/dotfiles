@@ -372,6 +372,22 @@ cx() {
   CMUX_CODEX_HOOKS_DISABLED=1 codex -a never -s danger-full-access --search "$@"
 }
 
+# Lightweight Codex provider/model switching. Provider definitions must exist
+# in ~/.codex/config.toml; credentials stay in the environment or local Codex
+# config. These overrides affect only the current Codex process.
+cxp() {
+  if [ "$#" -lt 2 ]; then
+    echo "usage: cxp <provider> <model> [codex args...]" >&2
+    return 2
+  fi
+  local provider="$1" model="$2"
+  shift 2
+  cx -c "model_provider=\"${provider}\"" -m "$model" "$@"
+}
+
+cxds()    { cxp dspix deepseek-flash "$@"; }
+cxglm()   { cxp glmpix glm-5.3-flash "$@"; }
+
 # google gemini cli (override oh-my-zsh git plugin's gm='git merge')
 unalias gm 2>/dev/null
 gm() {
