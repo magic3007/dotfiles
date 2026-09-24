@@ -1,0 +1,143 @@
+# Match the local Yazi default theme (v26.1.22) using the terminal ANSI palette.
+# Source: https://github.com/sxyazi/yazi/blob/v26.1.22/yazi-config/preset/theme-dark.toml
+# Joshuto 0.9.9 schema: https://github.com/kamiyaa/joshuto/blob/v0.9.9/config/theme.toml
+# MIME-based colors are approximated by extensions; ordinary text stays neutral.
+lscolors_enabled = false
+
+[tabs.styles.active]
+fg = "reset"
+bg = "blue"
+bold = true
+
+[tabs.styles.inactive]
+fg = "blue"
+bg = "gray"
+
+[tabs.styles.active_prefix]
+fg = "blue"
+bg = "reset"
+
+[tabs.styles.active_postfix]
+fg = "blue"
+bg = "reset"
+
+[tabs.styles.inactive_prefix]
+fg = "gray"
+bg = "reset"
+
+[tabs.styles.inactive_postfix]
+fg = "gray"
+bg = "reset"
+
+[tabs.styles.scroll_front]
+fg = "yellow"
+bold = true
+
+[tabs.styles.scroll_back]
+fg = "yellow"
+bold = true
+
+[tabs.chars]
+active_prefix = ""
+active_postfix = ""
+inactive_prefix = ""
+inactive_postfix = ""
+divider = " "
+
+[regular]
+fg = "reset"
+
+[directory]
+fg = "blue"
+
+[executable]
+fg = "green"
+
+[link]
+fg = "reset"
+
+[link_invalid]
+bg = "red"
+
+[socket]
+fg = "reset"
+
+# Joshuto colors selected filenames together with their marker.
+[selection]
+fg = "light_yellow"
+prefix = "▎ "
+
+[visual_mode_selection]
+fg = "light_cyan"
+prefix = "▎ "
+
+[ext]
+
+# Images
+avif.fg = "yellow"
+bmp.fg = "yellow"
+gif.fg = "yellow"
+heic.fg = "yellow"
+heif.fg = "yellow"
+ico.fg = "yellow"
+jpeg.fg = "yellow"
+jpg.fg = "yellow"
+jxl.fg = "yellow"
+pgm.fg = "yellow"
+png.fg = "yellow"
+ppm.fg = "yellow"
+svg.fg = "yellow"
+tif.fg = "yellow"
+tiff.fg = "yellow"
+webp.fg = "yellow"
+
+# Audio and video
+aac.fg = "magenta"
+aiff.fg = "magenta"
+alac.fg = "magenta"
+amr.fg = "magenta"
+ape.fg = "magenta"
+avi.fg = "magenta"
+flac.fg = "magenta"
+flv.fg = "magenta"
+m3u.fg = "magenta"
+m3u8.fg = "magenta"
+m4a.fg = "magenta"
+m4v.fg = "magenta"
+mkv.fg = "magenta"
+mov.fg = "magenta"
+mp3.fg = "magenta"
+mp4.fg = "magenta"
+mpeg.fg = "magenta"
+mpg.fg = "magenta"
+ogg.fg = "magenta"
+opus.fg = "magenta"
+rmvb.fg = "magenta"
+wav.fg = "magenta"
+webm.fg = "magenta"
+wma.fg = "magenta"
+wmv.fg = "magenta"
+
+# Archives
+7z.fg = "red"
+arj.fg = "red"
+bz.fg = "red"
+bz2.fg = "red"
+cab.fg = "red"
+cpio.fg = "red"
+gz.fg = "red"
+lz.fg = "red"
+lzma.fg = "red"
+rar.fg = "red"
+tar.fg = "red"
+tgz.fg = "red"
+txz.fg = "red"
+xz.fg = "red"
+zip.fg = "red"
+zst.fg = "red"
+zstd.fg = "red"
+
+# Documents
+pdf.fg = "cyan"
+doc.fg = "cyan"
+rtf.fg = "cyan"

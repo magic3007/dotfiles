@@ -1,121 +1,250 @@
-# =============================================================================
-# Joshuto Mimetype Configuration
-# =============================================================================
-# Defines which programs open which file types.
-# First entry in app_list is the default opener.
-
+# Match local Yazi opener order: EDITOR (default vim), system open, reveal.
+# Joshuto 0.9.9 MIME tables use type/subtype, not wildcard MIME strings.
+# Subtype inheritance is not resolved by 0.9.9: explicit app_list is intentional.
+# Linux reveal opens the containing directory; macOS selects files in Finder.
 [class]
 text_default = [
-  { command = "vim" },
-  { command = "nvim" },
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
 ]
 
-image_default = [
-  { command = "open", fork = true, silent = true },
+media_default = [
+  { command = "sh", args = ["-c", "operation=open; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-open"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
 ]
 
-video_default = [
-  { command = "open", fork = true, silent = true },
-  { command = "mpv", args = ["--"] },
-]
-
-audio_default = [
-  { command = "open", fork = true, silent = true },
-  { command = "mpv", args = ["--"] },
-]
-
-reader_default = [
-  { command = "open", fork = true, silent = true },
+archive_default = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
 ]
 
 [extension]
-# Text / Code
-txt.inherit = "text_default"
-md.inherit = "text_default"
-org.inherit = "text_default"
-rst.inherit = "text_default"
-log.inherit = "text_default"
-conf.inherit = "text_default"
-cfg.inherit = "text_default"
-ini.inherit = "text_default"
-toml.inherit = "text_default"
-yaml.inherit = "text_default"
-yml.inherit = "text_default"
-json.inherit = "text_default"
-xml.inherit = "text_default"
-csv.inherit = "text_default"
-sh.inherit = "text_default"
-bash.inherit = "text_default"
-zsh.inherit = "text_default"
-py.inherit = "text_default"
-rb.inherit = "text_default"
-js.inherit = "text_default"
-ts.inherit = "text_default"
-tsx.inherit = "text_default"
-jsx.inherit = "text_default"
-go.inherit = "text_default"
-rs.inherit = "text_default"
-c.inherit = "text_default"
-cpp.inherit = "text_default"
-h.inherit = "text_default"
-hpp.inherit = "text_default"
-java.inherit = "text_default"
-lua.inherit = "text_default"
-vim.inherit = "text_default"
-tex.inherit = "text_default"
-css.inherit = "text_default"
-html.inherit = "text_default"
-sql.inherit = "text_default"
-makefile.inherit = "text_default"
+"txt".inherit = "text_default"
+"md".inherit = "text_default"
+"org".inherit = "text_default"
+"rst".inherit = "text_default"
+"log".inherit = "text_default"
+"conf".inherit = "text_default"
+"cfg".inherit = "text_default"
+"ini".inherit = "text_default"
+"toml".inherit = "text_default"
+"yaml".inherit = "text_default"
+"yml".inherit = "text_default"
+"json".inherit = "text_default"
+"xml".inherit = "text_default"
+"csv".inherit = "text_default"
+"sh".inherit = "text_default"
+"bash".inherit = "text_default"
+"zsh".inherit = "text_default"
+"py".inherit = "text_default"
+"rb".inherit = "text_default"
+"js".inherit = "text_default"
+"ts".inherit = "text_default"
+"tsx".inherit = "text_default"
+"jsx".inherit = "text_default"
+"go".inherit = "text_default"
+"rs".inherit = "text_default"
+"c".inherit = "text_default"
+"cpp".inherit = "text_default"
+"h".inherit = "text_default"
+"hpp".inherit = "text_default"
+"java".inherit = "text_default"
+"lua".inherit = "text_default"
+"vim".inherit = "text_default"
+"tex".inherit = "text_default"
+"css".inherit = "text_default"
+"html".inherit = "text_default"
+"sql".inherit = "text_default"
+"makefile".inherit = "text_default"
+"png".inherit = "media_default"
+"jpg".inherit = "media_default"
+"jpeg".inherit = "media_default"
+"gif".inherit = "media_default"
+"bmp".inherit = "media_default"
+"svg".inherit = "media_default"
+"webp".inherit = "media_default"
+"mp4".inherit = "media_default"
+"mkv".inherit = "media_default"
+"avi".inherit = "media_default"
+"mov".inherit = "media_default"
+"webm".inherit = "media_default"
+"mp3".inherit = "media_default"
+"flac".inherit = "media_default"
+"wav".inherit = "media_default"
+"ogg".inherit = "media_default"
+"m4a".inherit = "media_default"
+"pdf".inherit = "media_default"
+"doc".inherit = "media_default"
+"docx".inherit = "media_default"
+"xls".inherit = "media_default"
+"xlsx".inherit = "media_default"
+"ppt".inherit = "media_default"
+"pptx".inherit = "media_default"
+"zip".inherit = "archive_default"
+"tar".inherit = "archive_default"
+"gz".inherit = "archive_default"
+"rar".inherit = "archive_default"
+"7z".inherit = "archive_default"
+"bz2".inherit = "archive_default"
+"xz".inherit = "archive_default"
+"tgz".inherit = "archive_default"
+"zst".inherit = "archive_default"
 
-# Images
-png.inherit = "image_default"
-jpg.inherit = "image_default"
-jpeg.inherit = "image_default"
-gif.inherit = "image_default"
-bmp.inherit = "image_default"
-svg.inherit = "image_default"
-webp.inherit = "image_default"
-
-# Video
-mp4.inherit = "video_default"
-mkv.inherit = "video_default"
-avi.inherit = "video_default"
-mov.inherit = "video_default"
-webm.inherit = "video_default"
-
-# Audio
-mp3.inherit = "audio_default"
-flac.inherit = "audio_default"
-wav.inherit = "audio_default"
-ogg.inherit = "audio_default"
-m4a.inherit = "audio_default"
-
-# Documents
-pdf.inherit = "reader_default"
-doc.inherit = "reader_default"
-docx.inherit = "reader_default"
-xls.inherit = "reader_default"
-xlsx.inherit = "reader_default"
-ppt.inherit = "reader_default"
-pptx.inherit = "reader_default"
-
-# Archives
-zip.app_list = [{ command = "open" }]
-tar.app_list = [{ command = "open" }]
-gz.app_list = [{ command = "open" }]
-rar.app_list = [{ command = "open" }]
-7z.app_list = [{ command = "open" }]
-
-[mimetype]
-[mimetype."text/*"]
+[mimetype.text]
 inherit = "text_default"
 
-[mimetype."image/*"]
-inherit = "image_default"
+[mimetype.image]
+inherit = "media_default"
 
-[mimetype."video/*"]
-inherit = "video_default"
+[mimetype.video]
+inherit = "media_default"
 
-[mimetype."audio/*"]
-inherit = "audio_default"
+[mimetype.audio]
+inherit = "media_default"
+
+[mimetype.application]
+inherit = "media_default"
+
+[mimetype.inode]
+inherit = "media_default"
+
+[mimetype.font]
+inherit = "media_default"
+
+[mimetype.model]
+inherit = "media_default"
+
+[mimetype.message]
+inherit = "media_default"
+
+[mimetype.application.subtype."json"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."javascript"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-javascript"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."xml"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-shellscript"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-empty"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.text.subtype."javascript"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.inode.subtype."x-empty"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.inode.subtype."directory"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=edit; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-edit"] },
+  { command = "sh", args = ["-c", "operation=open; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-open"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."zip"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."gzip"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-gzip"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-tar"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-bzip2"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-7z-compressed"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-rar"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."vnd.rar"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."xz"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."x-xz"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
+
+[mimetype.application.subtype."zstd"]
+app_list = [
+  { command = "sh", args = ["-c", "operation=reveal; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-reveal"], fork = true, silent = true },
+  { command = "sh", args = ["-c", "operation=exif; exec sh \"${XDG_CONFIG_HOME:-$HOME/.config}/joshuto/open_file.sh\" \"$operation\" \"$@\"", "joshuto-exif"] }
+]
