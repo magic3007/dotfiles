@@ -444,13 +444,14 @@ autopi()   { pi --provider arkcoding --model 'ark-code-latest' "$@"; }
 sdpi()     { pi --provider arkcoding --model 'doubao-seed-2.0-lite' "$@"; }
 sdpipro()  { pi --provider arkcoding --model 'doubao-seed-2.0-pro' "$@"; }
 
-kmpi()     { pi --provider kimicode  --model 'kimi-k3[1m]' "$@"; }
-kmpi2()    { pi --provider moonshot  --model 'kimi-k3[1m]' "$@"; }
+kmpi()     { pi --provider kimicode  --model 'kimi-k3' "$@"; }
+kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
 
 glmpi()    { pi --provider arkcoding-responses --model 'glm-5.3' "$@"; }
 glmpix()   { pi --provider zai-responses --model 'glm-5.3-flash' "$@"; }
 
-odspi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-opus-4-8[1m]' "$@"; }
+f5pi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-fable-5' "$@"; }
+o5pi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-opus-5' "$@"; }
 
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
