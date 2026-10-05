@@ -59,7 +59,7 @@ channel = "stable"
 # Apply changes to a running server with: herdr server reload-config
 
 [ui.toast]
-delivery = "system"
+delivery = "terminal"
 
 [ui.sound]
 enabled = true

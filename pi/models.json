@@ -170,29 +170,77 @@
                     "id": "claude-fable-5",
                     "name": "Fable 5 (appintheloop)",
                     "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "low": "low",
+                        "medium": "medium",
+                        "high": "high",
+                        "xhigh": "xhigh",
+                        "max": "max"
+                    },
                     "input": ["text", "image"],
-                    "contextWindow": 1000000
+                    "contextWindow": 1000000,
+                    "compat": {
+                        "forceAdaptiveThinking": true
+                    }
                 },
                 {
                     "id": "claude-opus-4-8",
                     "name": "Opus 4.8 (appintheloop)",
                     "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "low": "low",
+                        "medium": "medium",
+                        "high": "high",
+                        "xhigh": "xhigh",
+                        "max": "max"
+                    },
                     "input": ["text", "image"],
-                    "contextWindow": 1000000
+                    "contextWindow": 1000000,
+                    "compat": {
+                        "forceAdaptiveThinking": true
+                    }
                 },
                 {
                     "id": "qwen3.8-max",
                     "name": "Qwen3.8 Max (appintheloop)",
                     "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "low": "low",
+                        "medium": "medium",
+                        "high": "high",
+                        "xhigh": "xhigh",
+                        "max": "max"
+                    },
                     "input": ["text", "image"],
-                    "contextWindow": 1000000
+                    "contextWindow": 1000000,
+                    "compat": {
+                        "forceAdaptiveThinking": true
+                    }
                 },
                 {
-                    "id": "claude-opus-5",
-                    "name": "Opus 5 (appintheloop)",
+                    "id": "claude-opus-5-5",
+                    "name": "Opus 5.5 (appintheloop)",
                     "reasoning": true,
+                    "thinkingLevelMap": {
+                        "off": null,
+                        "minimal": null,
+                        "low": "low",
+                        "medium": "medium",
+                        "high": "high",
+                        "xhigh": "xhigh",
+                        "max": "max"
+                    },
                     "input": ["text", "image"],
-                    "contextWindow": 1000000
+                    "contextWindow": 1000000,
+                    "compat": {
+                        "forceAdaptiveThinking": true
+                    }
                 }
             ]
         },
