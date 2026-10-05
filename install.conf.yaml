@@ -188,10 +188,19 @@
     ~/.local/bin/yolo: scripts/yolo-generic.sh
 
     # ---- omp (Stencil coding agent harness) ----
-    # Only the static config.yml is symlinked. The rest of ~/.omp/agent
-    # (agent.db, history.db, models.db, sessions/, cache/, ...) is runtime
-    # state and must stay local/machine-specific.
+    # 静态配置：config.yml / models.yml / WATCHDOG.yml。
+    # 其余 ~/.omp/agent 内容（agent.db、history.db、models.db、sessions/、
+    # cache/、terminal-sessions/、last-changelog-version）以及 ~/.omp/{logs,run,gpu_cache.json}
+    # 都是运行时状态，各机器不同，留在本机、不进 git。
+    #
+    # 硬约束（见 omp/README.md）：
+    #   1) config.yml 必须可写 —— omp 对它上 native file lock，repo 里保持普通可写文件。
+    #   2) omp config set/reset 会重写 config.yml 并剥离注释 —— 说明文字放 README，别写进 YAML。
+    #   3) models.yml 的 apiKey 写环境变量名（MAFIA_API_KEY），真实 key 只在
+    #      ~/.common_shell_setup_local.sh 里 export，密钥不入库。
     ~/.omp/agent/config.yml: omp/config.yml
+    ~/.omp/agent/models.yml: omp/models.yml
+    ~/.omp/agent/WATCHDOG.yml: omp/WATCHDOG.yml
 
     # ---- Cursor skills ----
     ~/.cursor/skills: claude/skills
@@ -432,8 +441,9 @@
 #       theme tool Oh My Posh (ohmyposh.dev). `omp` is an AI coding agent
 #       harness, not a prompt engine - it does NOT touch PROMPT.
 #       It installs via bun into ~/.bun/bin/omp.
-#       Config lives in ~/.omp/agent/config.yml (not symlinked by default;
-#       see comments below re: file-lock requirement).
+#       Static config lives in the repo (omp/) and is symlinked into
+#       ~/.omp/agent/ by the link section above — see that block's comments
+#       re: file-lock requirement and secret handling.
 # ---------------------------------------------------------------------------
 - shell:
     - [

@@ -1,0 +1,12 @@
+advisors:
+  - name: Turn reviewer
+    reviewMode: turn
+    syncBacklog: 5
+  - name: Final reviewer
+    reviewMode: agent-end
+    syncBacklog: strict
+    tools: [read, grep, glob, edit, write, bash]
+    instructions: |
+      You may edit files and run tests to verify a suspected bug.
+      Report what you changed via advise; never revert or rewrite the primary's work wholesale.
+      Report in Chinese instead of English.

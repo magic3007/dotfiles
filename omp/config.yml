@@ -1,9 +1,83 @@
-theme:
-  dark: titanium
-  light: light
-symbolPreset: nerd
-composer:
-  shape: box
 setupVersion: 2
-modelRoles:
-  default: deepseek/deepseek-v4-flash
+enabledModels:
+  - mafia/claude-opus-5-5
+  - devin/claude-opus-5-5
+  - devin/claude-opus-5-5-fast
+  - mafia/claude-fable-5-1
+  - devin/claude-fable-5-1
+modelRoles: 
+  # ------ 模型角色 ------
+  # 默认模型：开新session时，模型角色不设置时。
+  default: mafia/claude-opus-5-5:high
+  # 超低智力模型: 生成会话标题，本地memory，小型判断任务judge
+  tiny: mafia/claude-opus-5-5:medium
+  # 低智力模型：简单的subagent任务，生成commit message
+  smol: mafia/claude-opus-5-5:max
+  # 中等智力模型(task)：subagent主力使用。不设置的话，默认继承主agent当前的模型
+  # 高智力模型：reviewer 和 advisor
+  slow: mafia/claude-fable-5-1:max
+  # 视觉模型：读取图片
+  vision: mafia/claude-opus-5-5:max
+  
+  # 常用模型名，可以ctrl-P切换
+  mafia-opus: mafia/claude-opus-5-5:max
+  devin-opus: devin/claude-opus-5-5:max
+  devin-opus-fast: devin/claude-opus-5-5-fast:max
+  mafia-fable: mafia/claude-fable-5-1:max
+  devin-fable: devin/claude-fable-5-1:max
+cycleOrder:
+  - mafia-opus
+  - devin-opus
+  - devin-opus-fast
+  - mafia-fable
+  - devin-fable
+# 当模型报错时如何fallback到其它模型
+retry:
+  fallbackChains:
+    mafia/*:
+      - devin/*
+    devin/*:
+      - mafia/*
+# 默认 thinking 级别
+defaultThinkingLevel: max
+# 上下文压缩
+compaction:
+  # 优先无损 shake，再由主模型写 handoff，snapcompact/soft 兜底。remote实际不生效
+  methodOrder:
+    - shake
+    - handoff
+    - remote
+    - snapcompact
+    - soft
+  # 压缩后原样保留的近期历史
+  keepRecentTokens: 150000
+  # soft 摘要输出上限
+  reserveTokens: 20480
+  # 自动 handoff 文档落盘到 session artifacts 目录
+  handoffSaveToDisk: true
+# 关闭故障自动上报
+dev:
+  autoqaConsent: denied
+# 显示每次请求的情况，可以关
+display:
+  showTokenUsage: true
+  showTurnTime: true
+  # 关闭工具调用的显示
+  hideToolActivity: true
+# 关闭 thinking 显示
+hideThinkingBlock: true
+# 使用 nerd 字体
+symbolPreset: nerd
+# 状态栏
+statusLine:
+  preset: custom
+  rightSegments:
+    - context_pct
+    - session_name
+    - subagents
+    - usage
+    - cache_hit
+    - cost
+  compactThinkingLevel: false
+composer:
+  tokenRate: true

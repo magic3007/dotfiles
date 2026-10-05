@@ -1,0 +1,30 @@
+providers:
+  mafia:
+    baseUrl: https://api.appintheloop.com/v1
+    api: anthropic-messages
+    auth: apiKey
+    # 不写真实 key。值先走 omp 的 resolveConfigValue()：
+    #   1. `!cmd` 前缀 -> 跑 shell 命令取 stdout
+    #   2. 整串是合法环境变量名（$envExact）-> 读该环境变量
+    #   3. 都不是 -> 当字面量用
+    # MAFIA_API_KEY 在 ~/.common_shell_setup_local.sh（不入库）里 export。
+    apiKey: MAFIA_API_KEY
+    models:
+    - id: claude-fable-5-1
+      name: claude-fable-5-1
+      reasoning: true
+      headers:
+        X-Sub-Module: claude-code-internal
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
+        defaultLevel: max
+    - id: claude-opus-5-5
+      name: claude-opus-5-5
+      reasoning: true
+      headers:
+        X-Sub-Module: claude-code-internal
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
+        defaultLevel: max

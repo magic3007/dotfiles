@@ -9,10 +9,19 @@ Dotfiles repository using [Dotbot](https://github.com/anishathalye/dotbot) for i
 ## Commands
 
 ```bash
-./install              # Full installation (idempotent, safe to re-run)
-./install -n           # Dry run — preview what would be installed
+./install                                # Full installation (idempotent, safe to re-run)
+./install --only link                   # Phase 1 only: create/relink symlinks (no network)
+./install --only clean                  # Remove broken symlinks under ~
+./install --only create                 # Create missing directories
 git submodule update --init --recursive  # Update Vim plugins
 ```
+
+**No dry-run flag.** This pinned Dotbot submodule has no `-n` / `--dry-run`; both fail with
+`unrecognized arguments`. Preview by running the single Phase 1 directive you care about
+(`--only link` is the one you want after editing the `link` section — it is idempotent, and it
+refuses to overwrite an existing regular file, so a stray `~/.foo/config` must be moved aside
+first).
+
 
 ## Architecture
 
@@ -89,7 +98,7 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 - `claudeception` / `storage-ops` / `weaver_harness_hub` 含嵌套 SKILL.md，只链接它们自己的 `SKILL.md`（生成 `<name>.md`），避免递归带出与顶层同名的子 skill。
 - 脚本幂等，且不会覆盖同名的真实文件/目录；新增 skill 后重跑即可。
 
-**omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Only `~/.omp/agent/config.yml -> omp/config.yml` is symlinked; the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, ...) is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file; (3) never commit `auth.*`/provider tokens/secrets. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`).
+**omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Three static configs are symlinked into `~/.omp/agent/`: `config.yml`, `models.yml`, and `WATCHDOG.yml`; the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, `terminal-sessions/`, `last-changelog-version`) plus `~/.omp/{logs,run,gpu_cache.json}` is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file (`models.yml`/`WATCHDOG.yml` have no rewrite path, so comments there are fine); (3) never commit `auth.*`/provider tokens/secrets — `models.yml`'s `apiKey` takes an env-var *name* (omp runs it through `$envExact`), and the real `MAFIA_API_KEY` lives in the untracked `~/.common_shell_setup_local.sh`. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`). Note: this dotbot version has no `-n`/`--dry-run`; preview with `./install --only link`.
 
 **codex config.toml is platform-conditional**: `~/.codex/config.toml` is only symlinked on non-macOS. In `install.conf.yaml` that link entry carries `if: '[ "$(uname)" != "Darwin" ]'`. Reason: on macOS Codex rewrites `config.toml` natively at runtime (writes `[hooks.state]` etc.), so it must stay a real local writable file — never symlink it into the repo on macOS (that would pollute `codex/config.toml` with every run). Other platforms (Linux) keep the symlink so the tracked file stays the single source of truth.
 
