@@ -453,6 +453,9 @@ glmpix()   { pi --provider zai-responses --model 'glm-5.3-flash' "$@"; }
 f5pi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-fable-5' "$@"; }
 o5pi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-opus-5' "$@"; }
 
+okpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider kafara --model 'devin/claude-opus-5-5' "$@"; }
+fkpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider kafara --model 'devin/claude-fable-5-1' "$@"; }
+
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
 

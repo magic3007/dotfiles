@@ -186,44 +186,6 @@
                     }
                 },
                 {
-                    "id": "claude-opus-4-8",
-                    "name": "Opus 4.8 (appintheloop)",
-                    "reasoning": true,
-                    "thinkingLevelMap": {
-                        "off": null,
-                        "minimal": null,
-                        "low": "low",
-                        "medium": "medium",
-                        "high": "high",
-                        "xhigh": "xhigh",
-                        "max": "max"
-                    },
-                    "input": ["text", "image"],
-                    "contextWindow": 1000000,
-                    "compat": {
-                        "forceAdaptiveThinking": true
-                    }
-                },
-                {
-                    "id": "qwen3.8-max",
-                    "name": "Qwen3.8 Max (appintheloop)",
-                    "reasoning": true,
-                    "thinkingLevelMap": {
-                        "off": null,
-                        "minimal": null,
-                        "low": "low",
-                        "medium": "medium",
-                        "high": "high",
-                        "xhigh": "xhigh",
-                        "max": "max"
-                    },
-                    "input": ["text", "image"],
-                    "contextWindow": 1000000,
-                    "compat": {
-                        "forceAdaptiveThinking": true
-                    }
-                },
-                {
                     "id": "claude-opus-5-5",
                     "name": "Opus 5.5 (appintheloop)",
                     "reasoning": true,
@@ -241,6 +203,27 @@
                     "compat": {
                         "forceAdaptiveThinking": true
                     }
+                }
+            ]
+        },
+        "kafara": {
+            "baseUrl": "https://api.kafara.men",
+            "api": "anthropic-messages",
+            "apiKey": "$KAFARA_API_KEY",
+            "models": [
+                {
+                    "id": "devin/claude-fable-5-1",
+                    "name": "Fable 5.1 (Kafara)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
+                },
+                {
+                    "id": "devin/claude-opus-5-5",
+                    "name": "Opus 5.5 (Kafara)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
                 }
             ]
         },
