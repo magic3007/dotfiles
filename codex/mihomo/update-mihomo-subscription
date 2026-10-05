@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly config_dir="${HOME}/.config/mihomo"
+readonly subscription_config="${config_dir}/subscription.curl.conf"
+readonly normalizer="${HOME}/.local/libexec/normalize-mihomo-config.py"
+readonly mihomo_binary="${HOME}/.local/bin/mihomo"
+readonly user_runtime_dir="/run/user/$(id -u)"
+
+# mihomo 自带的 geo 数据下载走 GitHub 直连，在本机会超时。
+# 预置失败时用镜像补齐，否则 GEOIP,CN 规则会让 mihomo 启动失败。
+readonly geo_base="https://ghfast.top/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest"
+readonly geo_files=(geoip.metadb geosite.dat country.mmdb)
+
+ensure_geo_data() {
+  local missing=0 f
+  for f in "${geo_files[@]}"; do
+    if [ ! -s "${config_dir}/${f}" ]; then
+      missing=1
+      echo "geo data missing: ${f}, fetching via mirror" >&2
+      curl -fsSL --connect-timeout 10 --max-time 120 -o "${config_dir}/${f}" "${geo_base}/${f}" || {
+        echo "failed to fetch ${f}" >&2
+        return 1
+      }
+      chmod 0600 "${config_dir}/${f}"
+    fi
+  done
+  return "${missing}"
+}
+
+umask 0077
+# 拉订阅直连，不经过 mihomo 自己。
+unset http_proxy https_proxy ftp_proxy all_proxy
+unset HTTP_PROXY HTTPS_PROXY FTP_PROXY ALL_PROXY
+
+downloaded="$(mktemp "${config_dir}/subscription.XXXXXX.yaml")"
+normalized="$(mktemp "${config_dir}/normalized.XXXXXX.yaml")"
+cleanup() {
+  rm -f "${downloaded}" "${normalized}"
+}
+trap cleanup EXIT
+
+curl --silent --show-error --location --config "${subscription_config}" \
+  --output "${downloaded}"
+python3 "${normalizer}" "${downloaded}" "${normalized}"
+
+ensure_geo_data || true
+
+# 先校验，校验通过才替换正在使用的配置。
+"${mihomo_binary}" -t -d "${config_dir}" -f "${normalized}"
+chmod 0600 "${normalized}"
+mv -f "${normalized}" "${config_dir}/config.yaml"
+XDG_RUNTIME_DIR="${user_runtime_dir}" \
+DBUS_SESSION_BUS_ADDRESS="unix:path=${user_runtime_dir}/bus" \
+  systemctl --user restart mihomo.service

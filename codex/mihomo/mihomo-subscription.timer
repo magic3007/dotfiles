@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodically refresh the private Mihomo subscription
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=6h
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target
