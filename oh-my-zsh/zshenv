@@ -8,3 +8,35 @@ if [ -d "$_nvm_node" ]; then
   [ -n "$_latest" ] && export PATH="$_nvm_node/$_latest/bin:$PATH"
 fi
 unset _nvm_node _latest
+
+# --- Codex remote proxy hook -----------------------------------------------
+# The remote project in the Codex desktop app / VS Code is served by a resident
+# `codex app-server` daemon on this host. That daemon only reads its environment
+# once, at startup, so it must be launched with the proxy variables already set.
+#
+# ~/.local/codex-proxy/bin comes first so an interactive terminal resolves
+# `codex` to the wrapper, which loads proxy.env itself. The remote start
+# command re-prepends ~/.local/bin on its own, which bypasses the wrapper, so
+# the hook below is what actually guarantees the daemon gets the variables.
+if [ -d "$HOME/.local/codex-proxy/bin" ]; then
+  export PATH="$HOME/.local/codex-proxy/bin:$HOME/.local/bin:$PATH"
+fi
+
+# zsh has no BASH_EXECUTION_STRING. `zsh -c <command>` keeps the command in
+# /proc/$$/cmdline, so read it back and match the remote start signature.
+# An interactive shell has no `-c`, so the string stays short and never matches;
+# that keeps ordinary shells free of the proxy on purpose.
+# macOS has no /proc, so the readability test also keeps this a silent no-op
+# there (this file is shared with the Mac through the dotfiles repo).
+_codex_remote_cmd=""
+[[ -r /proc/$$/cmdline ]] && _codex_remote_cmd="$(< /proc/$$/cmdline)"
+case "$_codex_remote_cmd" in
+  *CODEX_SSH_SKIP_APP_SERVER_BOOT*|*desktop-ssh-websocket*|*app-server-control*|*"codex app-server"*|*"app-server --listen"*|*"app-server daemon"*|*"app-server proxy"*)
+    if [ -r "$HOME/.config/codex/proxy.env" ]; then
+      set -a
+      . "$HOME/.config/codex/proxy.env"
+      set +a
+    fi
+    ;;
+esac
+unset _codex_remote_cmd

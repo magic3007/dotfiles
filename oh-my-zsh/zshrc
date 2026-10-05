@@ -141,3 +141,7 @@ export PATH="$HOME/.kimi-code/bin:$PATH"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Codex proxy wrapper (must stay last: it has to outrank ~/.local/bin).
+# No-op when the wrapper is not installed, e.g. on machines without the proxy.
+[ -f ~/dotfiles/oh-my-zsh/codex-proxy.zsh ] && source ~/dotfiles/oh-my-zsh/codex-proxy.zsh
