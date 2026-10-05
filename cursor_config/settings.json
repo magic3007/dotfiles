@@ -11229,5 +11229,6 @@
     "terminal.integrated.macOptionIsMeta": true,
     "window.autoDetectColorScheme": true,
     "workbench.preferredLightColorTheme": "Cursor Dark",
-    "workbench.startupEditor": "none"
+    "workbench.startupEditor": "none",
+    "gitlens.graph.details.location": "auto"
 }

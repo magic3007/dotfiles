@@ -189,20 +189,15 @@
                     "id": "claude-opus-5-5",
                     "name": "Opus 5.5 (appintheloop)",
                     "reasoning": true,
-                    "thinkingLevelMap": {
-                        "off": null,
-                        "minimal": null,
-                        "low": "low",
-                        "medium": "medium",
-                        "high": "high",
-                        "xhigh": "xhigh",
-                        "max": "max"
-                    },
                     "input": ["text", "image"],
-                    "contextWindow": 1000000,
-                    "compat": {
-                        "forceAdaptiveThinking": true
-                    }
+                    "contextWindow": 1000000
+                },
+                {
+                    "id": "MiniMax-M3.1-Flash-Preview",
+                    "name": "MiniMax-M3.1-Flash-Preview (appintheloop)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 1000000
                 }
             ]
         },
@@ -211,13 +206,6 @@
             "api": "anthropic-messages",
             "apiKey": "$KAFARA_API_KEY",
             "models": [
-                {
-                    "id": "devin/claude-fable-5-1",
-                    "name": "Fable 5.1 (Kafara)",
-                    "reasoning": true,
-                    "input": ["text", "image"],
-                    "contextWindow": 1000000
-                },
                 {
                     "id": "devin/claude-opus-5-5",
                     "name": "Opus 5.5 (Kafara)",
