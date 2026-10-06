@@ -241,6 +241,10 @@
           Symlinking all skills into ~/.pi/agent/skills (single Pi source of truth),
       ]
     - [
+          "bash scripts/sync-omp-skills.sh || true",
+          Symlinking all skills into ~/.omp/agent/skills (omp reads neither Pi nor Claude skills dirs),
+      ]
+    - [
           chmod +x ~/.claude/hooks/check-expert-update.sh 2>/dev/null || true,
           Setting execute permission for Claude hooks,
       ]

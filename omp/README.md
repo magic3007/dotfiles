@@ -29,6 +29,38 @@
 > 迁移遗留：本机 `~/.omp/agent/{models,WATCHDOG}.yml.pre-dotfiles` 是接入 dotfiles 前的
 > 原始副本（`models.yml.pre-dotfiles` 里的 `apiKey` 是占位符，不是真 key）。确认无误后可删。
 
+## Skills
+
+omp 只读 `~/.omp/agent/skills`（provider `native`，user 级，由
+`skills.enablePiUser` 控制）、`~/.agents/skills` 和项目级目录
+（`.agents/skills`、`.claude/skills`）。**它不读 `~/.pi/agent/skills`、
+`~/.claude/skills`、`~/.codex/skills`**，所以 `~/.omp/agent/skills` 必须是一份镜像：
+
+    ./install            # 会跑 scripts/sync-omp-skills.sh
+    scripts/sync-omp-skills.sh [--dry-run]
+
+优先级 `~/.agents/skills` > `~/.claude/skills` > `~/.codex/skills`，按 frontmatter 的
+`name:` 去重，缺 `description` 的跳过。
+
+**链接必须是目录软链接，不能是 `<name>.md -> .../SKILL.md`。**
+omp 的 loader（`loadSkillsFromDir` → `fp()`，`dist/cli.js`）用
+`readdir(withFileTypes)` 遍历，然后对每个「目录或软链接」条目只探测
+`<entry>/SKILL.md`，既不递归也不读裸 `*.md` 文件：
+
+    for (const entry of dirents) {
+      if (!entry.isDirectory() && !entry.isSymbolicLink()) continue
+      const md = join(dir, entry.name, "SKILL.md")
+      if (existsSync(md)) push(read(md))
+    }
+
+所以 `claudeception.md -> ~/.claude/skills/claudeception/SKILL.md` 会被**静默丢弃**
+（它去找的是 `claudeception.md/SKILL.md`）。Pi 接受这种根级 `.md` skill，omp 不接受——
+这就是「Pi 里有 claudeception、omp 里没有」的原因。容器型 skill
+（`claudeception` / `storage-ops` / `weaver_harness_hub`）链**目录**即可，
+omp 只读一层，不会带出嵌套子 skill。
+
+`~/.omp/agent/skills` 本身是运行时目录（不入 git），由上述脚本重建。
+
 ## 硬性约束
 
 ### 1. `config.yml` 必须可写
