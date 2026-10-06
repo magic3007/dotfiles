@@ -1,0 +1,89 @@
+diff --git a/lua/nvim-treesitter/query_predicates.lua b/lua/nvim-treesitter/query_predicates.lua
+index 0638b6e7..b7a59c80 100644
+--- a/lua/nvim-treesitter/query_predicates.lua
++++ b/lua/nvim-treesitter/query_predicates.lua
+@@ -1,5 +1,21 @@
+ local query = require "vim.treesitter.query"
+ 
++-- Neovim 0.12+ ships some of these predicates/directives natively, and
++-- re-registering an existing name is a hard error there (the builtin
++-- implementation is kept). Tolerate only that specific conflict; anything
++-- else is a real failure and is re-raised.
++local function tolerant(add)
++  return function(name, handler, ...)
++    local ok, err = pcall(add, name, handler, ...)
++    if not ok and not tostring(err):match "Overriding existing" then
++      error(err)
++    end
++  end
++end
++
++local add_predicate = tolerant(query.add_predicate)
++local add_directive = tolerant(query.add_directive)
++
+ local function error(str)
+   vim.api.nvim_err_writeln(str)
+ end
+@@ -20,7 +36,7 @@ local function valid_args(name, pred, count, strict_count)
+   return true
+ end
+ 
+-query.add_predicate("nth?", function(match, pattern, bufnr, pred)
++add_predicate("nth?", function(match, pattern, bufnr, pred)
+   if not valid_args("nth?", pred, 2, true) then
+     return
+   end
+@@ -61,11 +77,11 @@ local function has_ancestor(match, pattern, bufnr, pred)
+   return false
+ end
+ 
+-query.add_predicate("has-ancestor?", has_ancestor)
++add_predicate("has-ancestor?", has_ancestor)
+ 
+-query.add_predicate("has-parent?", has_ancestor)
++add_predicate("has-parent?", has_ancestor)
+ 
+-query.add_predicate("is?", function(match, pattern, bufnr, pred)
++add_predicate("is?", function(match, pattern, bufnr, pred)
+   if not valid_args("is?", pred, 2) then
+     return
+   end
+@@ -84,7 +100,7 @@ query.add_predicate("is?", function(match, pattern, bufnr, pred)
+   return vim.tbl_contains(types, kind)
+ end)
+ 
+-query.add_predicate("has-type?", function(match, pattern, bufnr, pred)
++add_predicate("has-type?", function(match, pattern, bufnr, pred)
+   if not valid_args(pred[1], pred, 2) then
+     return
+   end
+@@ -100,9 +116,9 @@ query.add_predicate("has-type?", function(match, pattern, bufnr, pred)
+ end)
+ 
+ -- Just avoid some annoying warnings for this directive
+-query.add_directive("make-range!", function() end)
++add_directive("make-range!", function() end)
+ 
+-query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
++add_directive("downcase!", function(match, _, bufnr, pred, metadata)
+   local text, key, value
+ 
+   if #pred == 3 then
+@@ -129,7 +145,7 @@ query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
+   end
+ end)
+ 
+-query.add_directive("exclude_children!", function(match, _pattern, _bufnr, pred, metadata)
++add_directive("exclude_children!", function(match, _pattern, _bufnr, pred, metadata)
+   local capture_id = pred[2]
+   local node = match[capture_id]
+   local start_row, start_col, end_row, end_col = node:range()
+@@ -156,7 +172,7 @@ end)
+ 
+ -- Trim blank lines from end of the region
+ -- Arguments are the captures to trim.
+-query.add_directive("trim!", function(match, _, bufnr, pred, metadata)
++add_directive("trim!", function(match, _, bufnr, pred, metadata)
+   for _, id in ipairs { select(2, unpack(pred)) } do
+     local node = match[id]
+     local start_row, start_col, end_row, end_col = node:range()
