@@ -72,13 +72,11 @@
     # ---- AI tools ----
     ~/.claude/settings.json: claude/settings.json
     ~/.claude/config.json: claude/config.json
-    ~/.claude/skills: claude/skills
     # ~/.claude/commands: claude/commands  # deprecated, converted to skills
     ~/.claude/hooks: claude/hooks
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.codex/config.toml: codex/config.toml
-    ~/.codex/skills: codex/skills
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
     ~/.pi/agent/settings.json: pi/settings.json
@@ -89,10 +87,14 @@
     ~/.config/opencode/package.json: opencode/package.json
     ~/.kimi-code/config.toml: kimi-code/config.toml
     ~/.local/bin/yolo: scripts/yolo-generic.sh
-    ~/.cursor/skills: claude/skills
 
     # ---- Ghostty (cross-platform) ----
     ~/.config/ghostty/config: ghostty/config
 
     # ---- cmux ----
     ~/.config/cmux/cmux.json: cmux/cmux.json
+
+# Skill views are generated (per-skill links), not whole-dir links: see
+# scripts/sync-skills.py. Never exits non-zero on conflicts (prints warnings).
+- shell:
+    - [python3 scripts/sync-skills.py, Building skill views from skills/ and <tool>/skills/]

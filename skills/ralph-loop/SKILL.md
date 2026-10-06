@@ -3,23 +3,6 @@ name: ralph-loop
 description: "Ralph Wiggum 迭代开发循环。三阶段工作流（需求→规划→构建），每阶段有 code review + 测试 gate。 触发词：ralph loop、迭代开发、interview me、plan system、build system。"
 ---
 
-## Codex compatibility
-
-When this skill uses Claude Code terminology, apply these mappings:
-
-- Resolve bundled files relative to `${CODEX_HOME:-$HOME/.codex}/skills/ralph-loop`.
-- Use `request_user_input` when it is available; otherwise ask the user directly
-  instead of calling `AskUserQuestion`.
-- Use `update_plan` for task lists, shell execution for `Bash`, `rg` for
-  `Glob`/`Grep`, and Codex file inspection/editing tools for `Read`/`Write`/`Edit`.
-- Treat `$ARGUMENTS` as the user's request arguments. Commands prefixed with `!`
-  are instructions to run explicitly; Codex does not evaluate them on load.
-- Use `AGENTS.md` and `.codex/` for Codex project guidance. Only operate on
-  `AGENTS.md` or `.claude/` when the task explicitly targets Claude Code.
-- Named `mcp__...` tools require the matching installed MCP server or app. If it
-  is unavailable, report the dependency and use a documented safe fallback only
-  when this skill provides one.
-
 # Ralph Loop v2 (Claude Code Edition)
 
 基于 Geoffrey Huntley 的 Ralph Wiggum 技术的自主迭代开发。

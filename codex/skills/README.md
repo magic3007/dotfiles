@@ -1,15 +1,13 @@
 # Codex Skills
 
-Codex-specific skills live here. Dotbot links this directory to `~/.codex/skills`.
+Codex-only skills. `scripts/sync-skills.py` links each one into `~/.codex/skills/`
+(a real local dir that also holds Codex's runtime `.system/`).
 
-This directory is intentionally separate from `claude/skills` and `gemini/skills`; copy or install a skill here only when Codex should use it.
+Skills useful to more than one harness belong in the repo's top-level `skills/`
+instead; Codex reads those from `~/.agents/skills`.
 
-Migrated command workflows:
+Codex-only skills here: `insights` (Codex session analytics) and
+`toil-offloading` (native Codex team). The former `$create-pr`, `$gen-commit-msg`,
+`$pr-review`, `$smart-commit` copies were merged into the shared `skills/` versions.
 
-- `$create-pr`
-- `$gen-commit-msg`
-- `$pr-review`
-- `$smart-commit`
-
-Use `/skills` in Codex CLI to browse them, or mention a skill directly with the
-`$skill-name` syntax.
+Use `/skills` in Codex CLI to browse, or mention a skill with `$skill-name`.

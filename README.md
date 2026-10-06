@@ -167,7 +167,8 @@ and environment variables.
 
 ```
 dotfiles/
-├── claude/          → ~/.claude/         Claude Code (hooks, skills, agents, settings)
+├── skills/          → ~/.agents/skills/  Shared agent skills (all harnesses; scripts/sync-skills.py)
+├── claude/          → ~/.claude/         Claude Code (hooks, Claude-only skills, settings)
 ├── codex/           → ~/.codex/          OpenAI Codex
 ├── gemini/          → ~/.gemini/         Google Gemini CLI
 ├── opencode/        → ~/.config/opencode/ Opencode

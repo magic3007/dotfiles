@@ -68,14 +68,29 @@ Shell aliases and wrapper functions in `common_shell_setup.sh`:
 - `mxcc()` — Codex with MiniMax via OpenRouter
 - `qwcc()` — Codex with Qwen3.5 via Aliyun
 
-### Skills tool (`skills` CLI) — do NOT use `-g`
+### Skills (shared vs. harness-specific)
 
-`npx skills add <pkg> -g` (global) writes symlinks into `~/.claude/skills`, `~/.cursor/skills`, `~/.pi/agent/skills`, etc. Since `~/.claude/skills` and `~/.cursor/skills` are symlinks into this repo's `claude/skills/`, the relative symlinks it creates are **broken** (e.g. `lark-apps -> ../../.agents/skills/lark-apps` resolves to the repo root instead of `~`). This previously replaced the tracked `claude/skills/lark-*` files and showed up as mass deletions in git.
+One source per skill, one generator, generated views. Sources (repo):
 
-Rules:
-- **Never run `npx skills add <pkg> -g`** — it corrupts `claude/skills/`.
-- lark-* skills are **not tracked** in this repo anymore (see `.gitignore`). They live in `~/.agents/skills/` (source) and `~/.pi/agent/skills/` (working symlinks); they're also embedded in lark-cli (`lark-cli skills read`).
-- To add a skill from a package: copy the skill dir into this repo manually and track it, or install it only into the agent that uses it (project-scope, not `-g`).
+| Source | Scope | Generated view | Read by |
+|---|---|---|---|
+| `skills/` | shared, harness-neutral | `~/.agents/skills/<name>` | Codex, Pi, omp, Cursor, Gemini natively |
+| `claude/skills/` | Claude Code only | `~/.claude/skills/<name>` | Claude Code (view also gets every shared + `~/.agents` external skill, since Claude Code ignores `~/.agents/skills`) |
+| `codex/skills/` | Codex only | `~/.codex/skills/<name>` | Codex (`.system/` there is Codex runtime, local) |
+| `pi/skills/` | Pi only | `~/.pi/agent/skills/<name>` | Pi |
+| `omp/skills/` | omp only (none yet) | `~/.omp/agent/skills/<name>` | omp |
+
+`scripts/sync-skills.py [--dry-run]` builds all views (run by `./install` and every `sync.sh` tick). Views are real directories of per-skill symlinks — never symlink a whole view into the repo. The script:
+- flattens bundles (`skills/tide/*`, `skills/scientific-agent-skills/skills/*`, …) to one entry per frontmatter `name:`; skips `examples/`, `plugins/`, `templates/`, hidden dirs;
+- exposes a skill that contains nested skills (`storage-ops`, `claudeception`, `weaver_harness_hub`→`hub`) as a shim dir without the nested subtrees, so recursive loaders (Codex, Cursor) don't list children twice;
+- links a top-level Claude plugin bundle without its own `SKILL.md` (`claude/skills/codepp-harbor-task`, uses hooks) whole;
+- only touches symlinks into the repo / `~/.agents/skills` / legacy mirrors and its own shims; real dirs (npx installs, Codex `.system`, Claude `synced/`) are left alone and reported.
+
+Placement rule: a skill is **shared** unless it depends on one harness — Claude-only runtime features (`` !`cmd` `` injection, `${CLAUDE_SKILL_DIR}`, plugin hooks: `hub*`, `web-access`, `codepp-harbor-task`), configures/operates that harness (`check-claude-code-config`, `claude-cron-automation`, `nvm-claude`, Codex `insights`), or generates that harness's project files (`setup-harness`, `project-starter`, `harness-generate-*`, `claude-code-custom-skill-development`). Shared skills reference their own files via `~/.agents/skills/<name>/…` (exists for every harness); Codex maps Claude Code vocabulary once in `codex/AGENTS.md`, not per skill. Per-harness opt-out of a shared skill uses the harness's own switch (Codex `[[skills.config]] enabled = false`, e.g. `ask-for-help`).
+
+Privacy: this repo is public. Internal skills stay untracked via the explicit list in `.gitignore`; a new skill dir shows up as untracked until you either list it there or `git add` it.
+
+Third-party installs: `npx skills add <pkg> -g` puts the skill in `~/.agents/skills/` (tracked in `~/.agents/.skill-lock.json`); lark-* live there. The harness dirs are no longer symlinks into this repo, so `-g` can't write into the repo any more; re-run `scripts/sync-skills.py` afterwards so Claude Code sees the new skill.
 
 ### AI Tool Configurations (`Codex/`, `codex/`, `gemini/`, `opencode/`, `pi/`)
 
@@ -89,31 +104,11 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 **Pi extensions** (`pi/extensions/` → `~/.pi/agent/extensions/`): TypeScript 扩展，通过 `pi.on()` 订阅生命周期事件。现有扩展：
 - `pi-end-reminder.ts` — 监听 `agent_settled` 事件，任务完成后通过 `~/.local/bin/wechat-reminder` 发送飞书/微信通知（对应 Claude Code 的 `claude-end-reminder.sh`）。默认通过环境变量 `END_REMINDER_ENABLE` 开关（默认关闭，见 wechat-reminder 节）。新扩展加到 `pi/extensions/` 即可自动被发现（`/reload` 热加载）。
 
-**Pi skills（单一来源 `~/.pi/agent/skills`）**：`pi/settings.json` 的 `skills` 只写 `~/.pi/agent/skills`。
-**不要**再加 `~/.claude/skills` / `~/.codex/skills`：`~/.codex/skills` 是 `codex/skills/scripts/sync_from_claude.py` 从 `~/.claude/skills` 生成的副本，两个目录同载会产生 231 条 `name collision` warning（且 Codex 那份永远被跳过、从未生效）；`~/.codex/skills/AGENTS.md`、`README.md` 还会报 `description is required`。
-
-`~/.pi/agent/skills` 里是为每个 skill 建的 symlink，由 `scripts/sync-pi-skills.sh` 生成（已接入 `install.conf.yaml`，`./install` 会自动执行；也可单独跑，支持 `--dry-run`）：
-- 优先级：`~/.agents/skills` > `~/.claude/skills` > `~/.codex/skills`。`~/.agents/skills` 会被 Pi 自动加载且无法从 settings 关闭，所以同名 skill 链接到这里可避免重复。
-- 按 frontmatter 的 `name:` 去重（不是目录名），缺 `description` 的会被跳过。
-- `claudeception` / `storage-ops` / `weaver_harness_hub` 含嵌套 SKILL.md，只链接它们自己的 `SKILL.md`（生成 `<name>.md`），避免递归带出与顶层同名的子 skill。
-- 脚本幂等，且不会覆盖同名的真实文件/目录；新增 skill 后重跑即可。
+**Pi skills**: `pi/settings.json` loads `~/.pi/agent/skills` (Pi-only view); shared skills come from `~/.agents/skills`, which Pi always auto-loads. Never add `~/.claude/skills` / `~/.codex/skills` there (duplicate names).
 
 **omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Three static configs are symlinked into `~/.omp/agent/`: `config.yml`, `models.yml`, and `WATCHDOG.yml`; the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, `terminal-sessions/`, `last-changelog-version`) plus `~/.omp/{logs,run,gpu_cache.json}` is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file (`models.yml`/`WATCHDOG.yml` have no rewrite path, so comments there are fine); (3) never commit `auth.*`/provider tokens/secrets — `models.yml`'s `apiKey` takes an env-var *name* (omp runs it through `$envExact`), and the real `MAFIA_API_KEY` lives in the untracked `~/.common_shell_setup_local.sh`. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`).
 
-**omp skills 镜像**：omp 只读 `~/.omp/agent/skills`（`native` user 级）、`~/.agents/skills` 和项目级目录，**不读** `~/.pi/agent/skills` / `~/.claude/skills` / `~/.codex/skills`。因此 `scripts/sync-omp-skills.sh`（已接入 `install.conf.yaml`，支持 `--dry-run`）把三个源目录镜像成**目录软链接**，优先级 `~/.agents/skills` > `~/.claude/skills` > `~/.codex/skills`，按 frontmatter `name:` 去重。必须链目录而不是 `<name>.md -> SKILL.md`：omp 的 loader（`fp()`，`dist/cli.js`）只对「目录或软链接」条目探测 `<entry>/SKILL.md`，不递归也不读裸 `*.md`，所以 Pi 用的 `claudeception.md` / `hub.md` / `storage-ops.md` 在 omp 里会被静默丢弃。注意这条约束与 `sync-pi-skills.sh` 的容器型 skill 处理**故意不同**。Note: this dotbot version has no `-n`/`--dry-run`; preview with `./install --only link`.
-
 **codex config.toml is platform-conditional**: `~/.codex/config.toml` is only symlinked on non-macOS. In `install.conf.yaml` that link entry carries `if: '[ "$(uname)" != "Darwin" ]'`. Reason: on macOS Codex rewrites `config.toml` natively at runtime (writes `[hooks.state]` etc.), so it must stay a real local writable file — never symlink it into the repo on macOS (that would pollute `codex/config.toml` with every run). Other platforms (Linux) keep the symlink so the tracked file stays the single source of truth.
-
-**Tool-specific skills**: Codex, Codex, and Gemini use independent skill directories:
-- `Codex/skills/` -> `~/.Codex/skills`
-- `codex/skills/` -> `~/.codex/skills`
-- `gemini/skills/` -> `~/.gemini/skills`
-
-Add a skill to each tool's own directory when it should be available there. Cursor currently keeps using `Codex/skills/` via `~/.cursor/skills`.
-
-`claude/skills/ask-for-help/` is intentionally shared with Pi because
-`pi/settings.json` loads `~/.claude/skills`. It stops repeated recovery after
-five distinct failed attempts and prepares a Codex escalation packet.
 
 **Codex native toil team**: `codex/config.toml` registers the Responses API
 providers and a flat native team capped at 50 concurrent threads. Role files
