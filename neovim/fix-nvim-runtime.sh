@@ -19,6 +19,8 @@ set -euo pipefail
 PACK_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/pack/packer/start"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PATCH_FILE="$SCRIPT_DIR/patches/nvim-treesitter-nvim0.12-predicates.patch"
+# Neovim ships lua/markdown/markdown_inline as built-in parsers; bash/python/cpp
+# have to be compiled. Only the missing ones are built, so a re-run is a no-op.
 PARSERS=(lua markdown markdown_inline bash python cpp)
 
 # Must match the `commit = "..."` values in lua/user/plugins.lua.
@@ -70,8 +72,19 @@ if [[ -d $ts_dir/.git && -f $PATCH_FILE ]]; then
 fi
 
 if command -v nvim >/dev/null 2>&1; then
-  echo "install tree-sitter parsers: ${PARSERS[*]}"
-  nvim --headless -c "TSInstallSync ${PARSERS[*]}" -c 'qa!' || true
+  langs_lua=$(printf "'%s'," "${PARSERS[@]}")
+  missing="$(nvim --headless \
+    -c "lua local m = {} for _, l in ipairs({ $langs_lua }) do if #vim.api.nvim_get_runtime_file('parser/' .. l .. '.*', true) == 0 then m[#m + 1] = l end end io.write(table.concat(m, ' '))" \
+    -c 'qa!' 2>/dev/null || true)"
+
+  if [[ -n ${missing// /} ]]; then
+    echo "compile tree-sitter parsers: $missing"
+    # </dev/null: TSInstallSync asks "reinstall ? y/n" about parsers that already
+    # exist, and a terminal hangs on that prompt forever.
+    nvim --headless -c "TSInstallSync $missing" -c 'qa!' </dev/null || true
+  else
+    echo "ok    all tree-sitter parsers available"
+  fi
 fi
 
 echo "done — verify with: nvim --headless -c q   (expect no output)"

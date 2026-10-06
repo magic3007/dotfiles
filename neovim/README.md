@@ -27,8 +27,9 @@ The local Neovim is 0.12, which is newer than everything the config assumes.
 Three kinds of fix keep startup silent:
 
 1. **Plugin revisions restored** — `fix-nvim-runtime.sh` (this repo) checks out
-   `nvim-treesitter` and `nvim-lspconfig` at the pinned commits, and compiles the
-   `ensure_installed` tree-sitter parsers, which had never been built.
+   `nvim-treesitter` and `nvim-lspconfig` at the pinned commits. `bash`,
+   `python` and `cpp` also had never been compiled; `lua`, `markdown` and
+   `markdown_inline` are built into Neovim.
 2. **tree-sitter predicate conflict** — the 2022 `nvim-treesitter` registers a
    `has-ancestor?` predicate that 0.12 already ships; re-registering raises and
    aborts module load. `patches/nvim-treesitter-nvim0.12-predicates.patch` makes
