@@ -28,14 +28,18 @@ skills/android-16kb-alignment/
 skills/android-dev-loop/
 skills/android-ui-review/
 skills/arxiv-read/
+skills/audit-vela-benchmarks/
 skills/bedrock-tool/
 skills/bench-m3/
+skills/bench2dataspec-v2/
 skills/canoe/
+skills/canoe-sdk-gpu-sandbox/
 skills/canvo/
 skills/change-watch/
 skills/circus-operator/
 skills/conference-paper-github-crawler/
 skills/continuous-learning/
+skills/css-appended-styles-override-media-queries/
 skills/data-validate/
 skills/datahub-dorge-sample-backflow/
 skills/debug-experience-system/
@@ -52,6 +56,8 @@ skills/grafana-tool/
 skills/hailuo-log-query/
 skills/hello-world/
 skills/iam-auth/
+skills/immutable-ml-run/
+skills/impossible-metric-check-denominator/
 skills/ip-lookup/
 skills/issue-fix/
 skills/issue-report/
@@ -59,7 +65,10 @@ skills/job-debug/
 skills/job-log/
 skills/job-profile/
 skills/job-submit/
+skills/jsdom-dialog-showmodal-polyfill/
 skills/langfuse/
+skills/llm-finding-verification/
+skills/local-bench/
 skills/m2-post-train-data-basic-analysis/
 skills/m2-raw-log-formatter/
 skills/machine-onboarding/
@@ -96,6 +105,8 @@ skills/test-smoke/
 skills/tide-scheduling/
 skills/tide/
 skills/transfer-tool/
+skills/vela-debug/
+skills/vela-metrics/
 skills/vela-session-debugger/
 skills/vela-skills/
 skills/vela/
