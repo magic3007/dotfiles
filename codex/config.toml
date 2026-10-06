@@ -1,8 +1,8 @@
 # OpenAI Codex shared configuration.
 # Modern codex CLI reads ~/.codex/config.toml (config.json / settings.json are deprecated).
 
-model = "gpt-5.6-sol"
-model_reasoning_effort = "high"
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "high"
 
 # Match the local Codex workflow: run without interactive approval prompts or
@@ -19,6 +19,12 @@ wire_api = "responses"
 requires_openai_auth = true
 supports_websockets = false
 base_url = "https://chatgpt.com/backend-api/codex"
+
+[model_providers.mafia]
+name = "Mafia"
+base_url = "https://api.appintheloop.com/v1"
+env_key = "MAFIA_API_KEY"
+wire_api = "responses"
 
 # Responses-compatible providers used by native Codex subagent roles.
 # Credentials remain in environment variables and are never stored here.
@@ -85,13 +91,27 @@ keepRemoteControlAwakeWhilePluggedIn = true
 [projects."/Users/magic/dotfiles"]
 trust_level = "trusted"
 
+[projects."/home/yanzhou/projects/paperbench.workspace/paper-eval-pipeline"]
+trust_level = "trusted"
+
+[projects."/home/yanzhou/projects/paperbench.workspace/paper-rollout-pipeline"]
+trust_level = "trusted"
+
+[projects."/home/yanzhou/projects/paperbench.workspace/paper-rl-pipeline"]
+trust_level = "trusted"
+
+[projects."/home/yanzhou/dotfiles"]
+trust_level = "trusted"
+
 [tui]
 status_line = ["model-with-reasoning", "context-used", "weekly-limit", "thread-id", "current-dir"]
 status_line_use_colors = true
 theme = "coldark-dark"
+screen_reader_detection_done = true
 
 [tui.model_availability_nux]
 "gpt-5.6-sol" = 3
+"gpt-6.1-sol" = 4
 
 # Keep infrequently used skills installed but out of the model-visible catalog.
 # Re-enable an individual skill by changing its entry to `enabled = true` or
@@ -228,16 +248,9 @@ enabled = true
 name = "claudeception"
 enabled = true
 
+# Shared skill for Claude/Pi/omp: it prepares an escalation *to* Codex.
 [[skills.config]]
-name = "nextjs-server-side-error-debugging"
-enabled = false
-
-[[skills.config]]
-name = "prisma-connection-pool-exhaustion"
-enabled = false
-
-[[skills.config]]
-name = "typescript-circular-dependency"
+name = "ask-for-help"
 enabled = false
 
 [[skills.config]]
@@ -368,3 +381,13 @@ enabled = false
 
 [hooks.state."/Users/magic/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:e8dd3827a3cec0a1a3ac965d2b5c330121e396370e63f309cb6646d33e405c03"
+
+[marketplaces.openai-bundled]
+source_type = "local"
+source = "/home/yanzhou/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[notice.model_migrations]
+"gpt-5.6-sol" = "gpt-6-sol"
