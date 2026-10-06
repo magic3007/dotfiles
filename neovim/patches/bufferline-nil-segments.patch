@@ -1,0 +1,13 @@
+diff --git a/lua/bufferline/ui.lua b/lua/bufferline/ui.lua
+index 7e68d17..0fe0427 100644
+--- a/lua/bufferline/ui.lua
++++ b/lua/bufferline/ui.lua
+@@ -511,7 +511,7 @@ function M.element(current_state, element)
+ 
+   local name = get_name(ctx)
+   -- Guess how much space there will for padding based on the buffer's name
+-  local name_size = get_component_size({ duplicate_prefix, name, spacing(), icon, suffix })
++  local name_size = get_component_size(filter_invalid({ duplicate_prefix, name, spacing(), icon, suffix }))
+   local left_space, right_space = add_space(ctx, name_size)
+ 
+   local component = filter_invalid({
