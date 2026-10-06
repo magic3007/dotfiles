@@ -160,9 +160,30 @@ When adding new platform packages, edit the relevant `install-scripts/{linux,mac
 - 单张卡片最多 5 个表格，超出降级为纯文本
 - 环境变量：`FEISHU_WEBHOOK_URL`（飞书 webhook，支持逗号分隔多个）、`PUSHDEER_KEY`（微信推送）
 
+### Post-install Hooks (`scripts/post-install.sh`, `scripts/post-install.d/`)
+
+Things dotbot cannot express run as hooks after the symlinks are in place, via
+`scripts/post-install.sh` (called by `./install`; the 15-minute `sync.sh` calls
+only the cheap seed hook). Each hook in `scripts/post-install.d/` is idempotent
+and standalone:
+
+- `10-seed-configs.sh` — for config files whose owning tool rewrites them in
+  place (kimi CLI, ...). Such a tool writes a temp file and renames it over the
+  target, which replaces a symlink with a regular file, so the repo keeps a
+  reference copy and copies it in **only when the target is missing**. Never put
+  these in a `link:` section: dotbot then fails with "already exists but is a
+  regular file or directory" and exits 1 for the whole run.
+- `20-neovim-runtime.sh` — re-pins and patches the vendored Neovim plugins (see
+  `neovim/README.md`), using `scripts/apply-patches.sh` as the generic
+  idempotent patch applier.
+
 ### Adding New Configs
 
 When adding new dotfile configs:
 1. Add the config file to this repo
-2. Add a symlink entry to the `link` section in `install.conf.yaml`
-3. If platform-specific, wrap in a shell condition: `test "$(uname)" = "Darwin" && ...`
+2. Add a symlink entry to the `link` section in **both** `install.conf.yaml` and
+   `sync.conf.yaml` — the 15-minute auto-sync uses its own config, so a link
+   added to only one of them breaks the other run
+3. If the owning tool rewrites the file in place, seed it instead — see
+   "Post-install Hooks" above
+4. If platform-specific, wrap in a shell condition: `test "$(uname)" = "Darwin" && ...`

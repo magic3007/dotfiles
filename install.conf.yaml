@@ -179,7 +179,9 @@
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
-    ~/.kimi-code/config.toml: kimi-code/config.toml
+    # kimi 的 config.toml 由 CLI 自己用「写临时文件 + rename」重写，symlink 会被
+    # 顶成普通文件；所以不 link，改由 scripts/post-install.d/10-seed-configs.sh
+    # 在文件缺失时从 kimi-code/config.toml 复制一份。
     ~/.local/bin/yolo: scripts/yolo-generic.sh
 
     # ---- omp (Stencil coding agent harness) ----
@@ -228,6 +230,10 @@
 # Local post-link setup
 # ---------------------------------------------------------------------------
 - shell:
+    - command: "bash scripts/post-install.sh || true"
+      description: "Running post-install fixups (config seeds, vendored dependency pins and patches)"
+      stdout: true
+      stderr: true
     - [
           "python3 scripts/sync-skills.py || true",
           "Building skill views (~/.agents, ~/.claude, ~/.codex, ~/.pi/agent, ~/.omp/agent skills) from skills/ and <tool>/skills/",

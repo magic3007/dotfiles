@@ -1,4 +1,24 @@
-default_model = "kimi-code/kimi-for-coding"
+default_model = "kimi-code/k3"
+
+[thinking]
+enabled = true
+effort = "max"
+
+[services.moonshot_search]
+base_url = "https://api.kimi.com/coding/v1/search"
+api_key = ""
+
+[services.moonshot_search.oauth]
+storage = "file"
+key = "oauth/kimi-code"
+
+[services.moonshot_fetch]
+base_url = "https://api.kimi.com/coding/v1/fetch"
+api_key = ""
+
+[services.moonshot_fetch.oauth]
+storage = "file"
+key = "oauth/kimi-code"
 
 [providers."managed:kimi-code"]
 type = "kimi"
@@ -31,23 +51,3 @@ capabilities = [ "thinking", "always_thinking", "image_in", "video_in", "tool_us
 display_name = "K3"
 support_efforts = [ "max" ]
 default_effort = "max"
-
-[thinking]
-enabled = true
-
-[services.moonshot_search]
-base_url = "https://api.kimi.com/coding/v1/search"
-api_key = ""
-
-[services.moonshot_search.oauth]
-storage = "file"
-key = "oauth/kimi-code"
-
-[services.moonshot_fetch]
-base_url = "https://api.kimi.com/coding/v1/fetch"
-api_key = ""
-
-[services.moonshot_fetch.oauth]
-storage = "file"
-key = "oauth/kimi-code"
-

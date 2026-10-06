@@ -16,7 +16,6 @@
     - "~/.local/bin/"
     - "~/.cursor/"
     - "~/.pi/"
-    - "~/.kimi-code/"
 
 - create:
     - ~/.vim/undo-history
@@ -85,7 +84,10 @@
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
-    ~/.kimi-code/config.toml: kimi-code/config.toml
+    # ~/.kimi-code/config.toml is NOT linked: the kimi CLI rewrites it with an
+    # atomic write+rename, which turns a symlink into a regular file and makes
+    # dotbot fail ("already exists but is a regular file or directory").
+    # scripts/post-install.d/10-seed-configs.sh seeds it when it is missing.
     ~/.local/bin/yolo: scripts/yolo-generic.sh
 
     # ---- Ghostty (cross-platform) ----
@@ -97,4 +99,8 @@
 # Skill views are generated (per-skill links), not whole-dir links: see
 # scripts/sync-skills.py. Never exits non-zero on conflicts (prints warnings).
 - shell:
+    - command: "bash scripts/post-install.d/10-seed-configs.sh || true"
+      description: "Seeding configs that their owning tool rewrites in place"
+      stdout: true
+      stderr: true
     - [python3 scripts/sync-skills.py, Building skill views from skills/ and <tool>/skills/]
