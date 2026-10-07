@@ -1,4 +1,25 @@
-# OpenAI Codex shared configuration.
+# OpenAI Codex shared configuration — the only git-tracked Codex config.
+#
+# This file is NOT the live config and is NOT symlinked anywhere. Codex has no
+# include/extends mechanism, so scripts/codex-config-sync.py merges it into
+# ~/.codex/config.toml on every install and every 15-minute sync:
+#
+#   ~/.codex/config_local.toml   untracked per-machine overrides   (wins)
+#   codex/config.toml            this file, shared defaults        (middle)
+#   ~/.codex/config.toml         live file, machine state          (base)
+#
+# Keep out of this file anything Codex writes at runtime, because that would
+# push machine state into git — that is why [projects.*] trust levels,
+# [hooks.state], [marketplaces.*], [plugins.*], [notice.*], [desktop] and
+# [tui] nux/screen-reader state live only in the live file. Per-machine values
+# for a key defined here go in ~/.codex/config_local.toml, e.g. Linux hosts
+# disable the macOS-only [mcp_servers.node_repl] entry there with
+# `enabled = false`.
+#
+# [[skills.config]] toggles are user-authored per-machine policy: they live in
+# config_local.toml, not here. A list replaces the lower layer wholesale, so a
+# machine that defines [[skills.config]] fully owns its own toggle list.
+#
 # Modern codex CLI reads ~/.codex/config.toml (config.json / settings.json are deprecated).
 
 model = "gpt-5.5"
@@ -71,8 +92,10 @@ prevent_idle_sleep = true
 # [features.multi_agent_v2]
 # encrypted_messages = false
 
-# Keep startup fast: cap how long codex waits for MCP servers before giving up
-# (the previous value of 120s could block startup for up to 2 minutes).
+# ChatGPT desktop app MCP server (macOS path). Linux hosts keep the entry but
+# disable it in ~/.codex/config_local.toml, so the shared file stays the single
+# source of truth. Keep startup_timeout_sec small: the previous 120s value could
+# block startup for up to two minutes.
 [mcp_servers.node_repl]
 args = []
 command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
@@ -81,313 +104,7 @@ startup_timeout_sec = 10
 [shell_environment_policy]
 inherit = "core"
 
-[desktop]
-conversationDetailMode = "STEPS_COMMANDS"
-show-context-window-usage = true
-followUpQueueMode = "queue"
-selected-avatar-id = "hoots"
-keepRemoteControlAwakeWhilePluggedIn = true
-
-[projects."/Users/magic/dotfiles"]
-trust_level = "trusted"
-
-[projects."/home/yanzhou/projects/paperbench.workspace/paper-eval-pipeline"]
-trust_level = "trusted"
-
-[projects."/home/yanzhou/projects/paperbench.workspace/paper-rollout-pipeline"]
-trust_level = "trusted"
-
-[projects."/home/yanzhou/projects/paperbench.workspace/paper-rl-pipeline"]
-trust_level = "trusted"
-
-[projects."/home/yanzhou/dotfiles"]
-trust_level = "trusted"
-
 [tui]
 status_line = ["model-with-reasoning", "context-used", "weekly-limit", "thread-id", "current-dir"]
 status_line_use_colors = true
 theme = "coldark-dark"
-screen_reader_detection_done = true
-
-[tui.model_availability_nux]
-"gpt-5.6-sol" = 3
-"gpt-6.1-sol" = 4
-
-# Keep infrequently used skills installed but out of the model-visible catalog.
-# Re-enable an individual skill by changing its entry to `enabled = true` or
-# removing that entry.
-[[skills.config]]
-name = "ppw-abstract"
-enabled = false
-
-[[skills.config]]
-name = "ppw-caption"
-enabled = false
-
-[[skills.config]]
-name = "ppw-cover-letter"
-enabled = false
-
-[[skills.config]]
-name = "ppw-de-ai"
-enabled = false
-
-[[skills.config]]
-name = "ppw-experiment"
-enabled = false
-
-[[skills.config]]
-name = "ppw-literature"
-enabled = false
-
-[[skills.config]]
-name = "ppw-logic"
-enabled = false
-
-[[skills.config]]
-name = "ppw-polish"
-enabled = false
-
-[[skills.config]]
-name = "ppw-repo-to-paper"
-enabled = false
-
-[[skills.config]]
-name = "ppw-reviewer-simulation"
-enabled = false
-
-[[skills.config]]
-name = "ppw-team"
-enabled = false
-
-[[skills.config]]
-name = "ppw-translation"
-enabled = false
-
-[[skills.config]]
-name = "ppw-update"
-enabled = false
-
-[[skills.config]]
-name = "ppw-visualization"
-enabled = false
-
-[[skills.config]]
-name = "nature-citation"
-enabled = false
-
-[[skills.config]]
-name = "nature-data"
-enabled = false
-
-[[skills.config]]
-name = "nature-polishing"
-enabled = false
-
-[[skills.config]]
-name = "nature-response"
-enabled = false
-
-[[skills.config]]
-name = "nature-writing"
-enabled = false
-
-[[skills.config]]
-name = "check-claude-code-config"
-enabled = false
-
-[[skills.config]]
-name = "claude-code-custom-skill-development"
-enabled = false
-
-[[skills.config]]
-name = "project-starter"
-enabled = false
-
-[[skills.config]]
-name = "setup-harness"
-enabled = false
-
-[[skills.config]]
-name = "debug-experience-system"
-enabled = false
-
-[[skills.config]]
-name = "machine-onboarding"
-enabled = false
-
-[[skills.config]]
-name = "android-16kb-alignment"
-enabled = false
-
-[[skills.config]]
-name = "android-dev-loop"
-enabled = false
-
-[[skills.config]]
-name = "android-ui-review"
-enabled = false
-
-[[skills.config]]
-name = "harness-generate-android"
-enabled = false
-
-[[skills.config]]
-name = "harness-generate-ios"
-enabled = false
-
-[[skills.config]]
-name = "harness-generate-app-next-h5"
-enabled = false
-
-[[skills.config]]
-name = "autoskill"
-enabled = true
-
-[[skills.config]]
-name = "claudeception"
-enabled = true
-
-# Shared skill for Claude/Pi/omp: it prepares an escalation *to* Codex.
-[[skills.config]]
-name = "ask-for-help"
-enabled = false
-
-[[skills.config]]
-name = "continuous-learning"
-enabled = true
-
-[[skills.config]]
-name = "consciousness-council"
-enabled = true
-
-[[skills.config]]
-name = "vela-session-debugger"
-enabled = false
-
-[[skills.config]]
-name = "tide-add-managed-stream"
-enabled = false
-
-[[skills.config]]
-name = "tide-circus-config-checker"
-enabled = false
-
-[[skills.config]]
-name = "tide-cluster-info"
-enabled = false
-
-[[skills.config]]
-name = "tide-context-forwarder"
-enabled = false
-
-[[skills.config]]
-name = "tide-dc-quota-query"
-enabled = false
-
-[[skills.config]]
-name = "tide-dc-quota-setter"
-enabled = false
-
-[[skills.config]]
-name = "tide-limit-query"
-enabled = false
-
-[[skills.config]]
-name = "tide-limit-setter"
-enabled = false
-
-[[skills.config]]
-name = "tide-podbatch-query"
-enabled = false
-
-[[skills.config]]
-name = "tide-podbatch-setter"
-enabled = false
-
-[[skills.config]]
-name = "tide-queue-checker"
-enabled = false
-
-[[skills.config]]
-name = "tide-ratio-quota-query"
-enabled = false
-
-[[skills.config]]
-name = "tide-ratio-quota-setter"
-enabled = false
-
-[[skills.config]]
-name = "tide-resource-checker"
-enabled = false
-
-[[skills.config]]
-name = "tide-scheduling-checker"
-enabled = false
-
-[[skills.config]]
-name = "tide-scheduling-config-query"
-enabled = false
-
-[[skills.config]]
-name = "tide-scheduling-config-setter"
-enabled = false
-
-[[skills.config]]
-name = "tide-stream-dispatch-checker"
-enabled = false
-
-[[skills.config]]
-name = "tide-success-rate-checker"
-enabled = false
-
-[[skills.config]]
-name = "tide-traffic-checker"
-enabled = false
-
-[[skills.config]]
-name = "tide-whitelist-query"
-enabled = false
-
-[[skills.config]]
-name = "tide-whitelist-setter"
-enabled = false
-
-[[skills.config]]
-name = "hlog"
-enabled = false
-
-[[skills.config]]
-name = "atm-log-tracer"
-enabled = false
-
-[[skills.config]]
-name = "atm-apollo-reader"
-enabled = false
-
-[[skills.config]]
-name = "t2a-large-log-tracer"
-enabled = false
-
-[[skills.config]]
-name = "vulcan-job-monitor"
-enabled = false
-
-[[skills.config]]
-name = "vulcan2-info"
-enabled = false
-
-[hooks.state]
-
-[hooks.state."/Users/magic/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:e8dd3827a3cec0a1a3ac965d2b5c330121e396370e63f309cb6646d33e405c03"
-
-[marketplaces.openai-bundled]
-source_type = "local"
-source = "/home/yanzhou/.codex/.tmp/bundled-marketplaces/openai-bundled"
-
-[plugins."visualize@openai-bundled"]
-enabled = true
-
-[notice.model_migrations]
-"gpt-5.6-sol" = "gpt-6-sol"
