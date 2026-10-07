@@ -75,7 +75,9 @@
     ~/.claude/hooks: claude/hooks
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
-    ~/.codex/config.toml: codex/config.toml
+    # ~/.codex/config.toml is NOT linked: Codex edits it in place and writes
+    # machine state into it, which a symlink would push into this repo.
+    # scripts/codex-config-sync.py merges the tracked codex/config.toml into it.
     ~/.gemini/settings.json: gemini/settings.json
     ~/.gemini/skills: gemini/skills
     ~/.pi/agent/settings.json: pi/settings.json
@@ -104,3 +106,4 @@
       stdout: true
       stderr: true
     - [python3 scripts/sync-skills.py, Building skill views from skills/ and <tool>/skills/]
+    - [python3 scripts/codex-config-sync.py, Merging shared codex/config.toml into ~/.codex/config.toml]
