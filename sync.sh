@@ -4,6 +4,18 @@ set -euo pipefail
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_FILE="/tmp/dotfiles-sync.log"
 
+# launchd (and systemd user units) start us with a minimal PATH, where python3 is
+# /usr/bin/python3 — 3.9 on macOS, which has no tomllib — so every
+# `python3 scripts/*.py` step below fails although the same steps work from an
+# interactive shell. Put the user's own interpreters in front and keep whatever
+# PATH we were handed as the tail.
+export PATH="$HOME/.venv/bin:/opt/homebrew/bin:/usr/local/bin:${PATH:-/usr/bin:/bin:/usr/sbin:/sbin}"
+
+if ! python3 -c 'import tomllib' >/dev/null 2>&1; then
+    echo "warn: $(command -v python3) ($(python3 -V 2>&1)) has no tomllib — the codex config merge needs 3.11+" \
+        | tee -a "$LOG_FILE" >&2
+fi
+
 notify_failure() {
     local exit_code=$?
     HOSTNAME=$(hostname)
