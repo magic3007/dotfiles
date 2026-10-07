@@ -9,6 +9,7 @@ enabledModels:
   - deepseek/deepseek-v4-flash
   - deepseek/deepseek-flash
   - deepseek/deepseek-v4-flash-vision-exp
+  - mafia/MiniMax-M3.1-Flash-Preview
 modelRoles:
   default: deepseek/deepseek-flash
   tiny: mafia/claude-opus-5-5:medium
@@ -23,6 +24,7 @@ modelRoles:
   deepseek-pro: deepseek/deepseek-v4-pro:max
   deepseek-vflash: deepseek/deepseek-v4-flash:max
   deepseek-flash: deepseek/deepseek-flash:max
+  mafia-minimax: mafia/MiniMax-M3.1-Flash-Preview:max
 cycleOrder:
   - mafia-opus
   - devin-opus
