@@ -52,6 +52,28 @@
 > 迁移遗留：本机 `~/.omp/agent/{models,WATCHDOG}.yml.pre-dotfiles` 是接入 dotfiles 前的
 > 原始副本（`models.yml.pre-dotfiles` 里的 `apiKey` 是占位符，不是真 key）。确认无误后可删。
 
+## Thinking 级别（effort）
+
+解析优先级（源码 `resolveThinkingLevelForModel`）：
+
+1. 会话显式级别：`--thinking <level>`，或模型选择器的 `:level` 后缀（`modelRoles` 的值就是这种写法）。
+2. 模型定义里的 `thinking.defaultLevel`：`models.yml` 自声明，或目录内置。
+3. 全局 `defaultThinkingLevel`（本仓库现为 `auto`）。
+
+要点：
+
+- `auto` **只能**出现在第 1、3 层。模型定义与 `modelOverrides` 的 `defaultLevel` 只接受
+  `minimal|low|medium|high|xhigh|max`；写 `auto` 会让**整个 `models.yml` 加载失败**、该
+  provider 的模型全部消失（`Model "x" not found`），而 `omp models list` 仍返回 0——容易误判。
+- `auto` 是逐轮分类器：按请求挑档位，上限由 `providers.autoThinkingMaxEffort`（默认 `xhigh`）
+  决定。实测一个 "reply ok" 的短请求被判为 `low`。
+- 目录内置的 `defaultLevel` **压过**全局 `defaultThinkingLevel`。devin 目录 528 个模型里有 38 个
+  带 `defaultLevel`（`claude-opus-5-5`、`claude-fable-5-1` 都是 `medium`），这些模型只能用第 1 层
+  改成 auto：角色后缀 `:auto` 或 `--thinking auto`。
+- 查生效档位：会话 JSONL 里的 `thinking_level_change` 记录
+  （`~/.omp/agent/sessions/<cwd>/…jsonl`），`configured:"auto"` 表示 auto 已启用，
+  `thinkingLevel` 是该轮实际档位。
+
 ## Skills
 
 omp 读 `~/.agents/skills`（`skills.enableAgentsUser`）和 `~/.omp/agent/skills`

@@ -16,15 +16,15 @@ modelRoles:
   smol: mafia/claude-opus-5-5:max
   slow: mafia/claude-fable-5-1:max
   vision: mafia/claude-opus-5-5:max
-  mafia-opus: mafia/claude-opus-5-5:max
-  devin-opus: devin/claude-opus-5-5:max
-  devin-opus-fast: devin/claude-opus-5-5-fast:max
-  mafia-fable: mafia/claude-fable-5-1:max
-  devin-fable: devin/claude-fable-5-1:max
-  deepseek-pro: deepseek/deepseek-v4-pro:max
-  deepseek-vflash: deepseek/deepseek-v4-flash:max
-  deepseek-flash: deepseek/deepseek-flash:max
-  mafia-minimax: mafia/MiniMax-M3.1-Flash-Preview:max
+  mafia-opus: mafia/claude-opus-5-5:auto
+  devin-opus: devin/claude-opus-5-5:auto
+  devin-opus-fast: devin/claude-opus-5-5-fast:auto
+  mafia-fable: mafia/claude-fable-5-1:auto
+  devin-fable: devin/claude-fable-5-1:auto
+  deepseek-pro: deepseek/deepseek-v4-pro:auto
+  deepseek-vflash: deepseek/deepseek-v4-flash:auto
+  deepseek-flash: deepseek/deepseek-flash:auto
+  mafia-minimax: mafia/MiniMax-M3.1-Flash-Preview:auto
 cycleOrder:
   - mafia-opus
   - devin-opus
@@ -39,7 +39,7 @@ retry:
       - devin/*
     devin/*:
       - mafia/*
-defaultThinkingLevel: max
+defaultThinkingLevel: auto
 compaction:
   methodOrder:
     - shake
