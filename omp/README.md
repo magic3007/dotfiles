@@ -65,6 +65,22 @@ omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<en
 不读裸 `*.md`；所以视图里每个 skill 都必须是一个目录条目（脚本已保证，嵌套 bundle
 会被拍平）。完整布局见仓库根 `AGENTS.md` 的 Skills 一节。
 
+## 状态栏（`statusLine`）
+
+`config.yml` 里用 `preset: custom` + `rightSegments` 自定义。当前右侧：`context_pct`、
+`session_name`（会话标题，无标题时该段自动隐藏）、`session`（**session id 前 8 位**，便于就地读出
+`omp --fork <前缀>` / `--resume <前缀>` 要用的 id）、`subagents`、`usage`、`cache_hit`、`cost`；
+左侧用 schema 默认的 `vim, model, mode, path, git, pr`。
+
+- 预览单个 segment：`omp gallery --surface=segment --segment=session`（换成 `session_name` 等均可）。
+- 合法 segment 名（omp 18.7）：`pi`、`vim`、`hostname`、`model`、`mode`、`path`、`git`、`pr`、
+  `subagents`、`token_in`/`token_out`/`token_total`/`token_rate`、`cache_read`/`cache_write`/
+  `cache_hit`、`cost`、`context_pct`、`context_total`、`time_spent`、`time`、`session`、
+  `session_name`、`usage`、`collab`、`stream`、`status`（扩展经 `ctx.ui.setStatus()` 写的状态）。
+- session id 是「epoch 毫秒的 16 进制」（如 `01a11529-2d37-…`）。`session` 段只截前 8 位 =
+  毫秒 >> 16，所以**同一 ~65 秒窗口内启动的会话共享前缀**；`--fork`/`--resume` 用前缀匹配到多个时
+  会静默按「最新优先」取第一个（实测），拿不准就用不带参数的 `--resume` 选择器。
+
 ## 硬性约束
 
 ### 1. `config.yml` 必须可写

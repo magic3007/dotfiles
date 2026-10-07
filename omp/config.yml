@@ -61,6 +61,7 @@ statusLine:
   rightSegments:
     - context_pct
     - session_name
+    - session
     - subagents
     - usage
     - cache_hit
