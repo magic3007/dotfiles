@@ -122,9 +122,14 @@
 	process = git-lfs filter-process
 [safe]
 	directory = *
+# `gh auth setup-git` writes an empty "helper =" before its own entry. That
+# empty value CLEARS every helper accumulated so far, so github.com ends up with
+# gh as the only helper — which breaks HTTPS push wherever gh is not at that
+# exact path (macOS Homebrew: /opt/homebrew/bin/gh) or is not logged in. git
+# keeps going after a helper it cannot run, so gh is kept as an extra helper:
+# the OS store (macOS osxkeychain, Linux libsecret) is tried first and gh only
+# decides the credentials when nothing else has them.
 [credential "https://github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
+	helper = !gh auth git-credential
