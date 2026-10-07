@@ -87,6 +87,32 @@ omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<en
 不读裸 `*.md`；所以视图里每个 skill 都必须是一个目录条目（脚本已保证，嵌套 bundle
 会被拍平）。完整布局见仓库根 `AGENTS.md` 的 Skills 一节。
 
+## Plugins（插件）
+
+插件本体**不入库**。`~/.omp/plugins/` 是运行时状态：`bun install` 会重写 `package.json`
+与 `bun.lock`，omp 会就地重写 `omp-plugins.lock.json`，`node_modules/` 还有上百个包。
+
+仓库只跟踪**清单**，缺失项由安装钩子补齐：
+
+| repo 文件 | 作用 |
+|---|---|
+| `omp/plugins.txt` | 每行一个 `omp plugin install` spec（`npm:` 前缀、版本后缀、`[features]` 括号均可）；空行与 `#` 注释忽略 |
+| `scripts/post-install.d/40-omp-plugins.sh` | `./install` 时对比 `omp plugin list --json`，只安装缺失的插件 |
+
+要点：
+
+- **只在 `./install` 跑**，不进 15 分钟的 `sync.sh`：安装需要网络和 `bun`。
+- 已安装的插件**不重装**。重复 `omp plugin install` 不是空操作：它会重新解析包，并把 feature
+  选择重置回 manifest 默认值。
+- 只支持 npm spec。git / link 插件会告警跳过（GitHub 仓库名解析不出包名，无法判断是否已装）。
+- 当前清单：`npm:pi-fff`（FFF 模糊查找、`@...` 补全、内容搜索；默认**覆盖内建 `read`/`grep`**，
+  用会话内 `/fff-features` 开关）。它的状态文件写到 `~/.pi/agent/extensions/pi-fff.json`
+  —— omp 的 `getAgentDir()` 兼容 shim 解析到 `~/.pi/agent`，而该目录在 dotfiles 里是指向
+  `pi/extensions` 的软链接，所以保存 feature 开关会在 repo 里留下一个未跟踪文件。
+
+加插件：把 spec 写进 `omp/plugins.txt`，再跑 `bash scripts/post-install.d/40-omp-plugins.sh`
+（或 `./install`）。
+
 ## 状态栏（`statusLine`）
 
 `config.yml` 里用 `preset: custom` + `rightSegments` 自定义。当前右侧：`context_pct`、

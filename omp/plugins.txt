@@ -1,0 +1,11 @@
+# omp plugins, installed by scripts/post-install.d/40-omp-plugins.sh.
+#
+# One `omp plugin install` spec per line; blank lines and # comments are
+# ignored. npm specs support the feature bracket syntax (`pkg[a,b]`, `pkg[]`,
+# `pkg[*]`). The installed plugin trees, bun.lock and omp-plugins.lock.json are
+# runtime state and stay out of git (see omp/README.md, "Plugins").
+#
+# pi-fff: FFF-backed fuzzy file finding, @-autocomplete and content search.
+# Overrides the built-in read/grep tools while its features are enabled
+# (toggle with /fff-features inside omp).
+npm:pi-fff

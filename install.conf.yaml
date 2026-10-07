@@ -196,6 +196,9 @@
     # 其余 ~/.omp/agent 内容（agent.db、history.db、models.db、sessions/、
     # cache/、terminal-sessions/、last-changelog-version）以及 ~/.omp/{logs,run,gpu_cache.json}
     # 都是运行时状态，各机器不同，留在本机、不进 git。
+    # 插件同理：仓库只跟踪 omp/plugins.txt 里的 spec 清单，
+    # 缺失的插件由 scripts/post-install.d/40-omp-plugins.sh 在 ./install 时安装
+    # （需要网络，所以不进 15 分钟的 sync）。
     #
     # 硬约束（见 omp/README.md）：
     #   1) config.yml 必须可写 —— omp 对它上 native file lock，repo 里保持普通可写文件。
