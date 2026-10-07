@@ -28,3 +28,12 @@ providers:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
         defaultLevel: max
+    - id: MiniMax-M3.1-Flash-Preview
+      name: MiniMax-M3.1-Flash-Preview
+      reasoning: true
+      headers:
+        X-Sub-Module: claude-code-internal
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
+        defaultLevel: max
