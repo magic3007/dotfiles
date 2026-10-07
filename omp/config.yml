@@ -5,6 +5,10 @@ enabledModels:
   - devin/claude-opus-5-5-fast
   - mafia/claude-fable-5-1
   - devin/claude-fable-5-1
+  - deepseek/deepseek-v4-pro
+  - deepseek/deepseek-v4-flash
+  - deepseek/deepseek-flash
+  - deepseek/deepseek-v4-flash-vision-exp
 modelRoles:
   default: mafia/claude-opus-5-5:high
   tiny: mafia/claude-opus-5-5:medium
@@ -16,12 +20,17 @@ modelRoles:
   devin-opus-fast: devin/claude-opus-5-5-fast:max
   mafia-fable: mafia/claude-fable-5-1:max
   devin-fable: devin/claude-fable-5-1:max
+  deepseek-pro: deepseek/deepseek-v4-pro:max
+  deepseek-vflash: deepseek/deepseek-v4-flash:max
+  deepseek-flash: deepseek/deepseek-flash:max
 cycleOrder:
   - mafia-opus
   - devin-opus
   - devin-opus-fast
   - mafia-fable
   - devin-fable
+  - deepseek-pro
+  - deepseek-flash
 retry:
   fallbackChains:
     mafia/*:

@@ -26,6 +26,27 @@
 
 `~/.omp/` 下同样不入库：`logs/`、`run/`（daemon socket）、`gpu_cache.json`。
 
+### 内置 provider 不用写进 models.yml
+
+`models.yml` 只声明**目录里没有的**自定义 provider（示例：`mafia`）。omp 的模型目录
+（`@oh-my-pi/pi-catalog`）自带一批已适配的 provider——`deepseek`、`devin`、`anthropic`、
+`openrouter` 等——它们的 baseUrl、wire 兼容规则、模型清单都在包里，无需在 `models.yml`
+重复声明；重复声明反而要手写 api/baseUrl/models，并会丢掉内置的 compat 规则。
+
+凭据仍按第 3 节的环境变量约定提供，例如 `deepseek` → `DEEPSEEK_API_KEY`（在
+`~/.common_shell_setup_local.sh` 里 export）。启用方式是在 `config.yml` 的
+`enabledModels` 里列出模型、在 `modelRoles` 里起个角色名：
+
+    enabledModels:
+      - deepseek/deepseek-v4-pro
+      - deepseek/deepseek-flash
+    modelRoles:
+      deepseek-flash: deepseek/deepseek-flash:max
+
+之后 `--model deepseek-flash`（角色名）或 `--model deepseek/deepseek-v4-pro` 均可直接用。
+当前 `deepseek` 分组：`deepseek-v4-pro`、`deepseek-v4-flash`、`deepseek-flash`（V4.1，1M 上下文、
+支持图片）、`deepseek-v4-flash-vision-exp`；thinking 档位 low/high/max。
+
 > 迁移遗留：本机 `~/.omp/agent/{models,WATCHDOG}.yml.pre-dotfiles` 是接入 dotfiles 前的
 > 原始副本（`models.yml.pre-dotfiles` 里的 `apiKey` 是占位符，不是真 key）。确认无误后可删。
 

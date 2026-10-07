@@ -456,6 +456,17 @@ o5pi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi 
 okpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider kafara --model 'devin/claude-opus-5-5' "$@"; }
 fkpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider kafara --model 'devin/claude-fable-5-1' "$@"; }
 
+# omp (oh-my-pi / @oh-my-pi/pi-coding-agent) model shortcuts, mirroring the *pi group above.
+# Named after the *roles* in ~/dotfiles/omp/config.yml (modelRoles), so provider, model id,
+# base URL and thinking level stay in one place; omp's built-in providers (deepseek, devin,
+# …) need no entry in ~/dotfiles/omp/models.yml, only DEEPSEEK_API_KEY etc. in the environment.
+# Tool calls are already pre-approved (tools.approvalMode = yolo), so no extra flags here.
+# Anything else: `omp --model <role>` or `omp --model <provider>/<model-id>`.
+o5omp()  { omp --model mafia-opus       "$@"; }  # Claude Opus 5.5 via the mafia gateway
+f5omp()  { omp --model mafia-fable       "$@"; }  # Claude Fable 5.1 via the mafia gateway
+dvomp()  { omp --model devin-opus        "$@"; }  # claude-opus-5-5 via devin
+dsomp()  { omp --model deepseek-flash    "$@"; }  # DeepSeek V4.1 Flash (1M ctx, images)
+
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
 
