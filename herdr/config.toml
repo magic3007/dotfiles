@@ -10,7 +10,7 @@ onboarding = false
 [theme]
 # Built-in themes: catppuccin, terminal, tokyo-night, dracula, nord,
 #                  gruvbox, one-dark, solarized, kanagawa, rose-pine, vesper
-name = "vesper"
+name = "nord"
 
 # Follow host terminal light/dark appearance and switch Herdr UI themes.
 # auto_switch = false
@@ -67,4 +67,4 @@ enabled = true
 [ui]
 show_agent_labels_on_pane_borders = false
 agent_panel_sort = "spaces"
-status_indicators = "symbols"
+status_indicators = "dots"
