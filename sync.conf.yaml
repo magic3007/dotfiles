@@ -27,7 +27,12 @@
 - link:
     # ---- Shell ----
     ~/.zshenv: oh-my-zsh/zshenv
-    ~/.zshrc: oh-my-zsh/zshrc
+    # Same guard as install.conf.yaml: the endpoint-security agent rewrites
+    # ~/.zshrc as root, which would otherwise fail this sync on every 15-minute
+    # tick. Link only when the target is absent or already a symlink.
+    ~/.zshrc:
+        if: '[ ! -e ~/.zshrc ] || [ -L ~/.zshrc ]'
+        path: oh-my-zsh/zshrc
     ~/.zshrc.d: oh-my-zsh/zshrc.d
     ~/.bashrc: bash/bashrc
     ~/.common_shell_setup.sh: common_shell_setup.sh

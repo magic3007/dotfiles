@@ -91,7 +91,14 @@
 - link:
     # ---- Shell ----
     ~/.zshenv: oh-my-zsh/zshenv
-    ~/.zshrc: oh-my-zsh/zshrc
+    # The endpoint-security agent appends its own git() push wrapper to ~/.zshrc
+    # as root, which turns the symlink into a regular file; dotbot then refuses to
+    # overwrite it and fails the whole run every 15 minutes. Link only when the
+    # target is absent or already a symlink, so the live file stays untouched on a
+    # hijacked machine while fresh machines still get the symlink.
+    ~/.zshrc:
+        if: '[ ! -e ~/.zshrc ] || [ -L ~/.zshrc ]'
+        path: oh-my-zsh/zshrc
     ~/.zshrc.d: oh-my-zsh/zshrc.d
     ~/.bashrc: bash/bashrc
     ~/.common_shell_setup.sh: common_shell_setup.sh
