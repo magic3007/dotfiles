@@ -26,7 +26,7 @@ compatibility list below.
 ## Neovim 0.12 compatibility work
 
 The local Neovim is 0.12, which is newer than everything the config assumes.
-Four kinds of fix keep startup silent:
+Five kinds of fix keep startup and per-buffer rendering clean:
 
 1. **Plugin revisions restored** — `scripts/post-install.d/20-neovim-runtime.sh`
    checks out
@@ -53,6 +53,14 @@ Four kinds of fix keep startup silent:
    cannot be taken as a version bump here: it defers to `vim.tbl_isarray`,
    which Neovim 0.12.2 does not provide, so it would fall back to the same
    strict check.
+5. **Removed tree-sitter query aliases** — Neovim 0.12 dropped
+   `vim.treesitter.query.get_query` / `parse_query` / `get_query_files`, which
+   the pinned `nvim-treesitter` still calls (`query.lua` from its indent path,
+   plus `health.lua` and `configs.lua`). With indent-blankline's
+   `use_treesitter = true` (`lua/user/indentline.lua`), opening a `.py` file
+   raised `query.lua:91: attempt to call field 'get_query' (a nil value)` on
+   every redraw and the buffer lost its tree-sitter indents. `init.lua` maps the
+   removed names onto `get` / `parse` / `get_files` before any plugin loads.
 
 `wakatime/vim-wakatime` was removed from `plugins.lua`: no API key is configured
 anywhere, so it only printed a warning on every start. It is still used by the
