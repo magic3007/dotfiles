@@ -185,7 +185,7 @@
     ~/.local/bin/yolo: scripts/yolo-generic.sh
 
     # ---- omp (Stencil coding agent harness) ----
-    # 静态配置：config.yml / models.yml / WATCHDOG.yml。
+    # 静态配置：config.yml / models.yml / WATCHDOG.yml / AGENTS.md / RULES.md。
     # 其余 ~/.omp/agent 内容（agent.db、history.db、models.db、sessions/、
     # cache/、terminal-sessions/、last-changelog-version）以及 ~/.omp/{logs,run,gpu_cache.json}
     # 都是运行时状态，各机器不同，留在本机、不进 git。
@@ -198,6 +198,9 @@
     ~/.omp/agent/config.yml: omp/config.yml
     ~/.omp/agent/models.yml: omp/models.yml
     ~/.omp/agent/WATCHDOG.yml: omp/WATCHDOG.yml
+    # AGENTS.md = 用户级上下文文件；RULES.md = always-apply 常驻规则（长会话压缩后仍生效）。
+    ~/.omp/agent/AGENTS.md: omp/AGENTS.md
+    ~/.omp/agent/RULES.md: omp/RULES.md
 
     # ---- iTerm2 ----
     ~/.config/iterm2/com.googlecode.iterm2.plist: iterm2/com.googlecode.iterm2.plist

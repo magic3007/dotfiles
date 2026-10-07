@@ -9,13 +9,15 @@
 
 ## 软链接
 
-本目录下的**三个静态配置**被 `install.conf.yaml` 软链接进 `~/.omp/agent/`：
+本目录下的**五个静态配置**被 `install.conf.yaml` 软链接进 `~/.omp/agent/`：
 
 | repo 文件 | 软链接到 | 作用 |
 |---|---|---|
 | `omp/config.yml` | `~/.omp/agent/config.yml` | 全局设置：模型角色、fallback 链、压缩、状态栏 |
 | `omp/models.yml` | `~/.omp/agent/models.yml` | 自定义 provider / 模型定义 |
 | `omp/WATCHDOG.yml` | `~/.omp/agent/WATCHDOG.yml` | advisor（`--advisor`）的 reviewer 花名册 |
+| `omp/AGENTS.md` | `~/.omp/agent/AGENTS.md` | 用户级上下文文件：回复风格（ASD-STE100 + 中文） |
+| `omp/RULES.md` | `~/.omp/agent/RULES.md` | always-apply 常驻规则：同一句回复风格，长会话压缩后仍生效 |
 
 `~/.omp/agent/` 下其余内容是**运行时状态**，各机器不同，留在本机、不进 git：
 
@@ -99,6 +101,12 @@ omp 会对 config.yml 上 native file lock，只读符号链接或只读 store �
 `~/.common_shell_setup_local.sh` 不入库，所以密钥不跟仓库走。
 ⚠️ 若该环境变量未设置，`$envExact` 返回 `undefined`，omp 会退化成把字面量
 `MAFIA_API_KEY` 当 key 用 → 401。排查时先确认 `MAFIA_API_KEY` 已 export。
+
+### 4. 用户级 `AGENTS.md` 会遮蔽其他工具的用户级上下文
+
+`~/.omp/agent/AGENTS.md` 是 native provider（优先级 100）的用户级上下文文件。它存在时，omp 只保留这一个用户级上下文文件，`~/.claude/CLAUDE.md`、`~/.codex/AGENTS.md`、`~/.gemini/GEMINI.md`、`~/.copilot/copilot-instructions.md`、`~/.agents/AGENTS.md` 都不再进入会话（claude/codex/gemini 用户源本身还需 `enabledProviders` 才启用）。项目级上下文按目录深度各留一个，不受影响。
+
+`RULES.md` 只认 native 位置（本目录，以及项目最近的 `.omp/`）。它是 always-apply 常驻规则：正文随**每次请求**携带，长会话被压缩后仍然生效，因此必须保持很短；与 `AGENTS.md` 内容重复时会被去重。
 
 ## 常用命令
 
