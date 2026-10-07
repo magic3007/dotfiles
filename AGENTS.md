@@ -40,6 +40,8 @@ Machine-specific overrides go in `*_local` files (not tracked by git):
 - `~/.gitconfig_local` — local git user/config (included via `[include]` in gitconfig)
 - `~/.zsh_local` — local zsh config
 - `~/.common_shell_setup_local.sh` — local shell setup (bash/zsh)
+- `~/.codex/config_local.toml` — per-machine Codex config, merged over `codex/config.toml`
+  (example: Linux hosts disable the macOS-only `[mcp_servers.node_repl]`)
 - `~/.config/fish/conf.d/local.fish` — local fish config (fish is archived; see below)
 
 ### Shell Setup
@@ -86,7 +88,7 @@ One source per skill, one generator, generated views. Sources (repo):
 - links a top-level Claude plugin bundle without its own `SKILL.md` (`claude/skills/codepp-harbor-task`, uses hooks) whole;
 - only touches symlinks into the repo / `~/.agents/skills` / legacy mirrors and its own shims; real dirs (npx installs, Codex `.system`, Claude `synced/`) are left alone and reported.
 
-Placement rule: a skill is **shared** unless it depends on one harness — Claude-only runtime features (`` !`cmd` `` injection, `${CLAUDE_SKILL_DIR}`, plugin hooks: `hub*`, `web-access`, `codepp-harbor-task`), configures/operates that harness (`check-claude-code-config`, `claude-cron-automation`, `nvm-claude`, Codex `insights`), or generates that harness's project files (`setup-harness`, `project-starter`, `harness-generate-*`, `claude-code-custom-skill-development`). Shared skills reference their own files via `~/.agents/skills/<name>/…` (exists for every harness); Codex maps Claude Code vocabulary once in `codex/AGENTS.md`, not per skill. Per-harness opt-out of a shared skill uses the harness's own switch (Codex `[[skills.config]] enabled = false`, e.g. `ask-for-help`).
+Placement rule: a skill is **shared** unless it depends on one harness — Claude-only runtime features (`` !`cmd` `` injection, `${CLAUDE_SKILL_DIR}`, plugin hooks: `hub*`, `web-access`, `codepp-harbor-task`), configures/operates that harness (`check-claude-code-config`, `claude-cron-automation`, `nvm-claude`, Codex `insights`), or generates that harness's project files (`setup-harness`, `project-starter`, `harness-generate-*`, `claude-code-custom-skill-development`). Shared skills reference their own files via `~/.agents/skills/<name>/…` (exists for every harness); Codex maps Claude Code vocabulary once in `codex/AGENTS.md`, not per skill. Per-harness opt-out of a shared skill uses the harness's own switch (Codex `[[skills.config]] enabled = false`, e.g. `ask-for-help`); the Codex toggle list is per-machine and lives in the untracked `~/.codex/config_local.toml`.
 
 Privacy: this repo is public. Internal skills stay untracked via the explicit list in `.gitignore`; a new skill dir shows up as untracked until you either list it there or `git add` it.
 
@@ -108,7 +110,35 @@ Each AI coding tool has its own config directory symlinked to `~/`:
 
 **omp** (`omp/`, https://omp.sh, Stencil/oh-my-pi): a coding agent harness. Five static configs are symlinked into `~/.omp/agent/`: `config.yml`, `models.yml`, `WATCHDOG.yml`, `AGENTS.md` (user-level context file), and `RULES.md` (always-apply sticky rule); the rest of `~/.omp/agent` (`*.db`, `sessions/`, `cache/`, `terminal-sessions/`, `last-changelog-version`) plus `~/.omp/{logs,run,gpu_cache.json}` is runtime state and stays local. Hard constraints on `config.yml`: (1) it MUST remain writable — omp takes a native file lock, a read-only symlink breaks every launch; (2) it does NOT support comments — `omp config set` rewrites it as pure YAML and strips comments, so keep explanatory prose in `omp/README.md`, not in the file (`models.yml`/`WATCHDOG.yml` have no rewrite path, so comments there are fine); (3) never commit `auth.*`/provider tokens/secrets — `models.yml`'s `apiKey` takes an env-var *name* (omp runs it through `$envExact`), and the real `MAFIA_API_KEY` lives in the untracked `~/.common_shell_setup_local.sh`. Install: `curl -fsSL https://omp.sh/install | sh` (→ `~/.bun/bin/omp`).
 
-**codex config.toml is platform-conditional**: `~/.codex/config.toml` is only symlinked on non-macOS. In `install.conf.yaml` that link entry carries `if: '[ "$(uname)" != "Darwin" ]'`. Reason: on macOS Codex rewrites `config.toml` natively at runtime (writes `[hooks.state]` etc.), so it must stay a real local writable file — never symlink it into the repo on macOS (that would pollute `codex/config.toml` with every run). Other platforms (Linux) keep the symlink so the tracked file stays the single source of truth.
+**codex config.toml is split, never symlinked**: Codex has no `include`
+directive, and it edits `~/.codex/config.toml` in place at runtime, writing
+machine-local state into it (`[projects.*]` trust levels, `[hooks.state]`,
+`[marketplaces.*]`, `[plugins.*]`, `[notice.*]`, `[tui]` nux/screen-reader
+state). A symlink therefore pushed that state into this repo — earlier commits
+carried `/Users/magic/...` and `/home/yanzhou/.codex/.tmp/...` entries — and on
+macOS Codex replaces the symlink with a regular file anyway. So:
+
+- `codex/config.toml` (tracked) holds **shared** keys only: default model,
+  providers, `[agents]`, `[features]`, `[shell_environment_policy]`, `[tui]`
+  preferences, and `[mcp_servers.*]` definitions.
+- `[[skills.config]]` toggles and `[projects.*]` trust are **user-authored
+  per-machine policy**, not repo-derived state: the skill toggles live in
+  `config_local.toml`, project trust in the live file.
+- `~/.codex/config.toml` is a **real machine-local file** (mode 0600) that
+  Codex owns; it keeps its own `[projects.*]`/`[hooks.state]`/… state.
+- `scripts/codex-config-sync.py` merges `~/.codex/config_local.toml`
+  (untracked overrides) over `codex/config.toml` over the live file, and
+  rewrites the live file when the result differs. It also replaces an existing
+  symlink with a real file even when the content is already correct.
+- Precedence mirrors git config: `config_local.toml` > `codex/config.toml` >
+  `~/.codex/config.toml`. A shared key can only be overridden per machine via
+  `config_local.toml`, never by editing the live file.
+
+Both `install.conf.yaml` and `sync.conf.yaml` therefore contain no
+`~/.codex/config.toml` link; the merge runs from
+`scripts/post-install.d/30-codex-config.sh` (install) and the `shell:` section of
+`sync.conf.yaml` (15-minute tick). Add new shared keys only to
+`codex/config.toml`, and never add keys Codex itself writes.
 
 **Codex native toil team**: `codex/config.toml` registers the Responses API
 providers and a flat native team capped at 50 concurrent threads. Role files
@@ -176,6 +206,9 @@ and standalone:
 - `20-neovim-runtime.sh` — re-pins and patches the vendored Neovim plugins (see
   `neovim/README.md`), using `scripts/apply-patches.sh` as the generic
   idempotent patch applier.
+- `30-codex-config.sh` — merges the tracked `codex/config.toml` into the
+  machine-local `~/.codex/config.toml` via `scripts/codex-config-sync.py`; also
+  runs from the `shell:` section of `sync.conf.yaml` on every 15-minute tick.
 
 ### Adding New Configs
 
