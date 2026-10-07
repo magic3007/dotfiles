@@ -22,6 +22,9 @@ claude/skills/nvm-claude/
 claude/skills/project-starter/
 claude/skills/setup-harness/
 claude/skills/weaver_harness_hub/
+# lark-* are third-party skills installed into ~/.agents/skills by `npx skills add`;
+# the relative links the old layout left inside claude/skills are local only.
+claude/skills/lark-*
 skills/activate-stale-project-doc/
 skills/alert-tool/
 skills/android-16kb-alignment/
