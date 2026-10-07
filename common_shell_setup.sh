@@ -462,8 +462,6 @@ fkpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi 
 # …) need no entry in ~/dotfiles/omp/models.yml, only DEEPSEEK_API_KEY etc. in the environment.
 # Tool calls are already pre-approved (tools.approvalMode = yolo), so no extra flags here.
 # Anything else: `omp --model <role>` or `omp --model <provider>/<model-id>`.
-o5omp()  { omp --model mafia-opus       "$@"; }  # Claude Opus 5.5 via the mafia gateway
-f5omp()  { omp --model mafia-fable       "$@"; }  # Claude Fable 5.1 via the mafia gateway
 dvomp()  { omp --model devin-opus        "$@"; }  # claude-opus-5-5 via devin
 dsomp()  { omp --model deepseek-flash    "$@"; }  # DeepSeek V4.1 Flash (1M ctx, images)
 
