@@ -49,6 +49,16 @@
 当前 `deepseek` 分组：`deepseek-v4-pro`、`deepseek-v4-flash`、`deepseek-flash`（V4.1，1M 上下文、
 支持图片）、`deepseek-v4-flash-vision-exp`；thinking 档位 low/high/max。
 
+`enabledModels` 支持通配符（`model-resolver.ts` 的 `resolveGlobScopePattern` → `Bun.Glob`，
+同时匹配 `provider/modelId` 与裸 id，大小写不敏感），本机用
+`devin/*` 一次启用 devin 目录全部 644 个模型，无需逐个列举。
+
+`enabledModels` 是**白名单**：只要列表非空，未被任何条目命中的模型就不可用（命中为空时
+omp 直接报「没有可用模型」，不会退回内置默认）。所以启用新 provider 必须显式列出或加 glob。
+
+默认模型由 `modelRoles.default` 决定（本机 `deepseek/deepseek-flash:auto`，即 V4.1 Flash）；
+`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，不参与默认解析。
+
 > 迁移遗留：本机 `~/.omp/agent/{models,WATCHDOG}.yml.pre-dotfiles` 是接入 dotfiles 前的
 > 原始副本（`models.yml.pre-dotfiles` 里的 `apiKey` 是占位符，不是真 key）。确认无误后可删。
 
