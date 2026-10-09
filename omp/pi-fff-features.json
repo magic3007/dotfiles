@@ -1,0 +1,8 @@
+{
+  "enabledFeatures": [
+    "builtInReadEnhancement",
+    "builtInGrepEnhancement",
+    "agentTools",
+    "statusUI"
+  ]
+}

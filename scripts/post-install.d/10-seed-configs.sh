@@ -14,6 +14,11 @@
 # missing. An existing file is never touched, which also means the tool's own
 # edits (model choice, thinking effort) survive.
 #
+# The pi-fff entry is the same idea applied to plugin feature state: pi-fff
+# writes ~/.omp/agent/extensions/pi-fff.json whenever /fff-features toggles a
+# feature, so the repo seeds a copy with its incompatible `autocomplete` feature
+# (which breaks omp's `@` completion) left out — see omp/README.md, "Plugins".
+#
 # Add one "repo-path:destination" pair per line. Both sides are expanded; the
 # destination's parent directory is created when seeding.
 set -euo pipefail
@@ -22,6 +27,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 SEEDS=(
   "kimi-code/config.toml:$HOME/.kimi-code/config.toml"
+  "omp/pi-fff-features.json:$HOME/.omp/agent/extensions/pi-fff.json"
 )
 
 for entry in "${SEEDS[@]}"; do

@@ -5,7 +5,8 @@
 # `pkg[*]`). The installed plugin trees, bun.lock and omp-plugins.lock.json are
 # runtime state and stay out of git (see omp/README.md, "Plugins").
 #
-# pi-fff: FFF-backed fuzzy file finding, @-autocomplete and content search.
+# pi-fff: FFF-backed fuzzy file finding and content search.
 # Overrides the built-in read/grep tools while its features are enabled
-# (toggle with /fff-features inside omp).
+# (toggle with /fff-features inside omp). Its `autocomplete` feature stays off —
+# it breaks omp's `@` completion; see omp/README.md, "Plugins".
 npm:pi-fff

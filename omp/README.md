@@ -107,6 +107,7 @@ omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<en
 | repo 文件 | 作用 |
 |---|---|
 | `omp/plugins.txt` | 每行一个 `omp plugin install` spec（`npm:` 前缀、版本后缀、`[features]` 括号均可）；空行与 `#` 注释忽略 |
+| `omp/pi-fff-features.json` | pi-fff 的 feature 状态种子（关掉 `autocomplete`），由下面的 seed 钩子拷到 `~/.omp/agent/extensions/pi-fff.json` |
 | `scripts/post-install.d/40-omp-plugins.sh` | `./install` 时对比 `omp plugin list --json`，只安装缺失的插件 |
 
 要点：
@@ -115,10 +116,21 @@ omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<en
 - 已安装的插件**不重装**。重复 `omp plugin install` 不是空操作：它会重新解析包，并把 feature
   选择重置回 manifest 默认值。
 - 只支持 npm spec。git / link 插件会告警跳过（GitHub 仓库名解析不出包名，无法判断是否已装）。
-- 当前清单：`npm:pi-fff`（FFF 模糊查找、`@...` 补全、内容搜索；默认**覆盖内建 `read`/`grep`**，
-  用会话内 `/fff-features` 开关）。它的状态文件写到 `~/.pi/agent/extensions/pi-fff.json`
-  —— omp 的 `getAgentDir()` 兼容 shim 解析到 `~/.pi/agent`，而该目录在 dotfiles 里是指向
-  `pi/extensions` 的软链接，所以保存 feature 开关会在 repo 里留下一个未跟踪文件。
+- 当前清单：`npm:pi-fff`（FFF 模糊查找、内容搜索；默认**覆盖内建 `read`/`grep`**，用会话内
+  `/fff-features` 开关）。
+- **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
+  `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
+  `{ signal }` 对象（`options.signal.aborted`）；omp 的 `@oh-my-pi/pi-tui` 同位置直接传
+  `AbortSignal`，于是每敲一个 `@` 都抛
+  `TypeError: undefined is not an object (evaluating 'options.signal.aborted')`，
+  omp 记一条 `Autocomplete provider failed` 并取消补全——`@` 文件补全整个失效。
+  关掉这一个 feature 后走 omp 内建的 `CombinedAutocompleteProvider`（`fuzzyFind` + 目录/图标）。
+  上游修好（或 omp 补上兼容 shim）后可 `/fff-features` 重新打开，届时记得删掉下面的种子文件。
+- feature 状态文件是 `~/.omp/agent/extensions/pi-fff.json`：omp 的 `getAgentDir()` 兼容 shim
+  解析到 `~/.omp/agent`（实测：文件放 `~/.pi/agent/extensions/` 无效，放 `~/.omp/agent/extensions/`
+  立即生效）。仓库用 `omp/pi-fff-features.json` 做种子，由
+  `scripts/post-install.d/10-seed-configs.sh` 在目标缺失时拷入（已存在则不覆盖，保留你自己
+  在 `/fff-features` 里的选择）。
 
 加插件：把 spec 写进 `omp/plugins.txt`，再跑 `bash scripts/post-install.d/40-omp-plugins.sh`
 （或 `./install`）。
