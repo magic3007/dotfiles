@@ -35,8 +35,6 @@ retry:
   fallbackChains:
     mafia/*:
       - devin/*
-    devin/*:
-      - mafia/*
 defaultThinkingLevel: auto
 compaction:
   methodOrder:
