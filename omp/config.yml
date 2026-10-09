@@ -1,17 +1,15 @@
 setupVersion: 2
 enabledModels:
   - mafia/claude-opus-5-5
-  - devin/claude-opus-5-5
-  - devin/claude-opus-5-5-fast
+  - devin/*
   - mafia/claude-fable-5-1
-  - devin/claude-fable-5-1
   - deepseek/deepseek-v4-pro
   - deepseek/deepseek-v4-flash
   - deepseek/deepseek-flash
   - deepseek/deepseek-v4-flash-vision-exp
   - mafia/MiniMax-M3.1-Flash-Preview
 modelRoles:
-  default: deepseek/deepseek-flash
+  default: deepseek/deepseek-flash:auto
   tiny: mafia/claude-opus-5-5:medium
   smol: mafia/claude-opus-5-5:max
   slow: mafia/claude-fable-5-1:max
