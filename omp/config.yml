@@ -69,8 +69,14 @@ statusLine:
     - cache_hit
     - cost
   compactThinkingLevel: false
+  transparent: false
 composer:
   tokenRate: true
 colorBlindMode: false
 memory:
   backend: local
+autolearn:
+  enabled: true
+  autoContinue: true
+contextPromotion:
+  enabled: true
