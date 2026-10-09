@@ -52,7 +52,7 @@ display:
   showTokenUsage: true
   showTurnTime: true
   hideToolActivity: true
-hideThinkingBlock: true
+hideThinkingBlock: false
 symbolPreset: nerd
 statusLine:
   preset: custom
