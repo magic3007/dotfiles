@@ -462,8 +462,9 @@ fkpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi 
 # …) need no entry in ~/dotfiles/omp/models.yml, only DEEPSEEK_API_KEY etc. in the environment.
 # Tool calls are already pre-approved (tools.approvalMode = yolo), so no extra flags here.
 # Anything else: `omp --model <role>` or `omp --model <provider>/<model-id>`.
-dvomp()  { omp --model devin-opus        "$@"; }  # claude-opus-5-5 via devin
-dsomp()  { omp --model deepseek-flash    "$@"; }  # DeepSeek V4.1 Flash (1M ctx, images)
+dvomp()   { omp --model devin-opus       "$@"; }  # claude-opus-5-5 via devin
+dsomp()   { omp --model deepseek-flash   "$@"; }  # DeepSeek V4.1 Flash (1M ctx, images)
+glmomp()  { omp --model zai-flash        "$@"; }  # GLM-5.3-Flash via zai (role zai-flash = zai/glm-5.3-flash:max)
 
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'

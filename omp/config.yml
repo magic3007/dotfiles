@@ -8,6 +8,7 @@ enabledModels:
   - deepseek/deepseek-flash
   - deepseek/deepseek-v4-flash-vision-exp
   - mafia/MiniMax-M3.1-Flash-Preview
+  - zai/glm-5.3-flash
 modelRoles:
   default: deepseek/deepseek-flash:auto
   tiny: mafia/claude-opus-5-5:medium
@@ -23,6 +24,7 @@ modelRoles:
   deepseek-vflash: deepseek/deepseek-v4-flash:auto
   deepseek-flash: deepseek/deepseek-flash:auto
   mafia-minimax: mafia/MiniMax-M3.1-Flash-Preview:auto
+  zai-flash: zai/glm-5.3-flash:max
 cycleOrder:
   - mafia-opus
   - devin-opus
@@ -35,6 +37,8 @@ retry:
   fallbackChains:
     mafia/*:
       - devin/*
+    default:
+      - deepseek/deepseek-flash
 defaultThinkingLevel: auto
 compaction:
   methodOrder:

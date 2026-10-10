@@ -49,6 +49,11 @@
 当前 `deepseek` 分组：`deepseek-v4-pro`、`deepseek-v4-flash`、`deepseek-flash`（V4.1，1M 上下文、
 支持图片）、`deepseek-v4-flash-vision-exp`；thinking 档位 low/high/max。
 
+`zai` 分组同理（目录 18 个模型，凭据 `ZAI_API_KEY`）：`glm-5.3-flash`（1M 上下文、支持图片、
+目录 `thinking.mode: anthropic-budget-effort`，档位 low/high/max，`requiresEffort: true`）、
+`glm-5.3`、`glm-5.2`、`glm-4.7*` 等。本机启用 `zai/glm-5.3-flash`，角色 `zai-flash`
+= `zai/glm-5.3-flash:max`。
+
 `enabledModels` 支持通配符（`model-resolver.ts` 的 `resolveGlobScopePattern` → `Bun.Glob`，
 同时匹配 `provider/modelId` 与裸 id，大小写不敏感），本机用
 `devin/*` 一次启用 devin 目录全部 644 个模型，无需逐个列举。
