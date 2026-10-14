@@ -71,3 +71,19 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
+  # 火山引擎方舟 Coding Plan（Pro 订阅），与 gateways-login.json 的 volcengine 网关
+  # 是同一个 provider：这里只为 kimi-k3 补真实窗口。/api/coding 不返回 token_limits，
+  # 发现结果会落到插件兜底 200000/64000；1M/131072 取自内置目录同名模型的两处一致值
+  # （moonshot kimi-k3 与 devin kimi-k3）。
+  volcengine:
+    baseUrl: https://ark.cn-beijing.volces.com/api/coding/v1
+    api: anthropic-messages
+    auth: apiKey
+    apiKey: VE_CODE_API_KEY
+    models:
+    - id: kimi-k3
+      name: kimi-k3
+      reasoning: true
+      input: [text, image]
+      contextWindow: 1048576
+      maxTokens: 131072
