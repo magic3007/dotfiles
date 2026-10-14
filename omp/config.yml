@@ -1,14 +1,21 @@
 setupVersion: 2
+startup:
+  quiet: true
 enabledModels:
   - mafia/claude-opus-5-5
-  - devin/*
+  - devin/claude-opus-5-5
+  - devin/claude-opus-5-5-fast
   - mafia/claude-fable-5-1
+  - devin/claude-fable-5-1
+  - devin/gpt-6.1-sol
+  - devin/gpt-6-astra
   - deepseek/deepseek-v4-pro
   - deepseek/deepseek-v4-flash
   - deepseek/deepseek-flash
   - deepseek/deepseek-v4-flash-vision-exp
-  - mafia/MiniMax-M3.1-Flash-Preview
   - zai/glm-5.3-flash
+  - mafia/MiniMax-M3.1-Flash-Preview
+  - devin/*
 modelRoles:
   default: deepseek/deepseek-flash:auto
   tiny: mafia/claude-opus-5-5:medium
@@ -20,6 +27,8 @@ modelRoles:
   devin-opus-fast: devin/claude-opus-5-5-fast:auto
   mafia-fable: mafia/claude-fable-5-1:auto
   devin-fable: devin/claude-fable-5-1:auto
+  devin-sol: devin/gpt-6.1-sol:auto
+  devin-astra: devin/gpt-6-astra:auto
   deepseek-pro: deepseek/deepseek-v4-pro:auto
   deepseek-vflash: deepseek/deepseek-v4-flash:auto
   deepseek-flash: deepseek/deepseek-flash:auto
@@ -31,6 +40,8 @@ cycleOrder:
   - devin-opus-fast
   - mafia-fable
   - devin-fable
+  - devin-sol
+  - devin-astra
   - deepseek-pro
   - deepseek-flash
 retry:
