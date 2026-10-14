@@ -16,6 +16,9 @@ enabledModels:
   - zai/glm-5.3-flash
   - mafia/MiniMax-M3.1-Flash-Preview
   - devin/*
+  - devin-cliproxy/devin/claude-opus-5-5
+  - devin-cliproxy/devin/claude-fable-5-1
+  - devin-cliproxy/devin/gpt-6-astra
 modelRoles:
   default: deepseek/deepseek-flash:auto
   tiny: mafia/claude-opus-5-5:medium
