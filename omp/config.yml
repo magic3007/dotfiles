@@ -18,6 +18,7 @@ enabledModels:
   - devin/*
   - mafia/*
   - kafara/*
+  - gwtest/*
   - volcengine/*
   - devin-cliproxy/devin/claude-opus-5-5
   - devin-cliproxy/devin/claude-fable-5-1
