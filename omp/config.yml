@@ -7,7 +7,7 @@ enabledModels:
   - devin/claude-opus-5-5-fast
   - mafia/claude-fable-5-1
   - devin/claude-fable-5-1
-  - devin/gpt-6.1-sol
+  - devin/gpt-6-1-sol
   - devin/gpt-6-astra
   - deepseek/deepseek-v4-pro
   - deepseek/deepseek-v4-flash
@@ -27,7 +27,7 @@ modelRoles:
   devin-opus-fast: devin/claude-opus-5-5-fast:auto
   mafia-fable: mafia/claude-fable-5-1:auto
   devin-fable: devin/claude-fable-5-1:auto
-  devin-sol: devin/gpt-6.1-sol:auto
+  devin-sol: devin/gpt-6-1-sol:auto
   devin-astra: devin/gpt-6-astra:auto
   deepseek-pro: deepseek/deepseek-v4-pro:auto
   deepseek-vflash: deepseek/deepseek-v4-flash:auto
