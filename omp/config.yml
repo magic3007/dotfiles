@@ -16,7 +16,9 @@ enabledModels:
   - zai/glm-5.3-flash
   - mafia/MiniMax-M3.1-Flash-Preview
   - devin/*
-  - kafara-ai/*
+  - mafia/*
+  - kafara/*
+  - volcengine/*
   - devin-cliproxy/devin/claude-opus-5-5
   - devin-cliproxy/devin/claude-fable-5-1
   - devin-cliproxy/devin/gpt-6-astra
@@ -38,13 +40,6 @@ modelRoles:
   deepseek-flash: deepseek/deepseek-flash:auto
   mafia-minimax: mafia/MiniMax-M3.1-Flash-Preview:auto
   zai-flash: zai/glm-5.3-flash:max
-  kai-opus: kafara-ai/devin/claude-opus-4-7:auto
-  kai-sonnet: kafara-ai/devin/claude-sonnet-4-6:auto
-  kai-fable: kafara-ai/devin/claude-fable-5-1:auto
-  kai-haiku: kafara-ai/devin/claude-haiku-5-5:auto
-  kai-grok: kafara-ai/grok-4.7:auto
-  ag-opus: kafara-ai/claude-opus-5-5-high:auto
-  ag-sonnet: kafara-ai/claude-sonnet-5-5-high:auto
 cycleOrder:
   - mafia-opus
   - devin-opus
@@ -58,15 +53,8 @@ cycleOrder:
 retry:
   fallbackChains:
     # Claude 类模型的统一降级顺序：
-    #   mafia -> kafara/antigravity -> kafara/devin -> devin -> deepseek-flash 兜底
+    #   mafia -> devin -> deepseek-flash 兜底
     mafia/*:
-      - kafara-ai/claude-opus-5-5-high
-      - kafara-ai/devin/claude-opus-4-7
-      - devin/claude-opus-5-5
-      - deepseek/deepseek-flash
-    # 起点是 kafara 的 antigravity 系（ai.kafara.men 上不打前缀的那批 claude-*-5-5-*）
-    kafara-ai/*:
-      - kafara-ai/devin/claude-opus-4-7
       - devin/claude-opus-5-5
       - deepseek/deepseek-flash
     devin/*:
