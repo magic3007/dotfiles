@@ -43,6 +43,8 @@ modelRoles:
   kai-fable: kafara-ai/devin/claude-fable-5-1:auto
   kai-haiku: kafara-ai/devin/claude-haiku-5-5:auto
   kai-grok: kafara-ai/grok-4.7:auto
+  ag-opus: kafara-ai/claude-opus-5-5-high:auto
+  ag-sonnet: kafara-ai/claude-sonnet-5-5-high:auto
 cycleOrder:
   - mafia-opus
   - devin-opus
@@ -55,8 +57,23 @@ cycleOrder:
   - deepseek-flash
 retry:
   fallbackChains:
+    # Claude 类模型的统一降级顺序：
+    #   mafia -> kafara/antigravity -> kafara/devin -> devin -> deepseek-flash 兜底
     mafia/*:
-      - devin/*
+      - kafara-ai/claude-opus-5-5-high
+      - kafara-ai/devin/claude-opus-4-7
+      - devin/claude-opus-5-5
+      - deepseek/deepseek-flash
+    # 起点是 kafara 的 antigravity 系（ai.kafara.men 上不打前缀的那批 claude-*-5-5-*）
+    kafara-ai/*:
+      - kafara-ai/devin/claude-opus-4-7
+      - devin/claude-opus-5-5
+      - deepseek/deepseek-flash
+    devin/*:
+      - deepseek/deepseek-flash
+    devin-cliproxy/*:
+      - devin/claude-opus-5-5
+      - deepseek/deepseek-flash
     default:
       - deepseek/deepseek-flash
 defaultThinkingLevel: auto

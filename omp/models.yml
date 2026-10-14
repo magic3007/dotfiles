@@ -136,3 +136,60 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high"]
+    # Antigravity 系（Google AI Pro，走 API_PROVIDER_ANTHROPIC_VERTEX）。
+    # 上限取自上游 fetchAvailableModels 的实测值：maxTokens 1000000 / maxOutputTokens 128000。
+    # 这 6 个模型共用一个额度池（按 token 扣减，窗口约 65 万 input token）。
+    - id: claude-opus-5-5-high
+      name: Opus 5.5 High (Antigravity)
+      reasoning: true
+      input: [text, image]
+      contextWindow: 1000000
+      maxTokens: 128000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high"]
+    - id: claude-opus-5-5-medium
+      name: Opus 5.5 Medium (Antigravity)
+      reasoning: true
+      input: [text, image]
+      contextWindow: 1000000
+      maxTokens: 128000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high"]
+    - id: claude-opus-5-5-low
+      name: Opus 5.5 Low (Antigravity)
+      reasoning: true
+      input: [text, image]
+      contextWindow: 1000000
+      maxTokens: 128000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high"]
+    - id: claude-sonnet-5-5-high
+      name: Sonnet 5.5 High (Antigravity)
+      reasoning: true
+      input: [text, image]
+      contextWindow: 1000000
+      maxTokens: 128000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high"]
+    - id: claude-sonnet-5-5-medium
+      name: Sonnet 5.5 Medium (Antigravity)
+      reasoning: true
+      input: [text, image]
+      contextWindow: 1000000
+      maxTokens: 128000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high"]
+    - id: claude-sonnet-5-5-low
+      name: Sonnet 5.5 Low (Antigravity)
+      reasoning: true
+      input: [text, image]
+      contextWindow: 1000000
+      maxTokens: 128000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high"]
