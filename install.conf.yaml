@@ -206,7 +206,7 @@
     #   3) models.yml 的 apiKey 写环境变量名（MAFIA_API_KEY），真实 key 只在
     #      ~/.common_shell_setup_local.sh 里 export，密钥不入库。
     #   4) gateways-login.json 同理：apiKey 写环境变量名 / !命令 / 字面量三种「key 引用」，
-    #      omp-gateway 插件存引用、omp 解析，所以文件里不含密钥。
+    #      omp-model-gateway 插件存引用、omp 解析，所以文件里不含密钥。
     ~/.omp/agent/config.yml: omp/config.yml
     ~/.omp/agent/models.yml: omp/models.yml
     ~/.omp/agent/gateways-login.json: omp/gateways-login.json

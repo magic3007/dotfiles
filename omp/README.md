@@ -15,7 +15,7 @@
 |---|---|---|
 | `omp/config.yml` | `~/.omp/agent/config.yml` | 全局设置：模型角色、fallback 链、压缩、状态栏 |
 | `omp/models.yml` | `~/.omp/agent/models.yml` | 自定义 provider / 模型定义 |
-| `omp/gateways-login.json` | `~/.omp/agent/gateways-login.json` | `omp-gateway` 插件的网关清单（key 写引用，见第 3 节） |
+| `omp/gateways-login.json` | `~/.omp/agent/gateways-login.json` | `omp-model-gateway` 插件的网关清单（key 写引用，见第 3 节） |
 | `omp/WATCHDOG.yml` | `~/.omp/agent/WATCHDOG.yml` | advisor（`--advisor`）的 reviewer 花名册 |
 | `omp/AGENTS.md` | `~/.omp/agent/AGENTS.md` | 用户级上下文文件：回复风格（ASD-STE100 + 中文） |
 | `omp/RULES.md` | `~/.omp/agent/RULES.md` | always-apply 常驻规则：同一句回复风格，长会话压缩后仍生效 |
@@ -64,7 +64,7 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 
 ### Gateway provider（`gateways-login.json`）
 
-目录里没有、也不是手写 `models.yml` 的第三类 provider：**网关**。`omp-gateway` 插件把
+目录里没有、也不是手写 `models.yml` 的第三类 provider：**网关**。`omp-model-gateway` 插件把
 `~/.omp/agent/gateways-login.json` 里每个网关注册成一个 provider（本机：`volcengine`、
 `mafia`、`kafara`），字段是 `name` / `baseUrl` / `api` / `apiKey` / `extraModels`。
 该文件已入库（软链接，见上表）：`apiKey` 写的是 **key 引用**而非密钥（第 3 节），
@@ -153,7 +153,7 @@ omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<en
   选择重置回 manifest 默认值。
 - 只支持 npm spec。git / link 插件会告警跳过（GitHub 仓库名解析不出包名，无法判断是否已装）。
 - 当前清单：`npm:pi-fff`（FFF 模糊查找、内容搜索；默认**覆盖内建 `read`/`grep`**，用会话内
-  `/fff-features` 开关）、`npm:omp-gateway`（`/login` 的 gateway 入口；本机 `volcengine`、
+  `/fff-features` 开关）、`npm:omp-model-gateway`（`/login` 的 gateway 入口；本机 `volcengine`、
   `mafia`、`kafara` 三个 provider 都来自它，默认模型依赖它——见「Gateway provider」一节）。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
   `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
@@ -221,7 +221,7 @@ omp 会对 config.yml 上 native file lock，只读符号链接或只读 store �
       mafia:
         apiKey: MAFIA_API_KEY      # 真实 key 在 ~/.common_shell_setup_local.sh 里 export
 
-`gateways-login.json` 的 `apiKey` 走**同一套规则**（omp-gateway 插件把引用原样交给
+`gateways-login.json` 的 `apiKey` 走**同一套规则**（omp-model-gateway 插件把引用原样交给
 omp，不自己解析），所以入库写法同样是引用：
 
     { "name": "kafara", "baseUrl": "https://ai.kafara.men",
@@ -237,7 +237,7 @@ omp，不自己解析），所以入库写法同样是引用：
 `~/.common_shell_setup_local.sh` 不入库，所以密钥不跟仓库走。
 ⚠️ 若该环境变量未设置，`$envExact` 返回 `undefined`，omp 会退化成把字面量
 `MAFIA_API_KEY` 当 key 用 → 401。排查时先确认 `MAFIA_API_KEY` 已 export。
-（`omp-gateway` 插件在登录时会提示这种情况：「Nothing sets X, so omp sends that name
+（`omp-model-gateway` 插件在登录时会提示这种情况：「Nothing sets X, so omp sends that name
 itself as the key.」）
 
 ### 4. 用户级 `AGENTS.md` 会遮蔽其他工具的用户级上下文
