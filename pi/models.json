@@ -214,16 +214,37 @@
             ]
         },
         "kafara": {
-            "baseUrl": "https://api.kafara.men",
+            "baseUrl": "https://ai.kafara.men",
             "api": "anthropic-messages",
             "apiKey": "$KAFARA_API_KEY",
             "models": [
                 {
-                    "id": "devin/claude-opus-5-5",
-                    "name": "Opus 5.5 (Kafara)",
+                    "id": "devin/claude-opus-4-7",
+                    "name": "Opus 4.7 (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 1000000
+                    "contextWindow": 200000
+                },
+                {
+                    "id": "devin/claude-opus-5-5",
+                    "name": "Opus 5.5 (Kafara AI)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 200000
+                },
+                {
+                    "id": "devin/claude-haiku-5-5",
+                    "name": "Haiku 5.5 (Kafara AI)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 200000
+                },
+                {
+                    "id": "grok-4.7",
+                    "name": "Grok 4.7 (Kafara AI)",
+                    "reasoning": true,
+                    "input": ["text", "image"],
+                    "contextWindow": 200000
                 }
             ]
         },

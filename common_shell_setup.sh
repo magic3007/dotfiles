@@ -315,6 +315,10 @@ fi
 
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
+# google-cloud-sdk (brew cask gcloud-cli): binaries installed via
+# `gcloud components install` land here, not in /opt/homebrew/bin
+[ -d /opt/homebrew/share/google-cloud-sdk/bin ] && export PATH="/opt/homebrew/share/google-cloud-sdk/bin:$PATH"
+
 # chatgpt.sh
 export PATH="$PATH:$HOME/.chatgpt"
 

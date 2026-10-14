@@ -16,6 +16,7 @@ enabledModels:
   - zai/glm-5.3-flash
   - mafia/MiniMax-M3.1-Flash-Preview
   - devin/*
+  - kafara-ai/*
   - devin-cliproxy/devin/claude-opus-5-5
   - devin-cliproxy/devin/claude-fable-5-1
   - devin-cliproxy/devin/gpt-6-astra
@@ -37,6 +38,11 @@ modelRoles:
   deepseek-flash: deepseek/deepseek-flash:auto
   mafia-minimax: mafia/MiniMax-M3.1-Flash-Preview:auto
   zai-flash: zai/glm-5.3-flash:max
+  kai-opus: kafara-ai/devin/claude-opus-4-7:auto
+  kai-sonnet: kafara-ai/devin/claude-sonnet-4-6:auto
+  kai-fable: kafara-ai/devin/claude-fable-5-1:auto
+  kai-haiku: kafara-ai/devin/claude-haiku-5-5:auto
+  kai-grok: kafara-ai/grok-4.7:auto
 cycleOrder:
   - mafia-opus
   - devin-opus
