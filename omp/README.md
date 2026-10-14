@@ -9,12 +9,13 @@
 
 ## 软链接
 
-本目录下的**五个静态配置**被 `install.conf.yaml` 软链接进 `~/.omp/agent/`：
+本目录下的**六个静态配置**被 `install.conf.yaml` 软链接进 `~/.omp/agent/`：
 
 | repo 文件 | 软链接到 | 作用 |
 |---|---|---|
 | `omp/config.yml` | `~/.omp/agent/config.yml` | 全局设置：模型角色、fallback 链、压缩、状态栏 |
 | `omp/models.yml` | `~/.omp/agent/models.yml` | 自定义 provider / 模型定义 |
+| `omp/gateways-login.json` | `~/.omp/agent/gateways-login.json` | `omp-gateway` 插件的网关清单（key 写引用，见第 3 节） |
 | `omp/WATCHDOG.yml` | `~/.omp/agent/WATCHDOG.yml` | advisor（`--advisor`）的 reviewer 花名册 |
 | `omp/AGENTS.md` | `~/.omp/agent/AGENTS.md` | 用户级上下文文件：回复风格（ASD-STE100 + 中文） |
 | `omp/RULES.md` | `~/.omp/agent/RULES.md` | always-apply 常驻规则：同一句回复风格，长会话压缩后仍生效 |
@@ -66,10 +67,14 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 目录里没有、也不是手写 `models.yml` 的第三类 provider：**网关**。`omp-gateway` 插件把
 `~/.omp/agent/gateways-login.json` 里每个网关注册成一个 provider（本机：`volcengine`、
 `mafia`、`kafara`），字段是 `name` / `baseUrl` / `api` / `apiKey` / `extraModels`。
-该文件 0600、key 明文、**不入库**（与 omp 自带凭据库同等级）；新增/修改走会话内 `/login`
-的 gateway 入口。模型清单由 `GET <baseUrl>/v1/models` 发现，再并上 `extraModels` 的静态 id
-——所以 `omp models list` 里 `volcengine (34)` 大部分是发现来的，`ark-code-latest`、
-`doubao-seed-2.0-pro` 这类来自 `extraModels`。
+该文件已入库（软链接，见上表）：`apiKey` 写的是 **key 引用**而非密钥（第 3 节），
+插件存引用、omp 解析，所以文件里不含密钥。新增/修改走会话内 `/login` 的 gateway 入口
+（输入环境变量名或 `!命令` 即可；直接粘贴明文 key 时，若该 key 已存在于某个环境变量，
+插件会改存那个变量名并说明）。模型清单由 `GET <baseUrl>/v1/models` 发现，再并上
+`extraModels` 的静态 id —— 所以 `omp models list` 里 `volcengine (34)` 大部分是发现来的，
+`ark-code-latest`、`doubao-seed-2.0-pro` 这类来自 `extraModels`。
+
+手改该文件后执行 `omp models refresh` 让模型缓存重新拉取。
 
 因此默认模型 `volcengine/deepseek-v4-1-flash-260910` 依赖两个前提：插件装了、
 `gateways-login.json` 里有 `volcengine`（且 key 有效）。`enabledModels` 仍要写
@@ -216,9 +221,24 @@ omp 会对 config.yml 上 native file lock，只读符号链接或只读 store �
       mafia:
         apiKey: MAFIA_API_KEY      # 真实 key 在 ~/.common_shell_setup_local.sh 里 export
 
+`gateways-login.json` 的 `apiKey` 走**同一套规则**（omp-gateway 插件把引用原样交给
+omp，不自己解析），所以入库写法同样是引用：
+
+    { "name": "kafara", "baseUrl": "https://ai.kafara.men",
+      "api": "anthropic-messages", "apiKey": "KAFARA_API_KEY", "extraModels": [] }
+
+想更进一步（密钥在磁盘上也是密文）就用命令形式，让 omp 执行命令取 stdout：
+
+    "apiKey": "!gpg -q -d ~/.omp/keys/kafara.gpg"     # 或 !pass show llm/kafara、!op read op://…
+
+代价是每次启动多一次命令调用（结果缓存），且命令必须非交互——omp 用隔离 stdio 跑它，
+`gpg`/`pass` 不能弹 tty 提示（gpg-agent 已缓存口令，或口令来自 `--passphrase-file`）。
+
 `~/.common_shell_setup_local.sh` 不入库，所以密钥不跟仓库走。
 ⚠️ 若该环境变量未设置，`$envExact` 返回 `undefined`，omp 会退化成把字面量
 `MAFIA_API_KEY` 当 key 用 → 401。排查时先确认 `MAFIA_API_KEY` 已 export。
+（`omp-gateway` 插件在登录时会提示这种情况：「Nothing sets X, so omp sends that name
+itself as the key.」）
 
 ### 4. 用户级 `AGENTS.md` 会遮蔽其他工具的用户级上下文
 
