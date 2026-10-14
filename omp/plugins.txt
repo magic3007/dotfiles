@@ -10,3 +10,11 @@
 # (toggle with /fff-features inside omp). Its `autocomplete` feature stays off —
 # it breaks omp's `@` completion; see omp/README.md, "Plugins".
 npm:pi-fff
+#
+# omp-gateway: adds a `/login` entry that registers any base-URL + API-key
+# gateway and discovers its chat models. It owns
+# ~/.omp/agent/gateways-login.json, which is where the `volcengine` provider
+# (the default model's provider) and `mafia` come from. Without it the
+# modelRoles.default selector cannot resolve; see omp/README.md, "Gateway
+# provider（gateways-login.json）".
+npm:omp-gateway

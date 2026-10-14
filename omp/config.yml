@@ -23,7 +23,7 @@ enabledModels:
   - devin-cliproxy/devin/claude-fable-5-1
   - devin-cliproxy/devin/gpt-6-astra
 modelRoles:
-  default: deepseek/deepseek-flash:auto
+  default: volcengine/deepseek-v4-1-flash-260910:auto
   tiny: mafia/claude-opus-5-5:medium
   smol: mafia/claude-opus-5-5:max
   slow: mafia/claude-fable-5-1:max
@@ -62,6 +62,7 @@ retry:
     devin-cliproxy/*:
       - devin/claude-opus-5-5
       - deepseek/deepseek-flash
+    # default 角色（火山引擎）以及其他没有自己链的角色统一兜底到 deepseek-flash。
     default:
       - deepseek/deepseek-flash
 defaultThinkingLevel: auto

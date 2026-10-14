@@ -61,8 +61,34 @@
 `enabledModels` 是**白名单**：只要列表非空，未被任何条目命中的模型就不可用（命中为空时
 omp 直接报「没有可用模型」，不会退回内置默认）。所以启用新 provider 必须显式列出或加 glob。
 
-默认模型由 `modelRoles.default` 决定（本机 `deepseek/deepseek-flash:auto`，即 V4.1 Flash）；
-`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，不参与默认解析。
+### Gateway provider（`gateways-login.json`）
+
+目录里没有、也不是手写 `models.yml` 的第三类 provider：**网关**。`omp-gateway` 插件把
+`~/.omp/agent/gateways-login.json` 里每个网关注册成一个 provider（本机：`volcengine`、
+`mafia`、`kafara`），字段是 `name` / `baseUrl` / `api` / `apiKey` / `extraModels`。
+该文件 0600、key 明文、**不入库**（与 omp 自带凭据库同等级）；新增/修改走会话内 `/login`
+的 gateway 入口。模型清单由 `GET <baseUrl>/v1/models` 发现，再并上 `extraModels` 的静态 id
+——所以 `omp models list` 里 `volcengine (34)` 大部分是发现来的，`ark-code-latest`、
+`doubao-seed-2.0-pro` 这类来自 `extraModels`。
+
+因此默认模型 `volcengine/deepseek-v4-1-flash-260910` 依赖两个前提：插件装了、
+`gateways-login.json` 里有 `volcengine`（且 key 有效）。`enabledModels` 仍要写
+`volcengine/*`（白名单语义同上）。
+
+注意 `--profile <name>` 会把插件目录也隔离：profile 下 `omp plugin list` 是空的，
+网关 provider 与其模型都不存在，指向它们的 `modelRoles.default` 无法解析。要在 profile 里
+复现这套配置，得先在该 profile 装插件并重建 `gateways-login.json`。
+
+默认模型由 `modelRoles.default` 决定（本机 `volcengine/deepseek-v4-1-flash-260910:auto`，
+即火山引擎 Ark 上的 V4.1 Flash）；`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，
+不参与默认解析。
+
+默认模型的降级写在 `retry.fallbackChains.default`（本机 `- deepseek/deepseek-flash`）：
+`default` 角色自己的链就是这条，其他没有单独配置链的角色也复用同一条。链路解析按
+「精确模型 key → `provider/*` 通配 key → 角色名 → `default`」定 key（源码
+`resolveRetryFallbackChainKey`），所以默认模型失败时（401/429/5xx 等，`retry.fallbackOn`
+默认 `any`）会自动切到 `deepseek/deepseek-flash` 重试。实测：给默认模型一个坏 key，
+一轮内即 `switched model; retried` 并由 `deepseek/deepseek-flash` 完成该轮。
 
 > 迁移遗留：本机 `~/.omp/agent/{models,WATCHDOG}.yml.pre-dotfiles` 是接入 dotfiles 前的
 > 原始副本（`models.yml.pre-dotfiles` 里的 `apiKey` 是占位符，不是真 key）。确认无误后可删。
@@ -122,7 +148,8 @@ omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<en
   选择重置回 manifest 默认值。
 - 只支持 npm spec。git / link 插件会告警跳过（GitHub 仓库名解析不出包名，无法判断是否已装）。
 - 当前清单：`npm:pi-fff`（FFF 模糊查找、内容搜索；默认**覆盖内建 `read`/`grep`**，用会话内
-  `/fff-features` 开关）。
+  `/fff-features` 开关）、`npm:omp-gateway`（`/login` 的 gateway 入口；本机 `volcengine`、
+  `mafia`、`kafara` 三个 provider 都来自它，默认模型依赖它——见「Gateway provider」一节）。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
   `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
   `{ signal }` 对象（`options.signal.aborted`）；omp 的 `@oh-my-pi/pi-tui` 同位置直接传
