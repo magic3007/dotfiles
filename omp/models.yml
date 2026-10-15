@@ -9,10 +9,13 @@ providers:
     #   3. 都不是 -> 当字面量用
     # MAFIA_API_KEY 在 ~/.common_shell_setup_local.sh（不入库）里 export。
     apiKey: MAFIA_API_KEY
+    # 该网关 /v1/models 不返回 token_limits（只有 id/owned_by/supported_endpoint_types），
+    # 发现值一律落到插件兜底 200000/64000；1M 取自内置目录 anthropic 同名模型。
     models:
     - id: claude-fable-5-1
       name: claude-fable-5-1
       reasoning: true
+      contextWindow: 1000000
       headers:
         X-Sub-Module: claude-code-internal
       thinking:
@@ -21,6 +24,7 @@ providers:
     - id: claude-opus-5-5
       name: claude-opus-5-5
       reasoning: true
+      contextWindow: 1000000
       headers:
         X-Sub-Module: claude-code-internal
       thinking:
