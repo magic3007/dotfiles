@@ -95,6 +95,23 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 默认 `any`）会自动切到 `deepseek/deepseek-flash` 重试。实测：给默认模型一个坏 key，
 一轮内即 `switched model; retried` 并由 `deepseek/deepseek-flash` 完成该轮。
 
+本机另行给 Claude 类 provider 配了统一降级链 `mafia → devin → kafara`：
+
+| chain key | 顺序 |
+|---|---|
+| `mafia/*` | `devin/claude-opus-5-5` → `kafara/devin/claude-opus-5-5` |
+| `devin/*` | `kafara/devin/claude-opus-5-5` |
+| `default` | `deepseek/deepseek-flash`（火山引擎默认模型与其余角色） |
+
+`kafara/devin/claude-opus-5-5` 是 `ai.kafara.men` 发现结果里的 id 原样（网关 `GET /v1/models`
+返回的 `id` 是反转串 = 混淆，插件解出可读 id 并存进 `models.db` 的 `model_cache`），实测
+`POST /v1/messages` 直发该 id 与 `omp -p --model kafara/devin/claude-opus-5-5` 均 200。
+注意 `devin/claude-opus-5-5` 与 `mafia/claude-opus-5-5` 在 omp 默认编码系统提示下会被上游按
+ToS 拒答（`stopReason: error`），此时正是链尾 kafara 接手。
+
+按需删掉的 provider：`devin-cliproxy`（本机 127.0.0.1:30288 的 CLIProxyAPI）已从
+`models.yml` 与 `enabledModels` 移除；`cliproxy-yanzhou.service` 仍在跑，供其他客户端使用。
+
 > 迁移遗留：本机 `~/.omp/agent/{models,WATCHDOG}.yml.pre-dotfiles` 是接入 dotfiles 前的
 > 原始副本（`models.yml.pre-dotfiles` 里的 `apiKey` 是占位符，不是真 key）。确认无误后可删。
 

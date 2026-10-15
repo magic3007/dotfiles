@@ -39,42 +39,6 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
-  # 本机 CLIProxyAPI（Devin 账号）。端点与 key 见 ~/cliproxy-yanzhou/config.yaml。
-  devin-cliproxy:
-    baseUrl: http://127.0.0.1:30288/v1
-    api: anthropic-messages
-    auth: apiKey
-    # 与 MAFIA_API_KEY 同样处理：这里只写环境变量名，真值在
-    # ~/.common_shell_setup_local.sh（不入库）里 export。
-    apiKey: DEVIN_CLIPROXY_API_KEY
-    models:
-    - id: devin/claude-opus-5-5
-      name: devin/claude-opus-5-5 (CLIProxy)
-      reasoning: true
-      input: [text, image]
-      contextWindow: 1000000
-      maxTokens: 64000
-      thinking:
-        mode: anthropic-adaptive
-        efforts: ["low","medium","high","xhigh","max"]
-    - id: devin/claude-fable-5-1
-      name: devin/claude-fable-5-1 (CLIProxy)
-      reasoning: true
-      input: [text, image]
-      contextWindow: 1000000
-      maxTokens: 64000
-      thinking:
-        mode: anthropic-adaptive
-        efforts: ["low","medium","high","xhigh","max"]
-    - id: devin/gpt-6-astra
-      name: devin/gpt-6-astra (CLIProxy)
-      reasoning: true
-      input: [text, image]
-      contextWindow: 1000000
-      maxTokens: 64000
-      thinking:
-        mode: anthropic-adaptive
-        efforts: ["low","medium","high","xhigh","max"]
   # 火山引擎方舟 Coding Plan（Pro 订阅），与 gateways-login.json 的 volcengine 网关
   # 是同一个 provider：这里只为 kimi-k3 补真实窗口。/api/coding 不返回 token_limits，
   # 发现结果会落到插件兜底 200000/64000；1M/131072 取自内置目录同名模型的两处一致值

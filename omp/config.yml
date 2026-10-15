@@ -19,9 +19,6 @@ enabledModels:
   - mafia/*
   - kafara/*
   - volcengine/*
-  - devin-cliproxy/devin/claude-opus-5-5
-  - devin-cliproxy/devin/claude-fable-5-1
-  - devin-cliproxy/devin/gpt-6-astra
 modelRoles:
   default: volcengine/deepseek-v4-1-flash-260910:auto
   tiny: mafia/claude-opus-5-5:medium
@@ -52,17 +49,11 @@ cycleOrder:
   - deepseek-flash
 retry:
   fallbackChains:
-    # Claude 类模型的统一降级顺序：
-    #   mafia -> devin -> deepseek-flash 兜底
     mafia/*:
       - devin/claude-opus-5-5
-      - deepseek/deepseek-flash
+      - kafara/devin/claude-opus-5-5
     devin/*:
-      - deepseek/deepseek-flash
-    devin-cliproxy/*:
-      - devin/claude-opus-5-5
-      - deepseek/deepseek-flash
-    # default 角色（火山引擎）以及其他没有自己链的角色统一兜底到 deepseek-flash。
+      - kafara/devin/claude-opus-5-5
     default:
       - deepseek/deepseek-flash
 defaultThinkingLevel: auto
