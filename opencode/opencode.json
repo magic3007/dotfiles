@@ -1,12 +1,14 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-antigravity-auth@latest"],
+  "plugin": [
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "./plugins/caveman"
+  ],
   "permission": {
     "*": {
       "*": "allow"
     }
   },
-  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"],
   "provider": {
     "google": {
       "models": {
