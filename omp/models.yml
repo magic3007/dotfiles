@@ -39,6 +39,37 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
+  # kafara（ai.kafara.men）：/v1/models 只回 id/object/created/owned_by，不声明 token_limits，
+  # 发现值一律落到插件兜底 200000/64000。窗口照 mafia 块同款模型补成 1M（内置目录 anthropic
+  # 的 claude-opus-5-5 / claude-fable-5-1）；kafara 侧 id 是 devin/ 前缀或 -high 后缀，按原样写。
+  # 不需要 mafia 的 X-Sub-Module 头：默认编码系统提示 + 无头直连实测 200（stopReason=stop）。
+  kafara:
+    baseUrl: https://ai.kafara.men/v1
+    api: anthropic-messages
+    auth: apiKey
+    apiKey: KAFARA_API_KEY
+    models:
+    - id: devin/claude-opus-5-5
+      name: devin/claude-opus-5-5
+      reasoning: true
+      contextWindow: 1000000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
+    - id: claude-opus-5-5-high
+      name: claude-opus-5-5-high
+      reasoning: true
+      contextWindow: 1000000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
+    - id: devin/claude-fable-5-1
+      name: devin/claude-fable-5-1
+      reasoning: true
+      contextWindow: 1000000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
   # 火山引擎方舟 Coding Plan（Pro 订阅），与 gateways-login.json 的 volcengine 网关
   # 是同一个 provider：这里只为 kimi-k3 补真实窗口。/api/coding 不返回 token_limits，
   # 发现结果会落到插件兜底 200000/64000；1M/131072 取自内置目录同名模型的两处一致值

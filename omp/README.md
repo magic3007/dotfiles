@@ -109,6 +109,13 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 注意 `devin/claude-opus-5-5` 与 `mafia/claude-opus-5-5` 在 omp 默认编码系统提示下会被上游按
 ToS 拒答（`stopReason: error`），此时正是链尾 kafara 接手。
 
+kafara 与 mafia 一样不声明窗口（`/v1/models` 只回 `id/object/created/owned_by`，没有
+`token_limits`），发现结果一律落到插件兜底 200000/64000。所以 `models.yml` 里照 `mafia` 块
+的写法补了 `kafara` 块，把链上用到的 `devin/claude-opus-5-5`、`claude-opus-5-5-high`
+（kafara 原生 id，固定 high 档）和 `devin/claude-fable-5-1` 钉成 1M，thinking 档位
+`low…max`，值取自内置目录 anthropic 的同名模型。覆盖按 **provider+id** 生效，kafara 其余
+~90 个发现模型仍是 200000/64000。
+
 按需删掉的 provider：`devin-cliproxy`（本机 127.0.0.1:30288 的 CLIProxyAPI）已从
 `models.yml` 与 `enabledModels` 移除；`cliproxy-yanzhou.service` 仍在跑，供其他客户端使用。
 
