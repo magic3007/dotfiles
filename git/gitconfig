@@ -130,6 +130,8 @@
 # the OS store (macOS osxkeychain, Linux libsecret) is tried first and gh only
 # decides the credentials when nothing else has them.
 [credential "https://github.com"]
-	helper = !gh auth git-credential
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = !gh auth git-credential
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
