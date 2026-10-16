@@ -87,6 +87,7 @@ statusLine:
     - cost
   compactThinkingLevel: false
   transparent: false
+  showHookStatus: false
 composer:
   tokenRate: true
 colorBlindMode: false
