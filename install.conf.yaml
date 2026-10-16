@@ -214,6 +214,9 @@
     # AGENTS.md = 用户级上下文文件；RULES.md = always-apply 常驻规则（长会话压缩后仍生效）。
     ~/.omp/agent/AGENTS.md: omp/AGENTS.md
     ~/.omp/agent/RULES.md: omp/RULES.md
+    # extensions/ 是本机真目录（herdr 等工具也往里装文件），所以逐个文件链接。
+    # deepen.ts = /deepen：旁路增强提示词并回填输入框（见 omp/README.md）。
+    ~/.omp/agent/extensions/deepen.ts: omp/extensions/deepen.ts
 
     # ---- iTerm2 ----
     ~/.config/iterm2/com.googlecode.iterm2.plist: iterm2/com.googlecode.iterm2.plist

@@ -88,6 +88,7 @@
     ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
     ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
+    ~/.omp/agent/extensions/deepen.ts: omp/extensions/deepen.ts
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json

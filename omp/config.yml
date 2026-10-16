@@ -28,6 +28,8 @@ modelRoles:
   mafia-opus: mafia/claude-opus-5-5:auto
   devin-opus: devin/claude-opus-5-5:auto
   devin-opus-fast: devin/claude-opus-5-5-fast:auto
+  kafara-opus: kafara/devin/claude-opus-5-5:auto
+  kafara-opus-fast: kafara/devin/claude-opus-5-5-fast:auto
   mafia-fable: mafia/claude-fable-5-1:auto
   devin-fable: devin/claude-fable-5-1:auto
   devin-sol: devin/gpt-6-1-sol:auto
