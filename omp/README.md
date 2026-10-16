@@ -120,6 +120,47 @@ kafara 与 mafia 一样不声明窗口（`/v1/models` 只回 `id/object/created/
 按需删掉的 provider：`devin-cliproxy`（本机 127.0.0.1:30288 的 CLIProxyAPI）已从
 `models.yml` 与 `enabledModels` 移除；`cliproxy-yanzhou.service` 仍在跑，供其他客户端使用。
 
+### Gemini（Antigravity）要单独的出口节点
+
+`gvomp`（`omp --model kafara/gemini-4-argon-high`）在网关侧走 antigravity 凭证
+（`/opt/cliproxyapi/auth/antigravity-*.json`），上游是
+`daily-cloudcode-pa.googleapis.com`。这条上游有区域闸门：出口 IP 不受支持时回
+`400 invalid_request_error: User location is not supported for the API use.`。
+
+实测（2026-10-16，同一账号、同一客户端，各 8~20 次）：
+
+| 网关出口 | 成功 |
+|---|---|
+| 家宽 `208.214.194.162`（原 `PROXY` 默认） | 5/8 |
+| 美国 AI 解锁 `88.210.37.226` | 20/20 |
+
+所以问题在出口 IP，不在 omp。网关（my_gcp `/etc/mihomo/config.yaml`）加了一个只服务
+Cloud Code 的组，其余流量仍走家宽出口：
+
+    proxy-groups:
+      - name: GOOGLE-AI
+        type: select
+        use: [subscription]
+        filter: "美国AI解锁1"
+    rules:
+      - DOMAIN-SUFFIX,cloudcode-pa.googleapis.com,GOOGLE-AI
+      - DOMAIN-SUFFIX,cloudcode-pa.sandbox.googleapis.com,GOOGLE-AI
+      - DOMAIN,daily-cloudcode-pa.googleapis.com,GOOGLE-AI
+      - DOMAIN,daily-cloudcode-pa.sandbox.googleapis.com,GOOGLE-AI
+
+`daily-cloudcode-pa.googleapis.com` 必须写成 `DOMAIN`：它**不是**
+`cloudcode-pa.googleapis.com` 的子域（标签边界），`DOMAIN-SUFFIX` 不匹配，会静默落到
+`MATCH,PROXY` 又走家宽出口。`journalctl -u mihomo` 里 `match ... using` 可验证——
+命中打印 `match Domain(daily-cloudcode-pa.googleapis.com) using GOOGLE-AI[...]`。
+
+生效顺序：改完 `sudo systemctl restart mihomo`（`PUT /configs?force=true` 热载实测未生效），
+再 `sudo systemctl restart cliproxyapi`——CPA 按凭证持有 HTTP/1.1 长连接池，不重启会继续
+复用旧出口的连接。CPA 重启后 antigravity 模型表要等一轮 `fetchAvailableModels` 探测才回来，
+其间 `unknown provider for model gemini-4-argon-*` 是中间态，不是配置错。
+
+其余 provider（Devin、xAI、Claude）不受影响，仍出家宽出口：`curl -x
+http://127.0.0.1:7890 https://ipinfo.io/ip` 回 `208.214.194.162`。
+
 > 迁移遗留：本机 `~/.omp/agent/{models,WATCHDOG}.yml.pre-dotfiles` 是接入 dotfiles 前的
 > 原始副本（`models.yml.pre-dotfiles` 里的 `apiKey` 是占位符，不是真 key）。确认无误后可删。
 
