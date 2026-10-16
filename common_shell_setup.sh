@@ -470,6 +470,7 @@ dvomp()   { omp --model devin-opus       "$@"; }  # claude-opus-5-5 via devin
 kvomp()   { omp --model kafara-opus       "$@"; }  # claude-opus-5-5 via kafara
 dsomp()   { omp --model deepseek-flash   "$@"; }  # DeepSeek V4.1 Flash (1M ctx, images)
 glmomp()  { omp --model zai-flash        "$@"; }  # GLM-5.3-Flash via zai (role zai-flash = zai/glm-5.3-flash:max)
+gvomp()   { omp --model kafara/gemini-4-argon-high "$@"; }  # Gemini 4 Argon (high) via kafara, no modelRoles entry
 
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
