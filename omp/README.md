@@ -113,8 +113,48 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 
 仍未覆盖：**内置目录 provider**（`deepseek` 等）的 key 只能来自环境变量（目录定义，不是本文件），
 所以 xmatrix run 里 `retry.fallbackChains.default` 的 `deepseek/deepseek-flash` 取不到 key，
-降级链在 xmatrix 场景下是死的。要让降级链也生效，得把 `*_API_KEY` 灌进 daemon 的环境
-（systemd drop-in + `EnvironmentFile=`），那会把密钥落成第二份明文文件。
+降级链在 xmatrix 场景下是死的。下一节给通用做法。
+
+### xmatrix agent run 的凭据：给所有模型/harness 的做法
+
+xmatrix 的 daemon 子进程环境实测 = daemon env + `XMATRIX_*`（看
+`/proc/<run pid>/environ`，49 个变量里没有任何 `*_API_KEY`）。所以只要凭据**只来自环境变量**，
+在 xmatrix 里就会失败：
+
+| harness | 凭据来源 | xmatrix run 里 |
+|---|---|---|
+| omp 网关（volcengine/mafia/kafara） | `gateways-login.json` 的 key 引用 | 已改 `!命令` 引用，可用 |
+| omp 内置目录 provider（deepseek/zai/kimi/openrouter…） | 环境变量 | 变量名被当 key 发出 → 401 |
+| codex 自定义 provider | `config.toml` 的 `env_key = "DEEPSEEK_API_KEY"` 等 | 同上 |
+| codex 官方 / claude / gemini | 文件式（`~/.codex/auth.json`、`~/.claude/.credentials.json`、`~/.gemini/*`） | 可用（不依赖 env） |
+| omp vault（`omp login` 存过的 provider） | omp 自己的凭据库 | 可用，实测 `env -i` 下 `omp token devin/kimi-code` 仍可取 |
+
+**首选做法**：agent 的 runtime 指向 `~/.local/bin/xmatrix-<harness>`——本仓库
+`scripts/xmatrix-harness-env.sh` 的软链。脚本按软链名（去掉 `xmatrix-` 前缀）取 harness，
+先 `source ~/.common_shell_setup_local.sh`，再 `exec`。密钥仍只存一处，任何机器、任何 harness 通用，
+且不依赖「daemon 到底传不传 env」这种实现细节。
+
+    xmatrix agent remove --space <SPACE> omp
+    xmatrix agent add --space <SPACE> omp --runtime ~/.local/bin/xmatrix-omp
+
+（`xmatrix agent show` 不回显 runtime，改完只能靠触发一次 run 看
+`/proc/<pid>/environ` 或 run 日志确认。）实测：在干净环境
+`env -i HOME=/home/yanzhou PATH=<daemon PATH> ~/.local/bin/xmatrix-omp -p --no-session \
+--mode=json --model deepseek/deepseek-flash "reply ok"` → `provider=deepseek stop=stop`；
+不加 wrapper 时同条件是 401。
+
+wrapper 只把 `~/.local/bin`、`~/.bun/bin` 前置到 PATH。`gemini`、`claude` 在
+`~/.nvm/versions/node/*/bin`，要用它们当 xmatrix agent 得先软链进 `~/.local/bin`。
+
+**备选（本机可用但不推荐作主方案）**：
+
+- harness 原生凭据库：omp 用 `omp login <provider>`（或会话内 `/login`）把 key 存进 vault，
+  与 env 无关；缺点是每台机器要重新登录，且网关 provider 不吃 vault。
+- systemd drop-in + `EnvironmentFile=`：一次给 daemon 灌全部 key，codex/omp 都受益；
+  缺点是密钥多一份明文落盘。`xmatrix setup daemon` 会重写主单元，但 drop-in
+  （`xmatrix-daemon.service.d/*.conf`）不受影响。
+- 不要用 `xmatrix secret` 解决模型凭据：它是 Hub 侧密钥目录，只给 agent run 提供
+  `xmatrix secret exec`（自己包命令），不会自动注入 harness 环境。
 
 因此默认模型 `volcengine/deepseek-v4-1-flash-260910` 依赖两个前提：插件装了、
 `gateways-login.json` 里有 `volcengine`（且 key 有效）。`enabledModels` 仍要写

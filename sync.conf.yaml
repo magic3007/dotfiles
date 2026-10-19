@@ -108,6 +108,12 @@
     ~/.local/bin/omp:
         if: '[ -x ~/.bun/bin/omp ]'
         path: ~/.bun/bin/omp
+    # Agent-run runtime wrappers: xmatrix starts runs from its daemon, whose
+    # environment lacks the shell's *_API_KEY variables, so omp's catalog
+    # providers and codex's env_key providers authenticate with the variable
+    # name itself. Point an agent's runtime here to source the secrets first.
+    ~/.local/bin/xmatrix-omp: scripts/xmatrix-harness-env.sh
+    ~/.local/bin/xmatrix-codex: scripts/xmatrix-harness-env.sh
 
     # ---- Ghostty (cross-platform) ----
     ~/.config/ghostty/config: ghostty/config
