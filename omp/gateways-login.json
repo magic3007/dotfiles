@@ -4,21 +4,21 @@
       "name": "kafara",
       "baseUrl": "https://ai.kafara.men",
       "api": "anthropic-messages",
-      "apiKey": "KAFARA_API_KEY",
+      "apiKey": "!grep -m1 '^export KAFARA_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'",
       "extraModels": []
     },
     {
       "name": "mafia",
       "baseUrl": "https://api.appintheloop.com",
       "api": "anthropic-messages",
-      "apiKey": "MAFIA_API_KEY",
+      "apiKey": "!grep -m1 '^export MAFIA_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'",
       "extraModels": []
     },
     {
       "name": "volcengine",
       "baseUrl": "https://ark.cn-beijing.volces.com/api/coding",
       "api": "anthropic-messages",
-      "apiKey": "VE_CODE_API_KEY",
+      "apiKey": "!grep -m1 '^export VE_CODE_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'",
       "extraModels": [
         "ark-code-latest",
         "doubao-seed-2.0-pro",

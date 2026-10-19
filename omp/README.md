@@ -97,6 +97,25 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 
 手改该文件后执行 `omp models refresh` 让模型缓存重新拉取。
 
+本机三条网关的 `apiKey` 用的是 **`!命令` 引用**，不是环境变量名：
+
+    !grep -m1 '^export VE_CODE_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '"'
+
+原因：xmatrix 通过它的 daemon 拉起 omp，daemon 只带 systemd 单元里那点环境，
+**没有** `~/.common_shell_setup_local.sh` 里的 `*_API_KEY`。而引用解析规则是
+「`!命令` 取 stdout → 环境变量名取该变量 → 其余当字面量」，环境变量不存在时
+**会把变量名本身当 key 发出去**，火山引擎于是回
+`401 AuthenticationError: The API key format is incorrect`（实测复现：
+`VE_CODE_API_KEY=VE_CODE_API_KEY omp -p --mode=json --model volcengine/deepseek-v4-1-flash-260910 "reply ok"`）。
+换成命令引用后，daemon 拉起的 omp 也能取到 key，密钥仍只存在
+`~/.common_shell_setup_local.sh` 一处（那里是双引号赋值，所以命令里要 `tr -d '"'`）。
+命令引用按进程缓存，改 key 后需要新进程才生效。
+
+仍未覆盖：**内置目录 provider**（`deepseek` 等）的 key 只能来自环境变量（目录定义，不是本文件），
+所以 xmatrix run 里 `retry.fallbackChains.default` 的 `deepseek/deepseek-flash` 取不到 key，
+降级链在 xmatrix 场景下是死的。要让降级链也生效，得把 `*_API_KEY` 灌进 daemon 的环境
+（systemd drop-in + `EnvironmentFile=`），那会把密钥落成第二份明文文件。
+
 因此默认模型 `volcengine/deepseek-v4-1-flash-260910` 依赖两个前提：插件装了、
 `gateways-login.json` 里有 `volcengine`（且 key 有效）。`enabledModels` 仍要写
 `volcengine/*`（白名单语义同上）。
