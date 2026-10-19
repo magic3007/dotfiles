@@ -202,13 +202,8 @@
     ~/.local/bin/omp:
         if: '[ -x ~/.bun/bin/omp ]'
         path: ~/.bun/bin/omp
-    # xmatrix 的 agent run 由 daemon 拉起，daemon 环境里没有 shell 的 *_API_KEY，
-    # 于是 omp 的内置 provider（deepseek 等）与 codex 的 env_key provider 全 401。
-    # 把 agent 的 runtime 指到这两个软链（`xmatrix agent add ... omp --runtime
-    # ~/.local/bin/xmatrix-omp`），脚本按软链名 exec 对应 harness，并先 source
-    # ~/.common_shell_setup_local.sh。见 omp/README.md。
-    ~/.local/bin/xmatrix-omp: scripts/xmatrix-harness-env.sh
-    ~/.local/bin/xmatrix-codex: scripts/xmatrix-harness-env.sh
+    # agent run 的凭据不由这里解决：daemon 的环境靠 systemd drop-in 注入，
+    # 见 scripts/xmatrix-daemon-secrets.sh 与 scripts/post-install.d/50-xmatrix-daemon-secrets.sh。
 
     # ---- omp (Stencil coding agent harness) ----
     # 静态配置：config.yml / models.yml / gateways-login.json / WATCHDOG.yml / AGENTS.md / RULES.md。

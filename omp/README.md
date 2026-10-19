@@ -117,42 +117,46 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 
 ### xmatrix agent run 的凭据：给所有模型/harness 的做法
 
-xmatrix 的 daemon 子进程环境实测 = daemon env + `XMATRIX_*`（看
-`/proc/<run pid>/environ`，49 个变量里没有任何 `*_API_KEY`）。所以只要凭据**只来自环境变量**，
-在 xmatrix 里就会失败：
+xmatrix 的 daemon 子进程环境 = daemon env + `XMATRIX_*`（看 `/proc/<run pid>/environ`）。
+**没有下面那个 drop-in 时**，daemon 环境里没有任何 `*_API_KEY`，于是凭据只来自环境变量的
+provider 全部失败：
 
 | harness | 凭据来源 | xmatrix run 里 |
 |---|---|---|
 | omp 网关（volcengine/mafia/kafara） | `gateways-login.json` 的 key 引用 | 已改 `!命令` 引用，可用 |
-| omp 内置目录 provider（deepseek/zai/kimi/openrouter…） | 环境变量 | 变量名被当 key 发出 → 401 |
+| omp 内置目录 provider（deepseek/zai/kimi/openrouter…） | 环境变量 | 无 drop-in 时变量名被当 key 发出 → 401 |
 | codex 自定义 provider | `config.toml` 的 `env_key = "DEEPSEEK_API_KEY"` 等 | 同上 |
 | codex 官方 / claude / gemini | 文件式（`~/.codex/auth.json`、`~/.claude/.credentials.json`、`~/.gemini/*`） | 可用（不依赖 env） |
 | omp vault（`omp login` 存过的 provider） | omp 自己的凭据库 | 可用，实测 `env -i` 下 `omp token devin/kimi-code` 仍可取 |
 
-**首选做法**：agent 的 runtime 指向 `~/.local/bin/xmatrix-<harness>`——本仓库
-`scripts/xmatrix-harness-env.sh` 的软链。脚本按软链名（去掉 `xmatrix-` 前缀）取 harness，
-先 `source ~/.common_shell_setup_local.sh`，再 `exec`。密钥仍只存一处，任何机器、任何 harness 通用，
-且不依赖「daemon 到底传不传 env」这种实现细节。
+**做法**：给 daemon 的环境注入密钥。`scripts/xmatrix-daemon-secrets.sh`
+（`./install` 与 15 分钟 sync 都会跑）写一个 systemd drop-in：
 
-    xmatrix agent remove --space <SPACE> omp
-    xmatrix agent add --space <SPACE> omp --runtime ~/.local/bin/xmatrix-omp
+    ~/.config/systemd/user/xmatrix-daemon.service.d/10-secrets-env.conf
+    [Service]
+    ExecStart=
+    ExecStart=/bin/bash -c 'set -a; . "$HOME/.common_shell_setup_local.sh"; set +a; exec /home/yanzhou/.local/bin/xmatrix daemon'
 
-（`xmatrix agent show` 不回显 runtime，改完只能靠触发一次 run 看
-`/proc/<pid>/environ` 或 run 日志确认。）实测：在干净环境
-`env -i HOME=/home/yanzhou PATH=<daemon PATH> ~/.local/bin/xmatrix-omp -p --no-session \
---mode=json --model deepseek/deepseek-flash "reply ok"` → `provider=deepseek stop=stop`；
-不加 wrapper 时同条件是 401。
+daemon 先 source 密钥文件再 exec，于是 daemon 环境带着全部 key，agent run 继承。
+密钥仍只存在 `~/.common_shell_setup_local.sh` 一处（不额外落盘）。
+`xmatrix setup daemon` 会重写主单元，drop-in 不受影响；改完需要
+`scripts/xmatrix-daemon-secrets.sh --restart` 让 daemon 换环境。
 
-wrapper 只把 `~/.local/bin`、`~/.bun/bin` 前置到 PATH。`gemini`、`claude` 在
-`~/.nvm/versions/node/*/bin`，要用它们当 xmatrix agent 得先软链进 `~/.local/bin`。
+实测（2026-10-19，xmatrix 1.0.587）：daemon `/proc/<pid>/environ` 22 个 key 变量，
+取值与 shell 完全一致；新 spawn 的 run 子进程 21 个；火山 429（额度用尽）后
+`retry.fallbackChains.default` 真的切到 `deepseek/deepseek-flash` 并完成该轮
+（此前降级链因缺 key 是死的）。
 
-**备选（本机可用但不推荐作主方案）**：
+**这条路走不通，别试**：`xmatrix agent add ... --runtime <wrapper>` 对 harness run 无效。
+用 `--runtime /bin/echo` 做探针，run 仍然启动 omp（`✓ Oh My Pi ACP serve backend ready`），
+`xmatrix agent show` 也不回显 runtime。
 
-- harness 原生凭据库：omp 用 `omp login <provider>`（或会话内 `/login`）把 key 存进 vault，
-  与 env 无关；缺点是每台机器要重新登录，且网关 provider 不吃 vault。
-- systemd drop-in + `EnvironmentFile=`：一次给 daemon 灌全部 key，codex/omp 都受益；
-  缺点是密钥多一份明文落盘。`xmatrix setup daemon` 会重写主单元，但 drop-in
-  （`xmatrix-daemon.service.d/*.conf`）不受影响。
+**备选**：
+
+- harness 原生凭据库：omp 用 `omp login <provider>`（或会话内 `/login`）把 key 存进
+  vault，与 env 无关，实测 `env -i` 下 `omp token devin/kimi-code` 可取；缺点是每台机器
+  要重新登录，网关 provider 不吃 vault（仍是 `!命令` 引用）。
+- `EnvironmentFile=<生成的文件>`：等价，但密钥会多一份明文落盘，故本仓库用 ExecStart 覆盖。
 - 不要用 `xmatrix secret` 解决模型凭据：它是 Hub 侧密钥目录，只给 agent run 提供
   `xmatrix secret exec`（自己包命令），不会自动注入 harness 环境。
 
