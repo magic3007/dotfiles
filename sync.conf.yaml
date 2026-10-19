@@ -97,6 +97,17 @@
     # dotbot fail ("already exists but is a regular file or directory").
     # scripts/post-install.d/10-seed-configs.sh seeds it when it is missing.
     ~/.local/bin/yolo: scripts/yolo-generic.sh
+    # The xmatrix daemon probes harnesses with the PATH of its systemd unit
+    # (~/.config/systemd/user/xmatrix-daemon.service), which omits ~/.bun/bin;
+    # without these links the Hub reports omp as "not installed". bun is needed
+    # too because omp's shim is `#!/usr/bin/env bun`. Editing the unit's PATH is
+    # not durable: `xmatrix setup daemon` regenerates it from a fixed list.
+    ~/.local/bin/bun:
+        if: '[ -x ~/.bun/bin/bun ]'
+        path: ~/.bun/bin/bun
+    ~/.local/bin/omp:
+        if: '[ -x ~/.bun/bin/omp ]'
+        path: ~/.bun/bin/omp
 
     # ---- Ghostty (cross-platform) ----
     ~/.config/ghostty/config: ghostty/config

@@ -190,6 +190,18 @@
     # 顶成普通文件；所以不 link，改由 scripts/post-install.d/10-seed-configs.sh
     # 在文件缺失时从 kimi-code/config.toml 复制一份。
     ~/.local/bin/yolo: scripts/yolo-generic.sh
+    # xmatrix 的 harness 探测只看 daemon 进程的 PATH。daemon 由 systemd 单元
+    # ~/.config/systemd/user/xmatrix-daemon.service 启动，里面写死的 PATH 不含
+    # ~/.bun/bin，所以 omp 在 Hub 侧一直显示 missing（`xmatrix harness list --local`
+    # 用的是 shell 环境，看不出问题）。软链进该 PATH 已有的 ~/.local/bin。
+    # bun 也要链：omp 的 shim 是 `#!/usr/bin/env bun`。
+    # 不要改用改单元 PATH 的办法：`xmatrix setup daemon` 会用固定列表重写单元、覆盖手改。
+    ~/.local/bin/bun:
+        if: '[ -x ~/.bun/bin/bun ]'
+        path: ~/.bun/bin/bun
+    ~/.local/bin/omp:
+        if: '[ -x ~/.bun/bin/omp ]'
+        path: ~/.bun/bin/omp
 
     # ---- omp (Stencil coding agent harness) ----
     # 静态配置：config.yml / models.yml / gateways-login.json / WATCHDOG.yml / AGENTS.md / RULES.md。

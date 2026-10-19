@@ -30,6 +30,26 @@
 
 `~/.omp/` 下同样不入库：`logs/`、`run/`（daemon socket）、`gpu_cache.json`。
 
+### `~/.local/bin/{bun,omp}`（给 xmatrix 探测用）
+
+`install.conf.yaml` / `sync.conf.yaml` 还把 `~/.bun/bin/{bun,omp}` 软链到 `~/.local/bin/`。
+
+xmatrix 的 harness 探测只看 **daemon 进程的 PATH**。daemon 由 systemd 单元
+`~/.config/systemd/user/xmatrix-daemon.service` 启动，单元里写死的 PATH 是
+`~/.local/bin:~/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:~/bin:/usr/bin:...`，**不含 `~/.bun/bin`**，
+所以 omp 在 Hub 侧一直显示 `missing`。`xmatrix harness list --local` 用的是当前 shell 环境
+（PATH 含 `~/.bun/bin`），会显示 ok——两者不一致时问题在 daemon。
+
+bun 也要链：omp 的 shim 是 `#!/usr/bin/env bun`。
+
+不要改用「改单元 PATH」的办法：`xmatrix setup daemon` 会用固定列表重写单元，覆盖手改；
+软链不受影响，也不用重启 daemon。改完 `xmatrix harness refresh`，用
+`xmatrix harness status <harness:id>` 看结果。
+
+同源问题（本机未链）：`claude`、`gemini`（在 `~/.nvm/versions/node/*/bin`）、
+`kimi`（`~/.kimi-code/bin`）、`opencode`（`~/.opencode/bin`）同样不在 daemon PATH 里，
+Hub 侧也报 missing。
+
 ### 内置 provider 不用写进 models.yml
 
 `models.yml` 只声明**目录里没有的**自定义 provider（示例：`mafia`）。omp 的模型目录
