@@ -176,7 +176,7 @@ Package managers are configured with Chinese mirrors for faster downloads:
 
 ### Cross-Platform
 
-- **Linux**: apt-get for zsh, tmux, vim, htop, ranger, fish (see `install-scripts/linux/`). The `fish` package is still installed so archived fish config remains usable.
+- **Linux**: apt-get for zsh, tmux, vim, htop, ranger, ncdu, fish (see `install-scripts/linux/`). The `fish` package is still installed so archived fish config remains usable.
 - **macOS**: Homebrew for rg, lazygit, zellij, fish (see `install-scripts/mac/`); Cursor/Antigravity editor config symlinks; Karabiner keyboard remapping; skhd window management; iTerm2 plist sync via `~/.config/iterm2`; Ghostty terminal config via `ghostty/config`
 
 When adding new platform packages, edit the relevant `install-scripts/{linux,mac}/install-packages.sh`.
