@@ -40,21 +40,21 @@ install_with_apt() {
 
     if command -v timeout >/dev/null 2>&1; then
         run_sudo_noninteractive timeout 300 apt-get update || return 1
-        run_sudo_noninteractive timeout 300 apt-get install -y zsh tmux vim htop ranger bubblewrap fish || return 1
+        run_sudo_noninteractive timeout 300 apt-get install -y zsh tmux vim htop ranger ncdu bubblewrap fish || return 1
     else
         run_sudo_noninteractive apt-get update || return 1
-        run_sudo_noninteractive apt-get install -y zsh tmux vim htop ranger bubblewrap fish || return 1
+        run_sudo_noninteractive apt-get install -y zsh tmux vim htop ranger ncdu bubblewrap fish || return 1
     fi
 }
 
 install_with_mamba() {
     info "Trying mamba..."
-    mamba install -y zsh tmux vim htop ranger 2>/dev/null || return 1
+    mamba install -y zsh tmux vim htop ranger ncdu 2>/dev/null || return 1
 }
 
 install_with_conda() {
     info "Trying conda..."
-    conda install -y zsh tmux vim htop ranger 2>/dev/null || return 1
+    conda install -y zsh tmux vim htop ranger ncdu 2>/dev/null || return 1
 }
 
 install_with_pip() {
@@ -71,7 +71,7 @@ main() {
     # Check if already installed
     if command -v zsh >/dev/null 2>&1 && command -v tmux >/dev/null 2>&1 && \
        command -v vim >/dev/null 2>&1 && command -v htop >/dev/null 2>&1 && \
-       command -v ranger >/dev/null 2>&1; then
+       command -v ranger >/dev/null 2>&1 && command -v ncdu >/dev/null 2>&1; then
         info "Core packages already installed"
     else
         # Try installation methods in order
@@ -86,7 +86,7 @@ main() {
         else
             warn "No passwordless sudo and no conda/mamba/pip available."
             warn "Skipping system packages installation."
-            warn "You may need to ask admin to install: zsh tmux vim htop ranger"
+            warn "You may need to ask admin to install: zsh tmux vim htop ranger ncdu"
         fi
     fi
 
