@@ -80,6 +80,7 @@ cd ~/dotfiles
 | **Opencode** | Config, package.json |
 | **Pi** | Models + settings |
 | **Kimi Code** | config.toml |
+| **DeepSeek Harness** | CLI only (`dsh`); config is machine-local in `~/.dsh` (profiles, credentials) and not linked |
 | **ChatGPT** | Shell helper |
 
 > **任务完成提醒开关（默认关闭）**：`END_REMINDER_ENABLE` 控制 Claude Code、Codex 和 Pi 任务结束时的 wechat-reminder 飞书/微信通知。设为 `1` 启用（如 `END_REMINDER_ENABLE=1 claude`），未设置 / `0` 时静默。

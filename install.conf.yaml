@@ -380,6 +380,12 @@
 #   Pi:           npm install -g --ignore-scripts @earendil-works/pi-coding-agent  (primary, non-interactive)
 #                 curl -fsSL https://pi.dev/install.sh | sh  (fallback; reads confirmation via /dev/tty, cannot auto-confirm)
 #   Opencode:     curl -fsSL https://opencode.ai/install | bash
+#   DeepSeek Harness (dsh): npm install -g @deepseek-ai/dsh
+#                 Config lives in ~/.dsh (DSH_HOME). It is NOT linked here:
+#                 profiles/<name>/ holds pnpm node_modules and is initialized
+#                 on first run; .credentials.yaml holds API keys; the settings
+#                 UI rewrites profiles/*/cordis.patch.yml atomically (temp file
+#                 + rename), which would replace a symlink with a regular file.
 - shell:
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v claude >/dev/null || npm install -g @anthropic-ai/claude-code@latest || true",
@@ -412,6 +418,10 @@
     - [
           "command -v kimi >/dev/null || curl --connect-timeout 10 -fsSL https://code.kimi.com/kimi-code/install.sh | bash || true",
           Installing Kimi Code CLI,
+      ]
+    - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v dsh >/dev/null || npm install -g @deepseek-ai/dsh@latest || true",
+          Installing DeepSeek Harness CLI (dsh),
       ]
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v mgrep >/dev/null || npm install -g @mixedbread/mgrep@latest || true",
