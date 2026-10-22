@@ -478,12 +478,31 @@ gkomp()   { omp --model kafara/devin/grok-4-7 "$@"; }  # Grok 4.7 via kafara (no
 # Bare `dsh` therefore boots the web profile, the only interactive one shipped
 # (others: headless, sdk, sdk-minimal, acp). Everything else passes through, so
 # `dsh headless "..."`, `dsh --version`, `dsh plugin ...` behave as documented.
+#
+# The web profile also binds this machine's LAN IPv4 instead of loopback, so
+# another host can open the printed URL. dsh refuses wildcard binds (--host takes
+# one concrete interface literal), so the address is resolved per call, skipping
+# docker0. Auth is unchanged: the URL carries a token, other requests get 401.
+# An explicit `--host` in the arguments wins; other profiles are never touched.
+_dsh_lan_ip() {
+  ip -4 -o addr show scope global 2>/dev/null |
+    awk '$2 != "docker0" { split($4, a, "/"); print a[1]; exit }'
+}
+
 dsh() {
+  local arg ip has_host=0
+  for arg in "$@"; do
+    [ "$arg" = "--host" ] && has_host=1
+  done
+  ip=$(_dsh_lan_ip)
   if [ "$#" -eq 0 ]; then
-    command dsh web
-  else
-    command dsh "$@"
+    set -- web
+    [ -n "$ip" ] && set -- web --host "$ip"
+  elif [ "$has_host" -eq 0 ] && [ -n "$ip" ] &&
+       { [ "$1" = web ] || { [ "$1" = --profile ] && [ "${2-}" = web ]; }; }; then
+    set -- "$@" --host "$ip"
   fi
+  command dsh "$@"
 }
 
 # lark-cli - Lark/Feishu CLI tool
