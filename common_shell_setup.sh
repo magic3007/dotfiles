@@ -473,6 +473,19 @@ glmomp()  { omp --model zai-flash        "$@"; }  # GLM-5.3-Flash via zai (role 
 gvomp()   { omp --model kafara/gemini-4-argon-high "$@"; }  # Gemini 4 Argon (high) via kafara, no modelRoles entry
 gkomp()   { omp --model kafara/devin/grok-4-7 "$@"; }  # Grok 4.7 via kafara (no per-token cost); devin/grok-4-7 also works but bills
 
+# dsh (DeepSeek Harness): the launcher refuses to start without a profile name
+# (`error: --profile <name> is required`); there is no default-profile env var.
+# Bare `dsh` therefore boots the web profile, the only interactive one shipped
+# (others: headless, sdk, sdk-minimal, acp). Everything else passes through, so
+# `dsh headless "..."`, `dsh --version`, `dsh plugin ...` behave as documented.
+dsh() {
+  if [ "$#" -eq 0 ]; then
+    command dsh web
+  else
+    command dsh "$@"
+  fi
+}
+
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
 
