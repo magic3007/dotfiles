@@ -138,6 +138,9 @@ main() {
     # Install mgrep (semantic grep tool)
     install_mgrep
 
+    # Install Tailscale (mesh VPN client; joining happens in tailscale-setup.sh)
+    install_tailscale || true
+
     info "Package installation complete"
 }
 
@@ -716,6 +719,23 @@ install_mgrep() {
         info "mgrep installed globally via npm"
     else
         warn "Failed to install mgrep via npm"
+    fi
+}
+
+install_tailscale() {
+    if command -v tailscale >/dev/null 2>&1; then
+        info "Tailscale already installed"
+        return 0
+    fi
+
+    # Official installer: adds the Tailscale apt/yum repository, installs
+    # tailscale + tailscaled, and enables the systemd unit. It needs sudo and
+    # network access; a failure here must not abort the rest of the run.
+    info "Installing Tailscale via the official installer..."
+    if curl --connect-timeout 10 -fsSL https://tailscale.com/install.sh | sh; then
+        info "Tailscale installed"
+    else
+        warn "Failed to install Tailscale"
     fi
 }
 

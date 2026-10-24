@@ -304,6 +304,18 @@
     - [bash install-scripts/mac/install-packages.sh || true, Installing macOS packages with Homebrew]
 
 # ---------------------------------------------------------------------------
+# Tailscale mesh (tailnet join)
+# ---------------------------------------------------------------------------
+# Packages install the client (macOS cask tailscale-app / the official Linux
+# installer). This step only joins the tailnet and is idempotent: a Running
+# node is left alone. Set TAILSCALE_AUTHKEY in ~/.common_shell_setup_local.sh
+# for an unattended join; without it the script prints the manual command.
+# All tunables (hostname, exit node / subnet routes, Tailscale SSH) are
+# documented in scripts/tailscale-setup.sh.
+- shell:
+    - [bash scripts/tailscale-setup.sh || true, Joining the Tailscale tailnet (skipped without TAILSCALE_AUTHKEY)]
+
+# ---------------------------------------------------------------------------
 # oh-my-zsh
 # ---------------------------------------------------------------------------
 - shell:

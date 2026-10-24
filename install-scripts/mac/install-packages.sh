@@ -119,6 +119,30 @@ install_mgrep() {
     fi
 }
 
+install_tailscale() {
+    if command -v tailscale >/dev/null 2>&1 ||
+       [ -x "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]; then
+        info "Tailscale already installed"
+        return 0
+    fi
+
+    if ! command -v brew >/dev/null 2>&1; then
+        warn "Homebrew not found, cannot install Tailscale"
+        warn "Install the macOS package from https://tailscale.com/download/mac"
+        return 1
+    fi
+
+    # Standalone variant: GUI app plus /usr/local/bin/tailscale. The pkg
+    # installer needs an admin password, and the system extension must be
+    # approved in System Settings > Privacy & Security on first launch.
+    info "Installing Tailscale (standalone app + CLI)..."
+    if brew install --cask tailscale-app; then
+        info "Tailscale installed (CLI: /usr/local/bin/tailscale)"
+    else
+        warn "Failed to install Tailscale"
+    fi
+}
+
 main() {
     if [ "$(uname)" != "Darwin" ]; then
         echo "Not macOS, skipping"
@@ -132,6 +156,7 @@ main() {
     install_ghostty
     install_rtk
     install_mgrep
+    install_tailscale || true
 
     info "macOS package installation complete"
 }
