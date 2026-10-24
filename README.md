@@ -138,6 +138,39 @@ oc        # Opencode
 | **Obsidian** | Plugins, appearance, core plugin settings |
 | **wechat-reminder** | Dual-channel (WeChat PushDeer + Feishu webhook), Claude Code hook integration |
 
+### Networking (Tailscale mesh)
+
+Every machine installs the Tailscale client and joins the same tailnet.
+`install-scripts/{mac,linux}/install-packages.sh` installs it; `./install` then
+runs `scripts/tailscale-setup.sh`, which is idempotent (a `Running` node is left
+alone).
+
+| Platform | Installer | CLI |
+|----------|-----------|-----|
+| macOS | `brew install --cask tailscale-app` (standalone app; approve the system extension on first launch) | `/usr/local/bin/tailscale` |
+| Linux | `https://tailscale.com/install.sh` (systemd `tailscaled`) | `tailscale` |
+
+Unattended join — machine-local, never committed (`~/.common_shell_setup_local.sh`):
+
+```bash
+export TAILSCALE_AUTHKEY="tskey-auth-..."        # or file:/path/to/key
+export TAILSCALE_HOSTNAME="macbook"              # optional: admin console name
+# optional: advertise this host as exit node / subnet router
+export TAILSCALE_UP_FLAGS="--advertise-exit-node --advertise-routes=192.168.1.0/24"
+# optional: route this host's traffic through an exit node
+# export TAILSCALE_UP_FLAGS="--exit-node=devbox --exit-node-allow-lan-access"
+```
+
+Then `./install`, or inspect first with `scripts/tailscale-setup.sh --dry-run`.
+Without a key the node stays logged out and the script prints the manual
+`tailscale up` command. `TAILSCALE_RECONFIGURE=1` re-applies flags on a connected
+node; because `tailscale up` does not persist flags, spell out all of them in
+`TAILSCALE_UP_FLAGS`.
+
+Shell helpers: `ts` (`tailscale`), `tss` (`tailscale status`), `tsip` (this
+node's `100.x` address). Subnet routes and exit nodes must also be approved in
+the Tailscale admin console (`Machines → Edit route settings`).
+
 ## Local Customization
 
 Machine-specific overrides — gitignored:
@@ -196,6 +229,7 @@ dotfiles/
 ├── obsidian/        → Obsidian vault settings
 ├── docker/          → Dev Dockerfiles
 ├── install-scripts/ → Platform package installers
+├── scripts/         → Install helpers (Tailscale join, config sync, skill views)
 └── wechat-reminder/ → Dual-channel notification tool
 ```
 
