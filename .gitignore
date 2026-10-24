@@ -9,6 +9,7 @@ archive/fish/conf.d/local.fish
 .worktrees/
 archive/fish/fish_variables
 archive/fish/fish_plugins
+.cloudflare/
 
 # Private/internal skill dirs: present locally, never published (public repo).
 # New skills show up as untracked until you either add them here or `git add` them.
