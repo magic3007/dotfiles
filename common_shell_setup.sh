@@ -508,6 +508,27 @@ dsh() {
 # lark-cli - Lark/Feishu CLI tool
 alias lark='lark-cli'
 
+# Tailscale - mesh VPN (tailnet)
+# The macOS standalone/App Store app bundles the CLI; expose it when the
+# "Install CLI" step has not created /usr/local/bin/tailscale. TAILSCALE_BE_CLI
+# keeps the app bundle binary from opening a GUI window.
+if ! command -v tailscale >/dev/null 2>&1; then
+  for _ts_app in /Applications/Tailscale.app/Contents/MacOS/Tailscale \
+                 "$HOME/Applications/Tailscale.app/Contents/MacOS/Tailscale"; do
+    if [ -x "$_ts_app" ]; then
+      # _ts_app stays set: the function reads it on every call.
+      tailscale() { TAILSCALE_BE_CLI=1 "$_ts_app" "$@"; }
+      break
+    fi
+  done
+fi
+if command -v tailscale >/dev/null 2>&1; then
+  alias ts='tailscale'
+  alias tss='tailscale status'
+  # This node's Tailscale IPv4 address (empty when logged out/stopped).
+  tsip() { tailscale ip -4 2>/dev/null | head -n 1; }
+fi
+
 
 # uv - Python package manager
 # uv installs to ~/.local/bin by default
