@@ -14,7 +14,7 @@ enabledModels:
   - deepseek/deepseek-flash
   - deepseek/deepseek-v4-flash-vision-exp
   - zai/glm-5.3-flash
-  - mafia/MiniMax-M3.1-Flash-Preview
+  - mafia/MiniMax-M3.1-Flash
   - devin/*
   - mafia/*
   - kafara/*
@@ -37,7 +37,7 @@ modelRoles:
   deepseek-pro: deepseek/deepseek-v4-pro:auto
   deepseek-vflash: deepseek/deepseek-v4-flash:auto
   deepseek-flash: deepseek/deepseek-flash:auto
-  mafia-minimax: mafia/MiniMax-M3.1-Flash-Preview:auto
+  mafia-minimax: mafia/MiniMax-M3.1-Flash:auto
   zai-flash: zai/glm-5.3-flash:max
 cycleOrder:
   - mafia-opus
