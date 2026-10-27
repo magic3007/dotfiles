@@ -35,17 +35,24 @@ PACK_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/pack/packer/start"
 PARSERS=(lua markdown markdown_inline bash python cpp)
 
 # Must match the `commit = "..."` values in lua/user/plugins.lua.
-declare -A PINS=(
-  [nvim-treesitter]=8e763332b7bf7b3a426fd8707b7f5aa85823a5ac
-  [nvim-lspconfig]=f11fdff7e8b5b415e5ef1837bdcdd37ea6764dda
+# Parallel arrays, not `declare -A`: macOS still ships bash 3.2, which has no
+# associative arrays. There `[nvim-treesitter]=<sha>` is parsed as an arithmetic
+# subscript, so under `set -u` the hook died with "nvim: unbound variable"
+# before touching anything.
+PIN_PLUGINS=(nvim-treesitter nvim-lspconfig)
+PIN_COMMITS=(
+  8e763332b7bf7b3a426fd8707b7f5aa85823a5ac
+  f11fdff7e8b5b415e5ef1837bdcdd37ea6764dda
 )
 
-# Local patches, keyed by the plugin's directory name under PACK_DIR. The patch
-# files themselves live next to the config they belong to (neovim/patches/);
-# scripts/apply-patches.sh only needs a git checkout to be idempotent.
-declare -A PATCHES=(
-  [nvim-treesitter]="$PATCH_DIR/nvim-treesitter-nvim0.12-predicates.patch"
-  [bufferline.nvim]="$PATCH_DIR/bufferline-nil-segments.patch"
+# Local patches, by the plugin's directory name under PACK_DIR (same order).
+# The patch files themselves live next to the config they belong to
+# (neovim/patches/); scripts/apply-patches.sh only needs a git checkout to be
+# idempotent.
+PATCH_PLUGINS=(nvim-treesitter bufferline.nvim)
+PATCH_FILES=(
+  "$PATCH_DIR/nvim-treesitter-nvim0.12-predicates.patch"
+  "$PATCH_DIR/bufferline-nil-segments.patch"
 )
 
 if [[ ! -d $PACK_DIR ]]; then
@@ -53,12 +60,14 @@ if [[ ! -d $PACK_DIR ]]; then
   exit 0
 fi
 
-for plugin in "${!PINS[@]}"; do
+missing_pins=()
+for i in "${!PIN_PLUGINS[@]}"; do
+  plugin="${PIN_PLUGINS[$i]}"
   dir="$PACK_DIR/$plugin"
-  pin="${PINS[$plugin]}"
+  pin="${PIN_COMMITS[$i]}"
 
   if [[ ! -d $dir/.git ]]; then
-    echo "skip  $plugin (not installed)"
+    missing_pins+=("$plugin")
     continue
   fi
 
@@ -77,24 +86,42 @@ for plugin in "${!PINS[@]}"; do
   git -C "$dir" checkout --quiet "$pin"
 done
 
-for plugin in "${!PATCHES[@]}"; do
-  "$APPLY_PATCHES" "$PACK_DIR/$plugin" "${PATCHES[$plugin]}"
+# Guard the expansion: bash 3.2 raises "unbound variable" on "${arr[@]}" when
+# the array is empty and `set -u` is on.
+if [[ ${#missing_pins[@]} -gt 0 ]]; then
+  echo "skip  not installed: ${missing_pins[*]}"
+  echo "      run :PackerSync in nvim (or nvim +'PackerSync'), then re-run this hook"
+fi
+
+for i in "${!PATCH_PLUGINS[@]}"; do
+  plugin="${PATCH_PLUGINS[$i]}"
+  # Not installed yet (packer has not run, or the clone failed): nothing to
+  # patch. Applying anyway would make apply-patches.sh report a scary
+  # "not a git checkout" warning for a normal state.
+  [[ -d $PACK_DIR/$plugin/.git ]] || continue
+  "$APPLY_PATCHES" "$PACK_DIR/$plugin" "${PATCH_FILES[$i]}"
 done
 
 if command -v nvim >/dev/null 2>&1; then
-  langs_lua=$(printf "'%s'," "${PARSERS[@]}")
-  missing="$(nvim --headless \
-    -c "lua local m = {} for _, l in ipairs({ $langs_lua }) do if #vim.api.nvim_get_runtime_file('parser/' .. l .. '.*', true) == 0 then m[#m + 1] = l end end io.write(table.concat(m, ' '))" \
-    -c 'qa!' 2>/dev/null || true)"
-
-  # A tree-sitter parser is only compiled once; afterwards this is a no-op.
-  if [[ -n ${missing// /} ]]; then
-    echo "compile tree-sitter parsers: $missing"
-    # </dev/null: TSInstallSync asks "reinstall ? y/n" about parsers that already
-    # exist, and a terminal hangs on that prompt forever.
-    nvim --headless -c "TSInstallSync $missing" -c 'qa!' </dev/null || true
+  if [[ ! -d $PACK_DIR/nvim-treesitter ]]; then
+    # TSInstallSync is defined by nvim-treesitter; without it the command is
+    # E492 and the parsers cannot be built from here anyway.
+    echo "skip  tree-sitter parsers (nvim-treesitter not installed)"
   else
-    echo "ok    all tree-sitter parsers available"
+    langs_lua=$(printf "'%s'," "${PARSERS[@]}")
+    missing="$(nvim --headless \
+      -c "lua local m = {} for _, l in ipairs({ $langs_lua }) do if #vim.api.nvim_get_runtime_file('parser/' .. l .. '.*', true) == 0 then m[#m + 1] = l end end io.write(table.concat(m, ' '))" \
+      -c 'qa!' 2>/dev/null || true)"
+
+    # A tree-sitter parser is only compiled once; afterwards this is a no-op.
+    if [[ -n ${missing// /} ]]; then
+      echo "compile tree-sitter parsers: $missing"
+      # </dev/null: TSInstallSync asks "reinstall ? y/n" about parsers that already
+      # exist, and a terminal hangs on that prompt forever.
+      nvim --headless -c "TSInstallSync $missing" -c 'qa!' </dev/null || true
+    else
+      echo "ok    all tree-sitter parsers available"
+    fi
   fi
 fi
 
