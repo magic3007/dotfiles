@@ -80,7 +80,7 @@ One source per skill, one generator, generated views. Sources (repo):
 | `claude/skills/` | Claude Code only | `~/.claude/skills/<name>` | Claude Code (view also gets every shared + `~/.agents` external skill, since Claude Code ignores `~/.agents/skills`) |
 | `codex/skills/` | Codex only | `~/.codex/skills/<name>` | Codex (`.system/` there is Codex runtime, local) |
 | `pi/skills/` | Pi only | `~/.pi/agent/skills/<name>` | Pi |
-| `omp/skills/` | omp only (none yet) | `~/.omp/agent/skills/<name>` | omp |
+| `omp/skills/` | omp only (`toil-offloading`) | `~/.omp/agent/skills/<name>` | omp |
 
 `scripts/sync-skills.py [--dry-run]` builds all views (run by `./install` and every `sync.sh` tick). Views are real directories of per-skill symlinks — never symlink a whole view into the repo. The script:
 - flattens bundles (`skills/tide/*`, `skills/scientific-agent-skills/skills/*`, …) to one entry per frontmatter `name:`; skips `examples/`, `plugins/`, `templates/`, hidden dirs;

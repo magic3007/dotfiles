@@ -39,6 +39,7 @@ modelRoles:
   deepseek-flash: deepseek/deepseek-flash:auto
   mafia-minimax: mafia/MiniMax-M3.1-Flash:auto
   zai-flash: zai/glm-5.3-flash:max
+  task: deepseek/deepseek-flash:auto
 cycleOrder:
   - mafia-opus
   - devin-opus
@@ -53,8 +54,6 @@ retry:
   fallbackChains:
     mafia/*:
       - devin/claude-opus-5-5
-      - kafara/devin/claude-opus-5-5
-    devin/*:
       - kafara/devin/claude-opus-5-5
     default:
       - deepseek/deepseek-flash
