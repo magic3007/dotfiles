@@ -1,4 +1,49 @@
 providers:
+  minimax-test:
+    baseUrl: https://openplatform-sh-pre.xaminim.com/anthropic/v1
+    api: anthropic-messages
+    apiKey: MINIMAX_MY_API_KEY
+    authHeader: true
+    disableStrictTools: true
+    models:
+    - id: MiniMax-M78
+      name: MiniMax-M3-Pro
+      reasoning: true
+      supportsTools: true
+      input:
+      - text
+      - image
+      contextWindow: 1048576
+      maxTokens: 65536
+      thinking:
+        mode: anthropic-adaptive
+        efforts:
+        - low
+        - medium
+        - high
+        - xhigh
+        - max
+        defaultLevel: max
+        requiresEffort: true
+    - id: MiniMax-3.1-Flash
+      name: MiniMax-M3.1-Flash
+      reasoning: true
+      supportsTools: true
+      input:
+      - text
+      - image
+      contextWindow: 1048576
+      maxTokens: 65536
+      thinking:
+        mode: anthropic-adaptive
+        efforts:
+        - low
+        - medium
+        - high
+        - xhigh
+        - max
+        defaultLevel: max
+        requiresEffort: true
   mafia:
     baseUrl: https://api.appintheloop.com/v1
     api: anthropic-messages
