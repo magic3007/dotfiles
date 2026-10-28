@@ -332,6 +332,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 |---|---|
 | `omp/plugins.txt` | 每行一个 `omp plugin install` spec（`npm:` 前缀、版本后缀、`[features]` 括号均可）；空行与 `#` 注释忽略 |
 | `omp/pi-fff-features.json` | pi-fff 的 feature 状态种子（关掉 `autocomplete`），由下面的 seed 钩子拷到 `~/.omp/agent/extensions/pi-fff.json` |
+| `pi/herdr-agents/config.json` | pi-herdr-agents 的配置种子（`models.default` 等），同上由 seed 钩子拷到 `~/.pi/agent/herdr-agents/config.json` |
 | `scripts/post-install.d/40-omp-plugins.sh` | `./install` 时对比 `omp plugin list --json`，只安装缺失的插件 |
 
 要点：
@@ -342,7 +343,9 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 - 只支持 npm spec。git / link 插件会告警跳过（GitHub 仓库名解析不出包名，无法判断是否已装）。
 - 当前清单：`npm:pi-fff`（FFF 模糊查找、内容搜索；默认**覆盖内建 `read`/`grep`**，用会话内
   `/fff-features` 开关）、`npm:omp-model-gateway`（`/login` 的 gateway 入口；本机 `volcengine`、
-  `mafia`、`kafara` 三个 provider 都来自它，默认模型依赖它——见「Gateway provider」一节）。
+  `mafia`、`kafara` 三个 provider 都来自它，默认模型依赖它——见「Gateway provider」一节）、
+  `npm:pi-herdr-agents`（异步 subagent：每个子 agent 是 Herdr 窗格里的真 `pi` 进程，
+  工具 `subagent`/`subagent_send`/`worktree_*` 等；条件与限制见下）。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
   `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
   `{ signal }` 对象（`options.signal.aborted`）；omp 的 `@oh-my-pi/pi-tui` 同位置直接传
@@ -356,6 +359,16 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   立即生效）。仓库用 `omp/pi-fff-features.json` 做种子，由
   `scripts/post-install.d/10-seed-configs.sh` 在目标缺失时拷入（已存在则不覆盖，保留你自己
   在 `/fff-features` 里的选择）。
+- **`pi-herdr-agents` 的四个硬条件**（`subagent` 工具注册成功 ≠ 能启动）：
+  1. 必须在 Herdr 里启动 omp（`HERDR_ENV=1`），且 `herdr` 在 PATH。窗口外工具照常注册，
+     启动时才报不可用。
+  2. 会话必须落盘：`omp -p --no-session` 没有 session 文件可交给子 agent，启动直接失败。
+  3. 子 agent 跑的是 **`pi`**，不是 omp。模型选择器走 `models.default` / `models.agents`
+     （`~/.pi/agent/herdr-agents/config.json`），必须是 pi 认得的 id。沿用父会话的
+     `volcengine/…` 会得到 `Model "volcengine/deepseek-v4-1-flash-260910" not found`。
+     种子文件固定 `deepseek/deepseek-flash`。
+  4. 该包声明的 `skills/` 会被 omp 自动加载（会话里出现 `pi-herdr-agents` 技能，含
+     启动/监督/取消/worktree 的操作指南）。
 
 加插件：把 spec 写进 `omp/plugins.txt`，再跑 `bash scripts/post-install.d/40-omp-plugins.sh`
 （或 `./install`）。

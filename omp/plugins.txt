@@ -18,3 +18,12 @@ npm:pi-fff
 # modelRoles.default selector cannot resolve; see omp/README.md, "Gateway
 # provider（gateways-login.json）".
 npm:omp-model-gateway
+#
+# pi-herdr-agents: async subagents as real `pi` processes in Herdr panes
+# (`subagent`, `subagent_send`, `worktree_*`, …). Needs the `herdr` CLI and
+# HERDR_ENV=1, i.e. omp started inside a Herdr pane, plus a persistent session
+# (`--no-session` has no session file to hand the child). Children run `pi`,
+# not omp, so `models.default` in ~/.pi/agent/herdr-agents/config.json must name
+# a model pi knows — an omp-only selector such as volcengine/* makes every
+# launch die with `Model "…" not found`. See omp/README.md, "Plugins".
+npm:pi-herdr-agents

@@ -28,6 +28,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SEEDS=(
   "kimi-code/config.toml:$HOME/.kimi-code/config.toml"
   "omp/pi-fff-features.json:$HOME/.omp/agent/extensions/pi-fff.json"
+  "pi/herdr-agents/config.json:$HOME/.pi/agent/herdr-agents/config.json"
 )
 
 for entry in "${SEEDS[@]}"; do
