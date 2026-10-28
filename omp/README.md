@@ -333,6 +333,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 | `omp/plugins.txt` | 每行一个 `omp plugin install` spec（`npm:` 前缀、版本后缀、`[features]` 括号均可）；空行与 `#` 注释忽略 |
 | `omp/pi-fff-features.json` | pi-fff 的 feature 状态种子（关掉 `autocomplete`），由下面的 seed 钩子拷到 `~/.omp/agent/extensions/pi-fff.json` |
 | `pi/herdr-agents/config.json` | pi-herdr-agents 的配置种子（`models.default` 等），同上由 seed 钩子拷到 `~/.pi/agent/herdr-agents/config.json` |
+| `omp/patches/pi-herdr-agents-omp-runtime.patch` | 让该包的子 agent 跑 **omp** 而不是 `pi`（包本身硬编码 `pi`）；由 `scripts/post-install.d/41-herdr-agents-omp-runtime.sh` 在安装后套用 |
 | `scripts/post-install.d/40-omp-plugins.sh` | `./install` 时对比 `omp plugin list --json`，只安装缺失的插件 |
 
 要点：
@@ -344,7 +345,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 - 当前清单：`npm:pi-fff`（FFF 模糊查找、内容搜索；默认**覆盖内建 `read`/`grep`**，用会话内
   `/fff-features` 开关）、`npm:omp-model-gateway`（`/login` 的 gateway 入口；本机 `volcengine`、
   `mafia`、`kafara` 三个 provider 都来自它，默认模型依赖它——见「Gateway provider」一节）、
-  `npm:pi-herdr-agents`（异步 subagent：每个子 agent 是 Herdr 窗格里的真 `pi` 进程，
+  `npm:pi-herdr-agents`（异步 subagent：每个子 agent 是 Herdr 窗格里的 **omp** 进程，
   工具 `subagent`/`subagent_send`/`worktree_*` 等；条件与限制见下）。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
   `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
@@ -359,16 +360,27 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   立即生效）。仓库用 `omp/pi-fff-features.json` 做种子，由
   `scripts/post-install.d/10-seed-configs.sh` 在目标缺失时拷入（已存在则不覆盖，保留你自己
   在 `/fff-features` 里的选择）。
-- **`pi-herdr-agents` 的四个硬条件**（`subagent` 工具注册成功 ≠ 能启动）：
+- **`pi-herdr-agents` 的三条硬条件**（`subagent` 工具注册成功 ≠ 能启动）：
   1. 必须在 Herdr 里启动 omp（`HERDR_ENV=1`），且 `herdr` 在 PATH。窗口外工具照常注册，
      启动时才报不可用。
-  2. 会话必须落盘：`omp -p --no-session` 没有 session 文件可交给子 agent，启动直接失败。
-  3. 子 agent 跑的是 **`pi`**，不是 omp。模型选择器走 `models.default` / `models.agents`
-     （`~/.pi/agent/herdr-agents/config.json`），必须是 pi 认得的 id。沿用父会话的
-     `volcengine/…` 会得到 `Model "volcengine/deepseek-v4-1-flash-260910" not found`。
-     种子文件固定 `deepseek/deepseek-flash`。
-  4. 该包声明的 `skills/` 会被 omp 自动加载（会话里出现 `pi-herdr-agents` 技能，含
+  2. 会话必须落盘：`omp -p --no-session` 没有 session 文件可交给子 agent，启动直接失败；
+     headless 父进程退出时子窗格一并被关掉，所以结果投递要交互式会话。
+  3. 该包声明的 `skills/` 会被 omp 自动加载（会话里出现 `pi-herdr-agents` 技能，含
      启动/监督/取消/worktree 的操作指南）。
+- **子 agent 是 omp，靠本地补丁实现**。包硬编码子进程为 `pi`，并依赖 pi 的
+  `--session <file>`、`-e <hook>` 与 `agent_settled` 事件；omp 三者都没有。补丁
+  `omp/patches/pi-herdr-agents-omp-runtime.patch` 改了四处：
+  1. 子命令 `omp --hook … --model … --thinking … '<task>'`（`--system-prompt*` 传的是字面
+     文本，所以不再传文件路径，改为内联内容）。
+  2. 新增子 hook `child/pin-session.ts`：在 `session_start` 用
+     `sessionManager.setSessionFile()` 把 omp 的会话写入重定向到父进程期望的路径，
+     `.exit` sidecar、activity 文件、结果解析、`subagent_resume` 才能对上。
+  3. 子 hook 的自动退出走 `agent_end` + `ctx.isIdle()` 轮询（omp 没有 `agent_settled`，
+     且 `agent_end` 之后还可能继续重试/换模型）。
+  4. 插件在子进程里（`PI_SUBAGENT_ID` 已设）不再注册宿主，否则 omp 子 agent 还能再开子 agent。
+  包升级后补丁可能失效：钩子只警告、不做半截应用，此时子 agent 会退回 `pi`。
+- 模型选择：不给 `model` 时子 agent 继承父会话选择器（同样是 omp，所以 `volcengine/…` 也有效）；
+  `models.default` 种子固定为 `deepseek/deepseek-flash`，避免默认烧贵模型。
 
 加插件：把 spec 写进 `omp/plugins.txt`，再跑 `bash scripts/post-install.d/40-omp-plugins.sh`
 （或 `./install`）。

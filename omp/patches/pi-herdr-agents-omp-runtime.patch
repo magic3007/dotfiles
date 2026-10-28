@@ -1,0 +1,226 @@
+diff -r a/maestro/adapters/pi/child/pin-session.ts b/maestro/adapters/pi/child/pin-session.ts
+--- a/maestro/adapters/pi/child/pin-session.ts	1970-01-01 08:00:00.000000000 +0800
++++ b/maestro/adapters/pi/child/pin-session.ts	2026-10-28 15:59:08.717304858 +0800
+@@ -0,0 +1,25 @@
++/**
++ * omp child hook: pin the child session file to the path the parent expects.
++ *
++ * The Pi adapter passes the child session path with `pi --session <file>`. omp
++ * has no such flag — it always allocates a file under its own session dir — so
++ * the launch passes the path in `PI_HERDR_AGENTS_SESSION` instead and this hook
++ * redirects the writer to it during `session_start`. Sidecar (`<file>.exit`),
++ * activity file, result extraction and `subagent_resume` all keep working
++ * because every one of them reads that same path.
++ */
++export default function pinSession(pi: {
++	on(
++		event: "session_start",
++		handler: (
++			event: unknown,
++			ctx: { sessionManager: { setSessionFile(path: string): void } },
++		) => Promise<void>,
++	): void;
++}) {
++	pi.on("session_start", async (_event, ctx) => {
++		const target = process.env.PI_HERDR_AGENTS_SESSION;
++		if (!target) return;
++		ctx.sessionManager.setSessionFile(target);
++	});
++}
+diff -r a/maestro/adapters/pi/child/subagent-done.ts b/maestro/adapters/pi/child/subagent-done.ts
+--- a/maestro/adapters/pi/child/subagent-done.ts	1985-10-26 16:15:00.000000000 +0800
++++ b/maestro/adapters/pi/child/subagent-done.ts	2026-10-28 16:05:47.667316261 +0800
+@@ -248,7 +248,7 @@
+ 		recorder.agentStart();
+ 	});
+ 
+-	pi.on("agent_end", (event) => {
++	pi.on("agent_end", (event, ctx) => {
+ 		latestAgentMessages = event.messages;
+ 		recorder.agentEndWaiting();
+ 		if (autoExit) {
+@@ -256,6 +256,10 @@
+ 			// the latest agent turn completed normally, not by who initiated it.
+ 			userTookOver = false;
+ 		}
++		// omp emits no `agent_settled`. Its `agent_end` fires per run, including
++		// runs that continue into a retry or a model fallback, so the omp path
++		// waits for the session to go idle before finalizing.
++		if (isOmpHost(ctx)) void settleOmpCompletion(ctx, event.messages);
+ 	});
+ 
+ 	pi.on("agent_settled", (_event, ctx) => {
+@@ -293,6 +297,25 @@
+ 			// Fall back to the latest low-level run when session evidence is unavailable.
+ 		}
+ 
++		finalizeAutoExit(ctx, messages);
++	});
++
++	/** omp is the child harness: no `agent_settled`, but `ctx.isIdle()` exists. */
++	function isOmpHost(ctx: unknown): ctx is SettleContext {
++		return typeof (ctx as { isIdle?: unknown } | null)?.isIdle === "function";
++	}
++
++	interface SettleContext {
++		isIdle(): boolean;
++		shutdown(): void;
++		sessionManager: {
++			getBranch(): { type: string; message?: any }[];
++		};
++	}
++
++	/** Write the `.exit` sidecar and shut down once the run has actually settled. */
++	function finalizeAutoExit(ctx: { shutdown(): void }, messages: any[] | undefined) {
++		if (completionFinalized) return;
+ 		if (!shouldAutoExitOnAgentEnd(userTookOver, messages)) return;
+ 		completionFinalized = true;
+ 
+@@ -314,7 +337,30 @@
+ 
+ 		recorder.agentEndDone();
+ 		ctx.shutdown();
+-	});
++	}
++
++	/** Poll until omp stops retrying/falling back, then finalize like pi does. */
++	async function settleOmpCompletion(
++		ctx: SettleContext,
++		initialMessages: any[] | undefined,
++	) {
++		if (!autoExit || completionFinalized) return;
++		const deadline = Date.now() + 20_000;
++		while (Date.now() < deadline && !ctx.isIdle()) {
++			await new Promise((resolve) => setTimeout(resolve, 200));
++		}
++		if (completionFinalized) return;
++		let messages = latestAgentMessages ?? initialMessages;
++		try {
++			const branchMessages = ctx.sessionManager
++				.getBranch()
++				.flatMap((entry) => (entry.type === "message" ? [entry.message] : []));
++			if (branchMessages.length > 0) messages = branchMessages;
++		} catch {
++			// Fall back to the messages carried by the last agent_end.
++		}
++		finalizeAutoExit(ctx, messages);
++	}
+ 
+ 	pi.on("turn_start", (event) => {
+ 		recorder.turnStart(event.turnIndex);
+diff -r a/maestro/adapters/pi/launch.ts b/maestro/adapters/pi/launch.ts
+--- a/maestro/adapters/pi/launch.ts	1985-10-26 16:15:00.000000000 +0800
++++ b/maestro/adapters/pi/launch.ts	2026-10-28 15:59:31.889421685 +0800
+@@ -1,4 +1,4 @@
+-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
++import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+ import { dirname, join, resolve } from "node:path";
+ import { homedir } from "node:os";
+ import { fileURLToPath } from "node:url";
+@@ -221,8 +221,10 @@
+ 	cwd: string,
+ 	readEnvironment: ProcessEnvironmentReader = readLinuxProcessEnvironment,
+ ): boolean {
++	// The child harness is ours: `omp` runs under Bun, so the process name is
++	// not a reliable marker. The per-launch session path in the environment is
++	// unique to this child, so matching it plus the cwd is sufficient.
+ 	return (
+-		(process.name === "pi" || process.argv0?.split("/").pop() === "pi") &&
+ 		process.cwd === cwd &&
+ 		readEnvironment(process.pid)?.get(PI_LAUNCH_SESSION_ENV) === sessionFile
+ 	);
+@@ -836,13 +838,22 @@
+ 	artifacts: PreparedArtifacts,
+ ): string {
+ 	const { request } = resolved;
++	// The child runs `omp` (the same harness as the parent), not `pi`:
++	// - omp has no `--session <file>`, so `child/pin-session.ts` redirects the
++	//   session writer to PI_HERDR_AGENTS_SESSION (set in the env below).
++	// - omp loads extension files with `--hook` (`-e` is pi-only).
++	// - `--system-prompt`/`--append-system-prompt` take literal text, so the
++	//   generated file is inlined instead of being named by path.
+ 	const parts = [
+-		"pi",
+-		"--session",
+-		shellQuote(artifacts.sessionFile),
++		"omp",
+ 		...(request.handoff
+ 			? []
+-			: ["-e", shellQuote(join(SUBAGENTS_DIR, "child", "subagent-done.ts"))]),
++			: [
++					"--hook",
++					shellQuote(join(SUBAGENTS_DIR, "child", "subagent-done.ts")),
++					"--hook",
++					shellQuote(join(SUBAGENTS_DIR, "child", "pin-session.ts")),
++				]),
+ 		"--model",
+ 		shellQuote(request.runtimePlan.model),
+ 		"--thinking",
+@@ -853,7 +864,7 @@
+ 			request.behavior.systemPromptMode === "replace"
+ 				? "--system-prompt"
+ 				: "--append-system-prompt",
+-			shellQuote(artifacts.systemPromptFile),
++			shellQuote(readFileSync(artifacts.systemPromptFile, "utf8")),
+ 		);
+ 	}
+ 	const toolAllowlist = buildSubagentToolAllowlist(
+@@ -1072,11 +1083,11 @@
+ 		);
+ 		const command = [
+ 			...env,
+-			"pi",
+-			"--session",
++			"omp",
++			"-r",
+ 			shellQuote(request.sessionFile),
+ 			...(toolAllowlist ? ["--tools", shellQuote(toolAllowlist)] : []),
+-			"-e",
++			"--hook",
+ 			shellQuote(join(SUBAGENTS_DIR, "child", "subagent-done.ts")),
+ 			...(messageFile ? [shellQuote(`@${messageFile}`)] : []),
+ 		].join(" ");
+diff -r a/maestro/adapters/pi/pi-harness-adapter.ts b/maestro/adapters/pi/pi-harness-adapter.ts
+--- a/maestro/adapters/pi/pi-harness-adapter.ts	1985-10-26 16:15:00.000000000 +0800
++++ b/maestro/adapters/pi/pi-harness-adapter.ts	2026-10-28 15:59:36.813446511 +0800
+@@ -137,7 +137,7 @@
+ 	}
+ 	isAvailable(): boolean {
+ 		try {
+-			execFileSync("pi", ["--version"], { stdio: "ignore" });
++			execFileSync("omp", ["--version"], { stdio: "ignore" });
+ 			return true;
+ 		} catch {
+ 			return false;
+diff -r a/maestro/adapters/pi/session.ts b/maestro/adapters/pi/session.ts
+--- a/maestro/adapters/pi/session.ts	1985-10-26 16:15:00.000000000 +0800
++++ b/maestro/adapters/pi/session.ts	2026-10-28 15:59:36.825446572 +0800
+@@ -833,6 +833,14 @@
+ 		if (entry.type === "model_change") {
+ 			if (isString(entry.provider)) observed.provider = entry.provider;
+ 			if (isString(entry.modelId)) observed.modelId = entry.modelId;
++			// omp records one combined selector instead of provider + modelId.
++			if (isString(entry.model)) {
++				const slash = entry.model.indexOf("/");
++				if (slash > 0) {
++					if (!isString(entry.provider)) observed.provider = entry.model.slice(0, slash);
++					if (!isString(entry.modelId)) observed.modelId = entry.model.slice(slash + 1);
++				}
++			}
+ 		} else if (
+ 			entry.type === "thinking_level_change" &&
+ 			isString(entry.thinkingLevel)
+diff -r a/pi-extension/subagents/index.ts b/pi-extension/subagents/index.ts
+--- a/pi-extension/subagents/index.ts	1985-10-26 16:15:00.000000000 +0800
++++ b/pi-extension/subagents/index.ts	2026-10-28 15:59:22.457374131 +0800
+@@ -2445,6 +2445,10 @@
+ 		infrastructure?: PiRunSessionInfrastructure;
+ 	} = {},
+ ) {
++	// omp children load this same plugin (the child is `omp`, not `pi`). The
++	// adapter marks every child with PI_SUBAGENT_ID; a child must never
++	// register the subagent host, or it could spawn children of its own.
++	if (process.env.PI_SUBAGENT_ID) return;
+ 	runtime.pi = pi;
+ 	runtime.session = createDefaultRunSession(
+ 		{
