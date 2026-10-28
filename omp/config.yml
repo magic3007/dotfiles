@@ -18,9 +18,9 @@ enabledModels:
   - devin/*
   - mafia/*
   - kafara/*
-  - volcengine/*
+  - volcengine/kimi-k3.1-pro
 modelRoles:
-  default: volcengine/deepseek-v4-1-flash-260910:auto
+  default: volcengine/kimi-k3.1-pro:auto
   tiny: mafia/claude-opus-5-5:medium
   smol: mafia/claude-opus-5-5:max
   slow: mafia/claude-fable-5-1:max

@@ -86,27 +86,33 @@ omp 直接报「没有可用模型」，不会退回内置默认）。所以启�
 ### Gateway provider（`gateways-login.json`）
 
 目录里没有、也不是手写 `models.yml` 的第三类 provider：**网关**。`omp-model-gateway` 插件把
-`~/.omp/agent/gateways-login.json` 里每个网关注册成一个 provider（本机：`volcengine`、
-`mafia`、`kafara`），字段是 `name` / `baseUrl` / `api` / `apiKey` / `extraModels`。
+`~/.omp/agent/gateways-login.json` 里每个网关注册成一个 provider（本机：`mafia`、`kafara`），
+字段是 `name` / `baseUrl` / `api` / `apiKey` / `extraModels`。
 该文件已入库（软链接，见上表）：`apiKey` 写的是 **key 引用**而非密钥（第 3 节），
 插件存引用、omp 解析，所以文件里不含密钥。新增/修改走会话内 `/login` 的 gateway 入口
 （输入环境变量名或 `!命令` 即可；直接粘贴明文 key 时，若该 key 已存在于某个环境变量，
 插件会改存那个变量名并说明）。模型清单由 `GET <baseUrl>/v1/models` 发现，再并上
-`extraModels` 的静态 id —— 所以 `omp models list` 里 `volcengine (34)` 大部分是发现来的，
-`ark-code-latest`、`doubao-seed-2.0-pro` 这类来自 `extraModels`。
+`extraModels` 的静态 id，所以 `omp models list` 的条数基本等于发现结果。
+
+**火山引擎不走网关**：账号是 Ark Coding Plan，`GET /api/coding/v1/models` 回 38 个模型
+（deepseek、doubao、glm 都在内），而本机只用 Kimi-K3.1-Pro。所以 `volcengine` 已从
+`gateways-login.json` 删掉，改成 `models.yml` 里的静态 provider，只声明
+`kimi-k3.1-pro`（Ark 的 alias id，实发可用；带日期的 `kimi-k3-1-pro-261024` 是同一个模型）。
+效果：`omp models volcengine` 只剩 1 条，`--model volcengine/deepseek-v4-1-flash-260910`
+直接 `Model ... not found`。直连内置 `deepseek/` provider（默认模型的降级链）不受影响。
 
 手改该文件后执行 `omp models refresh` 让模型缓存重新拉取。
 
-本机三条网关的 `apiKey` 用的是 **`!命令` 引用**，不是环境变量名：
+本机网关与手写 provider 的 `apiKey` 用的是 **`!命令` 引用**，不是环境变量名：
 
-    !grep -m1 '^export VE_CODE_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '"'
+    !grep -m1 '^export MAFIA_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '"'
 
 原因：xmatrix 通过它的 daemon 拉起 omp，daemon 只带 systemd 单元里那点环境，
 **没有** `~/.common_shell_setup_local.sh` 里的 `*_API_KEY`。而引用解析规则是
 「`!命令` 取 stdout → 环境变量名取该变量 → 其余当字面量」，环境变量不存在时
 **会把变量名本身当 key 发出去**，火山引擎于是回
-`401 AuthenticationError: The API key format is incorrect`（实测复现：
-`VE_CODE_API_KEY=VE_CODE_API_KEY omp -p --mode=json --model volcengine/deepseek-v4-1-flash-260910 "reply ok"`）。
+`401 AuthenticationError: The API key format is incorrect`（早期 `volcengine` 的 apiKey 写的是
+环境变量名 `VE_CODE_API_KEY`，在 daemon 拉起的环境里必然复现）。
 换成命令引用后，daemon 拉起的 omp 也能取到 key，密钥仍只存在
 `~/.common_shell_setup_local.sh` 一处（那里是双引号赋值，所以命令里要 `tr -d '"'`）。
 命令引用按进程缓存，改 key 后需要新进程才生效。
@@ -123,7 +129,8 @@ provider 全部失败：
 
 | harness | 凭据来源 | xmatrix run 里 |
 |---|---|---|
-| omp 网关（volcengine/mafia/kafara） | `gateways-login.json` 的 key 引用 | 已改 `!命令` 引用，可用 |
+| omp 网关（mafia/kafara） | `gateways-login.json` 的 key 引用 | 已改 `!命令` 引用，可用 |
+| omp 手写 provider（volcengine） | `models.yml` 的 key 引用 | 同上（`!命令` 引用） |
 | omp 内置目录 provider（deepseek/zai/kimi/openrouter…） | 环境变量 | 无 drop-in 时变量名被当 key 发出 → 401 |
 | codex 自定义 provider | `config.toml` 的 `env_key = "DEEPSEEK_API_KEY"` 等 | 同上 |
 | codex 官方 / claude / gemini | 文件式（`~/.codex/auth.json`、`~/.claude/.credentials.json`、`~/.gemini/*`） | 可用（不依赖 env） |
@@ -160,16 +167,17 @@ daemon 先 source 密钥文件再 exec，于是 daemon 环境带着全部 key，
 - 不要用 `xmatrix secret` 解决模型凭据：它是 Hub 侧密钥目录，只给 agent run 提供
   `xmatrix secret exec`（自己包命令），不会自动注入 harness 环境。
 
-因此默认模型 `volcengine/deepseek-v4-1-flash-260910` 依赖两个前提：插件装了、
-`gateways-login.json` 里有 `volcengine`（且 key 有效）。`enabledModels` 仍要写
-`volcengine/*`（白名单语义同上）。
+因此默认模型 `volcengine/kimi-k3.1-pro` 依赖两个前提：`models.yml` 里的 `volcengine` 块在、
+key 取得到（`VE_CODE_API_KEY`）。`enabledModels` 里也要有
+`volcengine/kimi-k3.1-pro`（白名单语义同上）。这条不再依赖 `omp-model-gateway` 插件。
 
 注意 `--profile <name>` 会把插件目录也隔离：profile 下 `omp plugin list` 是空的，
-网关 provider 与其模型都不存在，指向它们的 `modelRoles.default` 无法解析。要在 profile 里
-复现这套配置，得先在该 profile 装插件并重建 `gateways-login.json`。
+网关 provider（`mafia`/`kafara`）与其模型都不存在；`models.yml` 与 profile 的配置文件也不共用，
+所以 `volcengine` 块同样不在。要在 profile 里复现这套配置，得先在该 profile 装插件、
+重建 `gateways-login.json`，并补上 `models.yml` 的 `volcengine` 块。
 
-默认模型由 `modelRoles.default` 决定（本机 `volcengine/deepseek-v4-1-flash-260910:auto`，
-即火山引擎 Ark 上的 V4.1 Flash）；`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，
+默认模型由 `modelRoles.default` 决定（本机 `volcengine/kimi-k3.1-pro:auto`，
+即火山引擎 Ark 上的 Kimi-K3.1-Pro）；`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，
 不参与默认解析。
 
 默认模型的降级写在 `retry.fallbackChains.default`（本机 `- deepseek/deepseek-flash`）：
@@ -179,13 +187,19 @@ daemon 先 source 密钥文件再 exec，于是 daemon 环境带着全部 key，
 默认 `any`）会自动切到 `deepseek/deepseek-flash` 重试。实测：给默认模型一个坏 key，
 一轮内即 `switched model; retried` 并由 `deepseek/deepseek-flash` 完成该轮。
 
+**副作用（实测，2026-10-28）**：降级成功的那一轮会把这个结论持久化——`omp/config.yml` 里的
+`modelRoles.default` 被改写成降级目标（`volcengine/kimi-k3.1-pro:auto` →
+`deepseek/deepseek-flash`），同一次写盘还把 `enabledModels` 里已不在目录中的条目一并删掉。
+所以火山引擎配额耗尽（Ark 回 `429 AccountQuotaExceeded`）跑过一次之后，回头要检查
+`enabledModels` 与 `modelRoles.default` 是否还指向 Kimi。显式 `--model` 的调用不改文件。
+
 本机另行给 Claude 类 provider 配了统一降级链 `mafia → devin → kafara`：
 
 | chain key | 顺序 |
 |---|---|
 | `mafia/*` | `devin/claude-opus-5-5` → `kafara/devin/claude-opus-5-5` |
 | `devin/*` | `kafara/devin/claude-opus-5-5` |
-| `default` | `deepseek/deepseek-flash`（火山引擎默认模型与其余角色） |
+| `default` | `deepseek/deepseek-flash`（火山引擎 Kimi 默认模型与其余角色） |
 
 `kafara/devin/claude-opus-5-5` 是 `ai.kafara.men` 发现结果里的 id 原样（网关 `GET /v1/models`
 返回的 `id` 是反转串 = 混淆，插件解出可读 id 并存进 `models.db` 的 `model_cache`），实测
@@ -343,8 +357,9 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   选择重置回 manifest 默认值。
 - 只支持 npm spec。git / link 插件会告警跳过（GitHub 仓库名解析不出包名，无法判断是否已装）。
 - 当前清单：`npm:pi-fff`（FFF 模糊查找、内容搜索；默认**覆盖内建 `read`/`grep`**，用会话内
-  `/fff-features` 开关）、`npm:omp-model-gateway`（`/login` 的 gateway 入口；本机 `volcengine`、
-  `mafia`、`kafara` 三个 provider 都来自它，默认模型依赖它——见「Gateway provider」一节）、
+  `/fff-features` 开关）、`npm:omp-model-gateway`（`/login` 的 gateway 入口；本机 `mafia`、
+  `kafara` 两个 provider 来自它；`volcengine` 已改为 `models.yml` 静态 provider——见
+  「Gateway provider」一节）、
   `npm:pi-herdr-agents`（异步 subagent：每个子 agent 是 Herdr 窗格里的 **omp** 进程，
   工具 `subagent`/`subagent_send`/`worktree_*` 等；条件与限制见下）。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的

@@ -115,18 +115,18 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
-  # 火山引擎方舟 Coding Plan（Pro 订阅），与 gateways-login.json 的 volcengine 网关
-  # 是同一个 provider：这里只为 kimi-k3 补真实窗口。/api/coding 不返回 token_limits，
-  # 发现结果会落到插件兜底 200000/64000；1M/131072 取自内置目录同名模型的两处一致值
-  # （moonshot kimi-k3 与 devin kimi-k3）。
+  # 火山引擎方舟 Coding Plan（Pro 订阅）。本机只用 Kimi-K3.1-Pro，所以这里写成
+  # 静态 provider（不经 gateways-login.json 发现）：发现结果会把账号下 38 个模型
+  # 全拉进来，deepseek/doubao/glm 就仍可被选中。apiKey 用 `!命令` 引用，理由同
+  # gateways-login.json：xmatrix daemon 拉起的 omp 没有 VE_CODE_API_KEY。
   volcengine:
     baseUrl: https://ark.cn-beijing.volces.com/api/coding/v1
     api: anthropic-messages
     auth: apiKey
-    apiKey: VE_CODE_API_KEY
+    apiKey: "!grep -m1 '^export VE_CODE_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'"
     models:
-    - id: kimi-k3
-      name: kimi-k3
+    - id: kimi-k3.1-pro
+      name: kimi-k3.1-pro
       reasoning: true
       input: [text, image]
       contextWindow: 1048576
