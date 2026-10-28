@@ -49,9 +49,10 @@ PIN_COMMITS=(
 # The patch files themselves live next to the config they belong to
 # (neovim/patches/); scripts/apply-patches.sh only needs a git checkout to be
 # idempotent.
-PATCH_PLUGINS=(nvim-treesitter bufferline.nvim)
+PATCH_PLUGINS=(nvim-treesitter nvim-treesitter bufferline.nvim)
 PATCH_FILES=(
   "$PATCH_DIR/nvim-treesitter-nvim0.12-predicates.patch"
+  "$PATCH_DIR/nvim-treesitter-lua-injection-node.patch"
   "$PATCH_DIR/bufferline-nil-segments.patch"
 )
 

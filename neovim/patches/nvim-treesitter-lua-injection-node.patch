@@ -1,0 +1,12 @@
+diff --git i/queries/lua/injections.scm w/queries/lua/injections.scm
+index baf1914a..ba59fd72 100644
+--- i/queries/lua/injections.scm
++++ w/queries/lua/injections.scm
+@@ -17,6 +17,6 @@
+   (#eq? @_vimcmd_identifier "vim.treesitter.query.set_query"))
+ 
+ ;; highlight string as query if starts with `;; query`
+-((string ("string_content") @query) (#lua-match? @query "^%s*;+%s?query"))
++((string content: (string_content) @query) (#lua-match? @query "^%s*;+%s?query"))
+ 
+ (comment) @comment

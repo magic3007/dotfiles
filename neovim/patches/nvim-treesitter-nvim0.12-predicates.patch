@@ -1,7 +1,7 @@
-diff --git a/lua/nvim-treesitter/query_predicates.lua b/lua/nvim-treesitter/query_predicates.lua
-index 0638b6e7..b7a59c80 100644
---- a/lua/nvim-treesitter/query_predicates.lua
-+++ b/lua/nvim-treesitter/query_predicates.lua
+diff --git i/lua/nvim-treesitter/query_predicates.lua w/lua/nvim-treesitter/query_predicates.lua
+index 0638b6e7..e90baab4 100644
+--- i/lua/nvim-treesitter/query_predicates.lua
++++ w/lua/nvim-treesitter/query_predicates.lua
 @@ -1,5 +1,21 @@
  local query = require "vim.treesitter.query"
  
@@ -24,16 +24,43 @@ index 0638b6e7..b7a59c80 100644
  local function error(str)
    vim.api.nvim_err_writeln(str)
  end
-@@ -20,7 +36,7 @@ local function valid_args(name, pred, count, strict_count)
+@@ -20,12 +36,24 @@ local function valid_args(name, pred, count, strict_count)
    return true
  end
  
 -query.add_predicate("nth?", function(match, pattern, bufnr, pred)
++-- Neovim 0.12 hands predicate/directive handlers the captures as a list of
++-- nodes per capture id (one pattern can bind several nodes), while the 0.8 API
++-- this plugin targets passed the node itself. Take the first bound node, which
++-- is what every handler below wants, and keep working on older Neovim.
++local function captured_node(match, id)
++  local captured = match[id]
++  if type(captured) == "table" then
++    return captured[1]
++  end
++  return captured
++end
++
 +add_predicate("nth?", function(match, pattern, bufnr, pred)
    if not valid_args("nth?", pred, 2, true) then
      return
    end
-@@ -61,11 +77,11 @@ local function has_ancestor(match, pattern, bufnr, pred)
+ 
+-  local node = match[pred[2]]
++  local node = captured_node(match, pred[2])
+   local n = tonumber(pred[3])
+   if node and node:parent() and node:parent():named_child_count() > n then
+     return node:parent():named_child(n) == node
+@@ -39,7 +67,7 @@ local function has_ancestor(match, pattern, bufnr, pred)
+     return
+   end
+ 
+-  local node = match[pred[2]]
++  local node = captured_node(match, pred[2])
+   local ancestor_types = { unpack(pred, 3) }
+   if not node then
+     return true
+@@ -61,18 +89,18 @@ local function has_ancestor(match, pattern, bufnr, pred)
    return false
  end
  
@@ -48,7 +75,15 @@ index 0638b6e7..b7a59c80 100644
    if not valid_args("is?", pred, 2) then
      return
    end
-@@ -84,7 +100,7 @@ query.add_predicate("is?", function(match, pattern, bufnr, pred)
+ 
+   -- Avoid circular dependencies
+   local locals = require "nvim-treesitter.locals"
+-  local node = match[pred[2]]
++  local node = captured_node(match, pred[2])
+   local types = { unpack(pred, 3) }
+ 
+   if not node then
+@@ -84,12 +112,12 @@ query.add_predicate("is?", function(match, pattern, bufnr, pred)
    return vim.tbl_contains(types, kind)
  end)
  
@@ -57,7 +92,13 @@ index 0638b6e7..b7a59c80 100644
    if not valid_args(pred[1], pred, 2) then
      return
    end
-@@ -100,9 +116,9 @@ query.add_predicate("has-type?", function(match, pattern, bufnr, pred)
+ 
+-  local node = match[pred[2]]
++  local node = captured_node(match, pred[2])
+   local types = { unpack(pred, 3) }
+ 
+   if not node then
+@@ -100,9 +128,9 @@ query.add_predicate("has-type?", function(match, pattern, bufnr, pred)
  end)
  
  -- Just avoid some annoying warnings for this directive
@@ -69,21 +110,36 @@ index 0638b6e7..b7a59c80 100644
    local text, key, value
  
    if #pred == 3 then
-@@ -129,7 +145,7 @@ query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
+@@ -118,7 +146,7 @@ query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
+   if type(value) == "string" then
+     text = value
+   else
+-    local node = match[value]
++    local node = captured_node(match, value)
+     text = query.get_node_text(node, bufnr) or ""
+   end
+ 
+@@ -129,9 +157,9 @@ query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
    end
  end)
  
 -query.add_directive("exclude_children!", function(match, _pattern, _bufnr, pred, metadata)
 +add_directive("exclude_children!", function(match, _pattern, _bufnr, pred, metadata)
    local capture_id = pred[2]
-   local node = match[capture_id]
+-  local node = match[capture_id]
++  local node = captured_node(match, capture_id)
    local start_row, start_col, end_row, end_col = node:range()
-@@ -156,7 +172,7 @@ end)
+   local ranges = {}
+   for i = 0, node:named_child_count() - 1 do
+@@ -156,9 +184,9 @@ end)
  
  -- Trim blank lines from end of the region
  -- Arguments are the captures to trim.
 -query.add_directive("trim!", function(match, _, bufnr, pred, metadata)
 +add_directive("trim!", function(match, _, bufnr, pred, metadata)
    for _, id in ipairs { select(2, unpack(pred)) } do
-     local node = match[id]
+-    local node = match[id]
++    local node = captured_node(match, id)
      local start_row, start_col, end_row, end_col = node:range()
+ 
+     -- Don't trim if region ends in middle of a line
