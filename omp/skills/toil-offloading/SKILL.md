@@ -30,7 +30,7 @@ brief below is the part of this skill that actually governs quality.
 | Tier | Model | Owns |
 |---|---|---|
 | Root | session model (defaults to `modelRoles.default`) | Goal, decomposition, design calls, contract authorship, integration, acceptance |
-| Subagent | default `task` agent → `modelRoles.task` (`deepseek/deepseek-flash:auto`) | Executing contracts: recon, implementation, refactoring, extraction, artifact generation, test writing, slice-local checks |
+| Subagent | default `task` agent → `modelRoles.task` (whatever the user configures) | Executing contracts: recon, implementation, refactoring, extraction, artifact generation, test writing, slice-local checks |
 
 The tier is one session-wide setting, not a per-assignment choice: the bundled
 `task` agent declares `model: "@task"`, so default spawns resolve through
