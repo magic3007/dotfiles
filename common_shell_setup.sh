@@ -454,11 +454,11 @@ kmpi2()    { pi --provider moonshot  --model 'kimi-k3' "$@"; }
 glmpi()    { pi --provider arkcoding-responses --model 'glm-5.3' "$@"; }
 glmpix()   { pi --provider zai-responses --model 'glm-5.3-flash' "$@"; }
 
-f5pi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-fable-5' "$@"; }
-o5pi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider openz --model 'claude-opus-5' "$@"; }
+f5pi()   { pi --provider openz --model 'claude-fable-5' "$@"; }
+o5pi()   { pi --provider openz --model 'claude-opus-5' "$@"; }
 
-okpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider kafara --model 'devin/claude-opus-5-5' "$@"; }
-fkpi()   { PI_SUBAGENT_PROVIDER=dspro PI_SUBAGENT_MODEL='deepseek-flash[1m]' pi --provider kafara --model 'devin/claude-fable-5-1' "$@"; }
+okpi()   { pi --provider kafara --model 'devin/claude-opus-5-5' "$@"; }
+fkpi()   { pi --provider kafara --model 'devin/claude-fable-5-1' "$@"; }
 
 # omp (oh-my-pi / @oh-my-pi/pi-coding-agent) model shortcuts, mirroring the *pi group above.
 # Named after the *roles* in ~/dotfiles/omp/config.yml (modelRoles), so provider, model id,
