@@ -20,7 +20,7 @@ enabledModels:
   - kafara/*
   - volcengine/kimi-k3.1-pro
 modelRoles:
-  default: volcengine/kimi-k3.1-pro:auto
+  default: deepseek/deepseek-flash
   tiny: mafia/claude-opus-5-5:medium
   smol: mafia/claude-opus-5-5:max
   slow: mafia/claude-fable-5-1:max
