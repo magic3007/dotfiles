@@ -1,6 +1,6 @@
 ---
 name: toil-offloading-pi
-description: "Orchestrate decomposable workloads with pi subagents (afang-subagent extension): the strong-but-slow root agent clarifies goals, cuts the work into contract-bearing subtasks, fans them out to cheap-and-fast subagents, grades delivery risk, runs an independent review where it pays, and accepts the result. Use when the user asks for toil offloading, broad delegation, multi-project fan-out, or substantial work that can be split; do not use for a small task that is faster to complete directly."
+description: "Orchestrate decomposable workloads with pi subagents (pi-herdr-agents extension): the strong-but-slow root agent clarifies goals, cuts the work into contract-bearing subtasks, fans them out to cheap-and-fast subagents, grades delivery risk, runs an independent review where it pays, and accepts the result. Use when the user asks for toil offloading, broad delegation, multi-project fan-out, or substantial work that can be split; do not use for a small task that is faster to complete directly."
 ---
 
 # Toil Offloading (pi)
@@ -16,15 +16,21 @@ stays with the root is the part that cannot be written down as a contract
 because it *is* the decision: which design is right, what the real requirement
 is, and whether the delivered work is acceptable.
 
-Use the `subagent` tool exposed by the `afang-subagent` extension. Do not launch
+Use the `subagent` tool exposed by the `pi-herdr-agents` extension. Do not launch
 agent CLIs (claude, codex, gemini, ...) as shell subprocesses.
+
+Runtime mechanics — launch parameters, supervision, worktrees, config keys — are
+owned by the package's operating guide: `/skill:pi-herdr-agents` plus the
+package docs under
+`~/.pi/agent/npm/node_modules/pi-herdr-agents/docs/`. This skill owns *what to
+delegate and how to write the contract*; it does not restate the tool reference.
 
 ## The two-tier model
 
 | Tier | Model | Owns |
 |---|---|---|
 | **Root** | the session's strong/slow model | Goal clarification, decomposition, architecture and design calls, contract authorship, integration, risk grading, acceptance |
-| **Subagents** | cheap/fast (set by `PI_SUBAGENT_PROVIDER` + `PI_SUBAGENT_MODEL`) | Executing contracts: recon, implementation, refactoring, data extraction, artifact generation, test writing, verification runs, review |
+| **Subagents** | cheap/fast (`models.default`, a role's pinned model, or the per-call `model`) | Executing contracts: recon, implementation, refactoring, data extraction, artifact generation, test writing, verification runs, review |
 
 Delegation is the default for decomposable work because the marginal subtask
 costs a cheap model's time, not the root's. The root should be spending its
@@ -32,19 +38,19 @@ context on the plan and the acceptance decision, not on typing out the changes.
 
 ### Where the tier is declared
 
-The split is one session-wide setting, not a per-agent choice:
+`~/.pi/agent/herdr-agents/config.json` holds the durable defaults, and the
+checked-in source of that file is `~/dotfiles/pi/herdr-agents/config.json`
+(the seed hook copies it only when the target is missing). The relevant key is
+`models.default`; per-role pins live in role frontmatter and per-task overrides
+in the tool call.
 
-```sh
-export PI_SUBAGENT_PROVIDER="dspro"
-export PI_SUBAGENT_MODEL="deepseek-flash[1m]"
-```
+Resolution order for a child's model: the `model` parameter → the role's
+frontmatter `model:` → `models.agents.<name>` → `models.default` → the parent
+model. Set the cheap tier in one place (`models.default`, or a role that most
+contracts use) instead of repeating it in every call. Pinning the same tier in
+two places creates a second source of truth that silently loses.
 
-It lives in `~/.common_shell_setup_local.sh` so every pi session inherits it,
-including the plain `pi` aliases. Resolution order in the `afang-subagent`
-extension: these env vars → agent frontmatter `model:` → current session model.
-Because the env vars win, do not pin models in agent frontmatter — that would be
-a second source of truth that silently loses. To change the subagent tier, change
-the env vars.
+The file is read at extension startup, so `/reload` after editing it.
 
 ### Why cheap subagents are safe here
 
@@ -55,64 +61,71 @@ why contract quality is the single most important thing this skill governs. A
 vague contract handed to a cheap model produces a confident guess, which is
 worse than no delegation.
 
-## pi runtime constraints
+## Runtime constraints that shape the design
 
-Hard limits — design the batch around them:
-
-- **Modes**: single (`{agent, task}`), parallel (`{tasks: [...]}`), chain
-  (`{chain: [...]}`, sequential with `{previous}`), background
-  (`{agent, task, background: true, topic?}`, returns `task-N` immediately).
-- **Fan-out width**: `PI_SUBAGENT_MAX_PARALLEL_TASKS` (default 64) tasks per
-  parallel call, `PI_SUBAGENT_MAX_CONCURRENCY` (default 16) running at once,
-  `PI_SUBAGENT_BG_MAX_TASKS` (default 16) background tasks. These are the
-  extension's current defaults; read the live tool schema if a call is rejected.
-- **No nested delegation.** The root session is depth 0; a spawned subagent is
-  depth 1 and does **not** register the `subagent` tool. A subagent cannot
-  delegate further — never write a contract that assumes it will.
-- **No per-task model override.** The subagent model is a session-wide setting,
-  declared once by the `PI_SUBAGENT_PROVIDER` / `PI_SUBAGENT_MODEL` environment
-  variables (set in `~/.common_shell_setup_local.sh`), which override every
-  subagent for the session. Agent frontmatter `model:` is the fallback when
-  those are unset; a subagent with neither inherits the current session model.
-  There is no "use a smarter model just for this one task" — choose the agent
-  type and the contract quality instead.
-- **Available agents** (builtin, shipped with the extension):
-
-  | Agent | Tools | Use for |
-  |---|---|---|
-  | `scout` | read, grep, find, ls, bash | Fast recon returning compressed context |
-  | `planner` | read, grep, find, ls | Turning settled context into an ordered plan |
-  | `worker` | full | Implementation, refactoring, artifacts — has write access |
-  | `reviewer` | read, grep, find, ls, bash (read-only) | Independent review against acceptance criteria |
-
-  User agents in `~/.pi/agent/agents/` override same-name builtins. Run
-  `subagent {}` to list what the runtime actually exposes.
-- **Monitoring**: `/subagent` (alias `/sa`) opens a panel to watch each child's
-  trajectory and kill individuals without aborting the batch. The
-  `subagent_tasks` tool (`list` / `status` / `result` / `cancel`) covers both
-  foreground live and background tasks.
-- Background results land in `<task cwd>/.pi/subagent-results/<timestamp>-<task-id>-<slug>.md`
-  (falls back to `~/.pi/agent/subagent-results/` when not writable).
+- **Launches are asynchronous.** `subagent` returns an acknowledgement and the
+  child's result arrives later as its own message. Fan-out is therefore N
+  independent calls, not one batch object, and there are no `parallel` / `chain`
+  / `background` modes to choose between: every launch is already background.
+- **Never poll.** Do not sleep, tail session files, run watch loops, or call
+  `subagents_list` to check progress. The runtime delivers each result as its own
+  turn. A `stalled` or no-progress notice is a fact to read, not an instruction
+  to act.
+- **No nested delegation.** Children are leaves by default and do not get the
+  `subagent` tool. Never write a contract that assumes the child will delegate
+  further.
+- **Per-child model and thinking are part of the contract surface.** A call may
+  pin `model` (a `provider/model-id`, a comma-separated fallback list, or
+  `task:<category>`) and `thinking`. Use it when one subtask genuinely needs a
+  stronger tier; put the pin in the call, not in prose the child must interpret.
+- **Roles are optional.** A bare `subagent({ name, task })` always works. A named
+  `agent` resolves from `.pi/agents/`, then `~/.pi/agent/agents/`, then installed
+  role packs, and a missing or invalid role fails before any pane is created. The
+  package ships no roles. Run `subagents_list` (or `/subagent list`) before
+  relying on a name; this machine currently defines `dspix`.
+- **Results are bounded.** A result longer than 16,000 characters is shortened in
+  the parent context; the full text stays in the child session. Require a return
+  format that survives truncation: verdict, paths, criteria-by-criteria results,
+  and evidence first, prose last.
+- **Worktrees are opt-in per launch.** Use one managed worktree per parallel,
+  independent writer; a single sequential writer can work in the parent
+  checkout. The base is the committed `HEAD`, so uncommitted parent changes are
+  not copied. The extension never pushes, merges, or removes a worktree on its
+  own — cleanup is an explicit `worktree_remove` by the root.
+- **Persistent specialists** (`persistent: true`) keep one policy-bound session
+  for sequential turn-based work; send follow-ups with `subagent_send`. They
+  cannot be resumed. Use them for a long-running reviewer the root revisits, not
+  for one-shot contracts.
+- **Control tools**: `subagent_interrupt` stops one turn and keeps the session,
+  `subagent_cancel` ends an ordinary run, `subagent_stop` retires a persistent
+  specialist, `subagent_resume` continues an exited child session. Do not poll
+  after a cancel or stop; the outcome arrives as a message.
+- **Children can ask the parent for help** with `caller_ping`. A help request is
+  a contract defect or a real ambiguity — answer it with the missing decision,
+  then continue, rather than restarting the child.
 
 ## Start with real work
 
 Do not create availability, model-identity, provider-routing, or capability
-probe assignments. Treat the advertised agent types as the session contract and
-send the first useful contracts directly. If a subagent cannot start or finish,
-record its actual outcome and continue other safe, useful work. Reassign only
-when the scope and acceptance condition remain explicit; never replace a
-subagent with a shell subprocess.
+probe assignments. Treat the advertised tool and role set as the session
+contract and send the first useful contracts directly. If a subagent cannot start
+or finish, record its actual outcome and continue other safe, useful work.
+Reassign only when the scope and acceptance condition remain explicit; never
+replace a subagent with a shell subprocess.
 
 ## Partition
 
 Cut by **what can stand alone**, not by what is easy.
 
-| Subagent | Work |
+| Contract type | Work |
 |---|---|
-| `scout` | Locating code, tracing dependencies, gathering context the root has not seen |
-| `planner` | Converting settled context and requirements into an ordered plan |
-| `worker` | Implementation, refactoring, migration, batch edits, artifacts, test writing, running the focused suite |
-| `reviewer` | Independent read-only review of a delivered change against its acceptance criteria |
+| Recon | Locating code, tracing dependencies, gathering context the root has not seen |
+| Planning | Converting settled context and requirements into an ordered plan |
+| Implementation | Implementation, refactoring, migration, batch edits, artifacts, test writing, running the focused suite |
+| Review | Independent read-only review of a delivered change against its acceptance criteria |
+
+These are contract shapes, not required agent names. Name a role only when one
+already exists for it.
 
 Keep in the root:
 
@@ -125,19 +138,17 @@ Keep in the root:
 
 Do not delegate a decision and call it "investigation" — if the root does not
 know the answer, decide it first, then delegate execution of that decision. The
-one legitimate exception is *context gathering*: a `scout` may return facts the
-root then reasons over. That is retrieval, not judgment.
+one legitimate exception is *context gathering*: a recon child may return facts
+the root then reasons over. That is retrieval, not judgment.
 
-### Choosing between parallel, chain, and background
+### Choosing when to fan out
 
-- **Parallel** for independent subtasks. This is the default; prefer it. With a
-  64/16 budget, a large mechanical sweep should be partitioned wide.
-- **Chain** only for a real dependency, using `{previous}` when a later step
-  consumes an earlier result the root has not yet seen. Do not chain work the
-  root can integrate itself — routing results through the root is usually better,
-  because the root is the one that must understand them.
-- **Background** when the root has independent useful work to do meanwhile.
-  Do not background a task and then idle waiting for it.
+- **Do** launch independent contracts together; each returns on its own.
+- **Do not** launch a child whose result the root must have before it can write
+  the next contract. Decide, write the next contract, then launch — sequential
+  dependencies are the root's job, not a chain the runtime performs.
+- **Do not** launch work the root will immediately duplicate while waiting. If
+  the root has nothing independent to do, the task was not worth delegating.
 
 ## Write the contract
 
@@ -181,21 +192,23 @@ Include every applicable field, with concrete values rather than placeholders:
 7. **Blockers and escalation.** What to do if inputs are absent, source material
    contradicts the contract, validation fails, or completion needs changes
    outside ownership. Require reporting the concrete evidence and the decision
-   needed, preserving completed work, and pausing dependent actions instead of
-   guessing, broadening scope, weakening checks, or claiming success.
-   Independent in-scope work may continue.
+   needed — via `caller_ping` when the child is blocked mid-run — preserving
+   completed work, and pausing dependent actions instead of guessing, broadening
+   scope, weakening checks, or claiming success. Independent in-scope work may
+   continue.
 8. **Return format.** A concise summary; changed file or artifact paths; results
    against each acceptance criterion; checks actually run with outcomes;
    remaining uncertainties and blockers. Separate verified facts from
-   assumptions and mark checks that were not run.
+   assumptions and mark checks that were not run. Front-load the verdict and the
+   evidence, because the parent sees a truncated result.
 
 Before sending, ask whether a subagent holding only this contract and the named
 materials can tell what to do, where, what to avoid, how to verify, and when to
 stop. Fill every gap first. Write down any command you already know it needs.
 
-Follow-ups may reference the existing contract in the same subagent's context,
-but must state the observed failure, the required correction, and the acceptance
-criteria that still apply. A replacement subagent needs the complete current
+Follow-ups may reference the existing contract in the same child's context, but
+must state the observed failure, the required correction, and the acceptance
+criteria that still apply. A replacement child needs the complete current
 contract and the relevant evidence — never just "continue" or "try again".
 
 ## Validate by risk, not by habit
@@ -206,17 +219,17 @@ is how incorrect work ships. Grade the delivery and match the check to it.
 
 | Risk | Signals | Check |
 |---|---|---|
-| **Low** | Formatting, renames, doc/index updates, mechanical sweeps, no behavior change | Root inspects the diff or artifact directly. No reviewer. |
-| **Medium** | Contained behavior change, new code behind clear tests, additive migrations | Root runs the focused suite; delegate `reviewer` when the change is large enough that the root would otherwise re-read it all. |
-| **High** | Security, auth, data mutation or deletion, concurrency, money/permissions, changes that are expensive or impossible to reverse | Always `reviewer` against the written acceptance criteria, *plus* root verification. |
+| **Low** | Formatting, renames, doc/index updates, mechanical sweeps, no behavior change | Root inspects the diff or artifact directly. No review child. |
+| **Medium** | Contained behavior change, new code behind clear tests, additive migrations | Root runs the focused suite; delegate a review contract when the change is large enough that the root would otherwise re-read it all. |
+| **High** | Security, auth, data mutation or deletion, concurrency, money/permissions, changes that are expensive or impossible to reverse | Always a review contract against the written acceptance criteria, *plus* root verification. |
 
 Verification depth should track **blast radius**, not diff size: a one-line
 permission check outranks a 500-line rename.
 
 ### The reviewer's real job
 
-`reviewer` is read-only (`read, grep, find, ls, bash`) and runs on the cheap
-model. Two consequences to design around:
+A review child runs on the cheap tier with read-only tools. Two consequences to
+design around:
 
 - **It is a second pass over the acceptance criteria, not an oracle.** Give it
   the criteria and the changed paths, and ask for specific findings with file
@@ -224,8 +237,13 @@ model. Two consequences to design around:
   does Y", missing edge cases, and obvious defects.
 - **A cheap reviewer cannot out-reason the root.** When a high-risk change needs
   judgment the cheap model may not be trusted with, the root does the deep
-  review itself; the `reviewer` pass is an additional sweep for concrete
+  review itself; the review contract is an additional sweep for concrete
   discrepancies, not a substitute for the root's verdict.
+
+Launch the review child in a fresh session (`fork: false`) when you need
+context-isolated review. Cross-family independence, when it matters, means
+pinning a `model` from a different family than the author — a fresh session alone
+does not provide it.
 
 Do not treat a clean review as acceptance. The root owns the verdict.
 
@@ -234,23 +252,30 @@ Do not treat a clean review as acceptance. The root owns the verdict.
 - Inspect the worktree before assigning writes so user changes and concurrent
   ownership are visible.
 - Partition contracts so parallel writes never overlap: by project, by disjoint
-  paths, or by distinct output artifacts.
+  paths, by distinct output artifacts, or by one managed worktree per writer.
 - Never assign overlapping writes in one checkout. If overlap is unavoidable,
-  serialize those contracts, or use isolated worktrees when already authorized.
+  serialize those contracts.
 - Subagents must not commit, submit, deploy, delete, or perform other external
   or destructive actions unless the user explicitly authorized that action.
+  When a worktree child commits, say so in the contract and keep the branch
+  unpushed: the root owns integration.
 - Do not redo a subagent's contract in the root while it is running. Continue
   orchestration, dependency analysis, or integration work that does not
   duplicate its ownership.
 - Do not treat a subagent's success message as acceptance evidence. Inspect the
   materialized changes or outputs and run proportionate verification.
+- Retained worktrees are part of the delivery: list them with `worktree_list` and
+  remove them with `worktree_remove` once their content is integrated.
 
 ## Integrate and accept
 
-Track every contract to completion. Follow up with the same subagent when its
-context is valuable. Re-read each result as **claims, not conclusions**: check
-the diff or artifacts against each acceptance criterion, and reconcile any
-report that disagrees with what is actually on disk.
+Track every contract to completion. Follow up with the same child when its
+context is valuable, or resume an exited child session with `subagent_resume`
+rather than starting over.
+
+Re-read each result as **claims, not conclusions**: check the diff or artifacts
+against each acceptance criterion, and reconcile any report that disagrees with
+what is actually on disk.
 
 Fix small integration gaps directly in the root. For substantial rework, issue a
 revised contract with a new boundary and acceptance condition rather than

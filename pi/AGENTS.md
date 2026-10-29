@@ -10,8 +10,8 @@
 subagent 出量。
 
 - 能切就派，判据与不可委派边界以 skill 为准，不要凭直觉放宽或收紧。
-- 用 `subagent` 工具（`afang-subagent` 扩展）。不要用 shell 起 claude / codex /
-  gemini 等 CLI 当子进程。
+- 用 `subagent` 工具（`pi-herdr-agents` 扩展，需在 Herdr 内启动 pi）。不要用
+  shell 起 claude / codex / gemini 等 CLI 当子进程。
 - 委派前必须写清合同（目标、输入路径、所有权边界、已定方案、验收标准、返回格式）。
   只发一句话目标等于让廉价模型猜，比不委派更糟。
 - 并行写入合同不得落在同一批重叠路径上。
