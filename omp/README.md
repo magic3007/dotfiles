@@ -176,8 +176,8 @@ key 取得到（`VE_CODE_API_KEY`）。`enabledModels` 里也要有
 所以 `volcengine` 块同样不在。要在 profile 里复现这套配置，得先在该 profile 装插件、
 重建 `gateways-login.json`，并补上 `models.yml` 的 `volcengine` 块。
 
-默认模型由 `modelRoles.default` 决定（本机 `volcengine/kimi-k3.1-pro:auto`，
-即火山引擎 Ark 上的 Kimi-K3.1-Pro）；`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，
+默认模型由 `modelRoles.default` 决定（本机 `minimax-test/MiniMax-3.1-Flash:auto`，
+即 `MINIMAX_MY_API_KEY` 指向的 openplatform 上的 MiniMax-M3.1-Flash）；`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，
 不参与默认解析。
 
 默认模型的降级写在 `retry.fallbackChains.default`（本机 `- deepseek/deepseek-flash`）：
@@ -199,7 +199,7 @@ key 取得到（`VE_CODE_API_KEY`）。`enabledModels` 里也要有
 |---|---|
 | `mafia/*` | `devin/claude-opus-5-5` → `kafara/devin/claude-opus-5-5` |
 | `devin/*` | `kafara/devin/claude-opus-5-5` |
-| `default` | `deepseek/deepseek-flash`（火山引擎 Kimi 默认模型与其余角色） |
+| `default` | `deepseek/deepseek-flash`（minimax-test 默认模型与其余角色） |
 
 `kafara/devin/claude-opus-5-5` 是 `ai.kafara.men` 发现结果里的 id 原样（网关 `GET /v1/models`
 返回的 `id` 是反转串 = 混淆，插件解出可读 id 并存进 `models.db` 的 `model_cache`），实测
@@ -304,7 +304,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 本机配置：
 
     modelRoles:
-      task: deepseek/deepseek-flash:auto     # 廉价执行档；root 用默认模型做判断
+      task: minimax-test/MiniMax-3.1-Flash:auto     # 廉价执行档；root 用默认模型做判断
 
 - 只改这一处。`tasks[].model` 或自定义 agent frontmatter 里再钉模型，就会出现第二个真相源，
   而且会静默覆盖本角色。

@@ -15,12 +15,13 @@ enabledModels:
   - deepseek/deepseek-v4-flash-vision-exp
   - zai/glm-5.3-flash
   - mafia/MiniMax-M3.1-Flash
+  - minimax-test/*
   - devin/*
   - mafia/*
   - kafara/*
   - volcengine/kimi-k3.1-pro
 modelRoles:
-  default: deepseek/deepseek-flash
+  default: minimax-test/MiniMax-3.1-Flash:auto
   tiny: mafia/claude-opus-5-5:medium
   smol: mafia/claude-opus-5-5:max
   slow: mafia/claude-fable-5-1:max
@@ -38,8 +39,9 @@ modelRoles:
   deepseek-vflash: deepseek/deepseek-v4-flash:auto
   deepseek-flash: deepseek/deepseek-flash:auto
   mafia-minimax: mafia/MiniMax-M3.1-Flash:auto
+  minimax-pro: minimax-test/MiniMax-M78:auto
   zai-flash: zai/glm-5.3-flash:max
-  task: deepseek/deepseek-flash:auto
+  task: minimax-test/MiniMax-3.1-Flash:auto
 cycleOrder:
   - mafia-opus
   - devin-opus
