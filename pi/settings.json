@@ -24,7 +24,8 @@
     "my-pi-plugins",
     "npm:pi-powerline-footer@0.12.2",
     "npm:pi-web-access",
-    "git:github.com/obra/superpowers"
+    "git:github.com/obra/superpowers",
+    "npm:pi-herdr-agents"
   ],
   "skills": [
     "~/.pi/agent/skills"

@@ -424,6 +424,10 @@
           Installing pi-web-access (companion for my-pi-plugins),
       ]
     - [
+          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-herdr-agents || true",
+          Installing pi-herdr-agents (provides the subagent tool),
+      ]
+    - [
           "command -v opencode >/dev/null || curl --connect-timeout 10 -fsSL https://opencode.ai/install | bash || true",
           Installing Opencode CLI,
       ]
