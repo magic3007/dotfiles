@@ -1,7 +1,7 @@
 {
   "theme": "gruvbox-dark",
   "defaultProvider": "dspro",
-  "defaultModel": "deepseek-v4-flash[1m]",
+  "defaultModel": "deepseek-flash[1m]",
   "powerline": {
     "preset": "default",
     "layout": {
