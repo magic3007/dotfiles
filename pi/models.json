@@ -25,7 +25,7 @@
                         "supportsStore": false,
                         "supportsDeveloperRole": false,
                         "supportsReasoningEffort": true,
-                        "maxTokensField": "max_output_tokens"
+                        "maxTokensField": "max_tokens"
                     }
                 }
             ]
