@@ -360,9 +360,10 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   `/fff-features` 开关）、`npm:omp-model-gateway`（`/login` 的 gateway 入口；本机 `mafia`、
   `kafara` 两个 provider 来自它；`volcengine` 已改为 `models.yml` 静态 provider——见
   「Gateway provider」一节）、
-  `~/projects/omp-herdr-agents`（**本地 fork** `omp-herdr-agents`：异步 subagent，每个子
-  agent 是 Herdr 窗格里的 **omp** 进程；工具 `subagent`/`subagent_send`/`worktree_*` 等；
-  条件与限制见下）。上游 `pi-herdr-agents` 仍留在 pi 侧（`pi/settings.json`），两者互不干扰。
+  `npm:omp-herdr-agents`（**本地 fork 发布的包**：异步 subagent，每个子 agent 是 Herdr
+  窗格里的 **omp** 进程；工具 `subagent`/`subagent_send`/`worktree_*` 等；条件与限制见下；
+  源码在 `~/projects/omp-herdr-agents`，未发布时可直接写该路径）。上游 `pi-herdr-agents`
+  仍留在 pi 侧（`pi/settings.json`），两者互不干扰。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
   `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
   `{ signal }` 对象（`options.signal.aborted`）；omp 的 `@oh-my-pi/pi-tui` 同位置直接传

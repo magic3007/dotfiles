@@ -23,7 +23,7 @@ npm:omp-model-gateway
 # `subagent_send`, `worktree_*`, …) whose children are omp processes. Needs
 # the `herdr` CLI and HERDR_ENV=1, i.e. omp started inside a Herdr pane, plus
 # a persistent session (`--no-session` has no session file to hand the child).
-# This is the local fork of pi-herdr-agents ported to omp; a filesystem path is
-# used until the package is published, because the fork is the only copy that
-# runs children as omp. See omp/README.md, "Plugins".
-~/projects/omp-herdr-agents
+# This is the local fork of pi-herdr-agents ported to omp; the published package
+# is the only copy that runs children as omp. A filesystem path also works here
+# (for an unpublished local build) — see omp/README.md, "Plugins".
+npm:omp-herdr-agents
