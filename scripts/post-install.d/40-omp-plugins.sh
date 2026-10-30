@@ -51,13 +51,26 @@ while IFS= read -r line || [[ -n $line ]]; do
   spec="$(printf '%s' "$spec" | sed -E 's/^#.*$//; s/[[:space:]]+#.*$//')"
   [[ -n $spec ]] || continue
 
-  # spec → package name: drop a trailing feature bracket, the npm: prefix and a
-  # version suffix (`pi-fff@1.2.3` → pi-fff, `@scope/pkg@1.2.3` → @scope/pkg).
-  name="$(printf '%s' "$spec" | sed -E 's/\[[^]]*\]$//; s/^npm://; s/@[^@/]+$//')"
+  # A filesystem path installs a local checkout (a fork that has no published
+  # release yet); its package name is the directory name.
+  if [[ $spec == /* || $spec == "~/"* ]]; then
+    path="${spec/#\~/$HOME}"
+    if [[ ! -d $path ]]; then
+      printf 'warn  %s: local plugin path does not exist\n' "$spec" >&2
+      continue
+    fi
+    name="$(basename "$path")"
+    target="$path"
+  else
+    # spec → package name: drop a trailing feature bracket, the npm: prefix and a
+    # version suffix (`pi-fff@1.2.3` → pi-fff, `@scope/pkg@1.2.3` → @scope/pkg).
+    name="$(printf '%s' "$spec" | sed -E 's/\[[^]]*\]$//; s/^npm://; s/@[^@/]+$//')"
 
-  if [[ ! $name =~ ^(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$ ]]; then
-    printf 'warn  %s: not an npm spec (git/link plugins are not tracked here)\n' "$spec" >&2
-    continue
+    if [[ ! $name =~ ^(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$ ]]; then
+      printf 'warn  %s: not an npm spec or an existing path (git specs are not tracked here)\n' "$spec" >&2
+      continue
+    fi
+    target="$spec"
   fi
 
   if is_installed "$name"; then
@@ -66,7 +79,7 @@ while IFS= read -r line || [[ -n $line ]]; do
   fi
 
   printf 'inst  %s <- %s\n' "$spec" "$(basename "$LIST")"
-  if ! omp plugin install "$spec"; then
+  if ! omp plugin install "$target"; then
     printf 'warn  omp plugin install %s failed (offline?)\n' "$spec" >&2
     status=1
   fi

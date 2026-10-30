@@ -19,11 +19,11 @@ npm:pi-fff
 # provider（gateways-login.json）".
 npm:omp-model-gateway
 #
-# pi-herdr-agents: async subagents in Herdr panes (`subagent`,
-# `subagent_send`, `worktree_*`, …). Needs the `herdr` CLI and HERDR_ENV=1,
-# i.e. omp started inside a Herdr pane, plus a persistent session
-# (`--no-session` has no session file to hand the child). The package launches
-# `pi`; omp/patches/pi-herdr-agents-omp-runtime.patch (applied by
-# scripts/post-install.d/41-herdr-agents-omp-runtime.sh) makes children run
-# `omp` instead. See omp/README.md, "Plugins".
-npm:pi-herdr-agents
+# omp-herdr-agents: async subagents in Herdr panes (`subagent`,
+# `subagent_send`, `worktree_*`, …) whose children are omp processes. Needs
+# the `herdr` CLI and HERDR_ENV=1, i.e. omp started inside a Herdr pane, plus
+# a persistent session (`--no-session` has no session file to hand the child).
+# This is the local fork of pi-herdr-agents ported to omp; a filesystem path is
+# used until the package is published, because the fork is the only copy that
+# runs children as omp. See omp/README.md, "Plugins".
+~/projects/omp-herdr-agents
