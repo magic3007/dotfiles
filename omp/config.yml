@@ -21,10 +21,10 @@ enabledModels:
   - kafara/*
   - volcengine/kimi-k3.1-pro
 modelRoles:
-  default: minimax-test/MiniMax-3.1-Flash:auto
+  default: minimax-test/MiniMax-M78:auto
   tiny: mafia/claude-opus-5-5:medium
-  smol: mafia/claude-opus-5-5:max
-  slow: mafia/claude-fable-5-1:max
+  smol: minimax-test/MiniMax-3.1-Flash:auto
+  slow: kafara/gpt-6-sol:max
   vision: mafia/claude-opus-5-5:max
   mafia-opus: mafia/claude-opus-5-5:auto
   devin-opus: devin/claude-opus-5-5:auto
@@ -41,7 +41,8 @@ modelRoles:
   mafia-minimax: mafia/MiniMax-M3.1-Flash:auto
   minimax-pro: minimax-test/MiniMax-M78:auto
   zai-flash: zai/glm-5.3-flash:max
-  task: minimax-test/MiniMax-3.1-Flash:auto
+  task: mafia/claude-opus-5-5:medium
+  advisor: mafia/claude-opus-5-5:high
 cycleOrder:
   - mafia-opus
   - devin-opus
@@ -59,6 +60,9 @@ retry:
       - kafara/devin/claude-opus-5-5
     default:
       - deepseek/deepseek-flash
+task:
+  agentModelOverrides:
+    reviewer: devin/gpt-6-1-sol:auto
 defaultThinkingLevel: auto
 compaction:
   methodOrder:
