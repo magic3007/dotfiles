@@ -59,10 +59,10 @@ channel = "stable"
 # Apply changes to a running server with: herdr server reload-config
 
 [ui.toast]
-delivery = "terminal"
+delivery = "off"
 
 [ui.sound]
-enabled = true
+enabled = false
 
 [ui]
 show_agent_labels_on_pane_borders = false
