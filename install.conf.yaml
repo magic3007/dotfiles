@@ -155,6 +155,15 @@
     ~/.vscoderc: vscode/vscoderc
     ~/Library/Application Support/Code/User/keybindings.json: vscode_config/keybindings.json
     ~/Library/Application Support/Code/User/settings.json: vscode_config/settings.json
+    # chatLanguageModels.json holds BYOK providers; its apiKey is a
+    # ${input:chat.lm.secret.*} reference to VS Code Secret Storage, never a
+    # literal, so the tracked file carries no secret.
+    ~/Library/Application Support/Code/User/chatLanguageModels.json: vscode_config/chatLanguageModels.json
+    # mcp.json defines MCP servers only (no credentials — keep it that way; use
+    # an env-var reference if a server ever needs a token).
+    ~/Library/Application Support/Code/User/mcp.json: vscode_config/mcp.json
+    # Custom chat modes / prompt files.
+    ~/Library/Application Support/Code/User/prompts: vscode_config/prompts
     ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
     ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
     ~/Library/Application Support/Antigravity/User/keybindings.json: antigravity_config/keybindings.json

@@ -1,0 +1,20 @@
+[
+	{
+		"name": "https://api.deepseek.com",
+		"vendor": "customendpoint",
+		"apiKey": "${input:chat.lm.secret.193b5406}",
+		"apiType": "chat-completions",
+		"models": [
+			{
+				"id": "deepseek-flash",
+				"name": "deepseek-flash",
+				"url": "https://api.deepseek.com/v1/chat/completions",
+				"toolCalling": true,
+				"vision": true,
+				"thinking": true,
+				"contextWindow": 1000000,
+				"maxOutputTokens": 384000
+			}
+		]
+	}
+]

@@ -48,6 +48,23 @@
     ~/.vim_runtime: vim/vimrc
     ~/.ideavimrc: ideavimrc
     ~/.config/nvim: neovim/nvim-basic-ide
+    # VS Code user config (macOS). Same files as install.conf.yaml; the 15-minute
+    # tick restores them if VS Code or a sync drops a link.
+    ~/Library/Application Support/Code/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/keybindings.json
+    ~/Library/Application Support/Code/User/settings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/settings.json
+    ~/Library/Application Support/Code/User/chatLanguageModels.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/chatLanguageModels.json
+    ~/Library/Application Support/Code/User/mcp.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/mcp.json
+    ~/Library/Application Support/Code/User/prompts:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/prompts
 
     # ---- File managers ----
     ~/.config/ranger: ranger
