@@ -180,3 +180,6 @@ export PATH=$HOME/.opencode/bin:$PATH
 [ -f $HOME/.local/bin/env ] && source "$HOME/.local/bin/env"
 export CLASHCTL_HOME=$HOME/clashctl
 [ -f $CLASHCTL_HOME/scripts/cmd/clashctl.sh ] && source $CLASHCTL_HOME/scripts/cmd/clashctl.sh
+
+# Added by MiniMax Code
+export PATH="$HOME/.minimax/bin:$PATH"
