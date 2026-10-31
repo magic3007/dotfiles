@@ -176,9 +176,23 @@ key 取得到（`VE_CODE_API_KEY`）。`enabledModels` 里也要有
 所以 `volcengine` 块同样不在。要在 profile 里复现这套配置，得先在该 profile 装插件、
 重建 `gateways-login.json`，并补上 `models.yml` 的 `volcengine` 块。
 
-默认模型由 `modelRoles.default` 决定（本机 `minimax-test/MiniMax-3.1-Flash:auto`，
-即 `MINIMAX_MY_API_KEY` 指向的 openplatform 上的 MiniMax-M3.1-Flash）；`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，
-不参与默认解析。
+默认模型由 `modelRoles.default` 决定（本机 `mafia/MiniMax-M78:auto`）。MiniMax-M78 有两个入口：
+
+| 入口 | 窗口 | 凭据 | 本机用法 |
+|---|---|---|---|
+| `mafia/MiniMax-M78` | 200K | `MAFIA_API_KEY` | `default` / `minimax-pro` / `smol`（`mafia/MiniMax-M3.1-Flash`）走这里 |
+| `minimax-test/MiniMax-M78` | 1M | `MINIMAX_MY_API_KEY` | 显式 `--model minimax-test/MiniMax-M78` |
+
+`modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，不参与默认解析。
+
+`minimax-test` 的上游只认 `X-Api-Key` 头：`Authorization: Bearer` 会被忽略。所以
+`models.yml` 里显式写了 `headers.X-Api-Key`，两个字段的值都用 `!grep` 从
+`~/.common_shell_setup_local.sh` 的 `export MINIMAX_MY_API_KEY=` 读（理由同 `volcengine`：
+xmatrix daemon 拉起的 omp 没有这个环境变量）。key 没写进那个文件时，omp 直接报
+`No API key found for minimax-test`（以前是发出无 key 请求、上游回
+`401 login fail: Please carry the API secret key in the 'X-Api-Key' field`，再被
+`default` 链静默降级到 `deepseek/deepseek-flash`）。补上 key 之后把 `default` 切回
+`minimax-test/MiniMax-M78:auto` 即可拿回 1M 窗口。
 
 默认模型的降级写在 `retry.fallbackChains.default`（本机 `- deepseek/deepseek-flash`）：
 `default` 角色自己的链就是这条，其他没有单独配置链的角色也复用同一条。链路解析按
@@ -199,7 +213,7 @@ key 取得到（`VE_CODE_API_KEY`）。`enabledModels` 里也要有
 |---|---|
 | `mafia/*` | `devin/claude-opus-5-5` → `kafara/devin/claude-opus-5-5` |
 | `devin/*` | `kafara/devin/claude-opus-5-5` |
-| `default` | `deepseek/deepseek-flash`（minimax-test 默认模型与其余角色） |
+| `default` | `deepseek/deepseek-flash`（未单独配链的角色共用这条兜底） |
 
 `kafara/devin/claude-opus-5-5` 是 `ai.kafara.men` 发现结果里的 id 原样（网关 `GET /v1/models`
 返回的 `id` 是反转串 = 混淆，插件解出可读 id 并存进 `models.db` 的 `model_cache`），实测

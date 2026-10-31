@@ -21,9 +21,9 @@ enabledModels:
   - kafara/*
   - volcengine/kimi-k3.1-pro
 modelRoles:
-  default: minimax-test/MiniMax-M78:auto
+  default: mafia/MiniMax-M78:auto
   tiny: mafia/claude-opus-5-5:medium
-  smol: minimax-test/MiniMax-3.1-Flash:auto
+  smol: mafia/MiniMax-M3.1-Flash:auto
   slow: kafara/gpt-6-sol:max
   vision: mafia/claude-opus-5-5:max
   mafia-opus: mafia/claude-opus-5-5:auto
@@ -39,7 +39,7 @@ modelRoles:
   deepseek-vflash: deepseek/deepseek-v4-flash:auto
   deepseek-flash: deepseek/deepseek-flash:auto
   mafia-minimax: mafia/MiniMax-M3.1-Flash:auto
-  minimax-pro: minimax-test/MiniMax-M78:auto
+  minimax-pro: mafia/MiniMax-M78:auto
   zai-flash: zai/glm-5.3-flash:max
   task: mafia/claude-opus-5-5:medium
   advisor: mafia/claude-opus-5-5:high
