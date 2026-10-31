@@ -11230,5 +11230,6 @@
     "window.autoDetectColorScheme": true,
     "workbench.preferredLightColorTheme": "Cursor Dark",
     "workbench.startupEditor": "none",
-    "gitlens.graph.details.location": "auto"
+    "gitlens.graph.details.location": "auto",
+    "js/ts.experimental.useTsgo": true
 }
