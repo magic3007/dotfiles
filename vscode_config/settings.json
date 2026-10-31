@@ -11222,5 +11222,6 @@
     "window.commandCenter": true,
     "terminal.integrated.macOptionIsMeta": true,
     "window.autoDetectColorScheme": true,
-    "workbench.startupEditor": "none"
+    "workbench.startupEditor": "none",
+    "workbench.preferredLightColorTheme": "Dark Modern"
 }
