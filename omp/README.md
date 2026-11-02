@@ -19,7 +19,6 @@
 | `omp/WATCHDOG.yml` | `~/.omp/agent/WATCHDOG.yml` | advisor（`--advisor`）的 reviewer 花名册 |
 | `omp/AGENTS.md` | `~/.omp/agent/AGENTS.md` | 用户级上下文文件：回复风格（ASD-STE100 + 中文） |
 | `omp/RULES.md` | `~/.omp/agent/RULES.md` | always-apply 常驻规则：同一句回复风格，长会话压缩后仍生效 |
-| `omp/extensions/deepen.ts` | `~/.omp/agent/extensions/deepen.ts` | `/deepen` 扩展，见下文「扩展：`/deepen`」 |
 
 `~/.omp/agent/` 下其余内容是**运行时状态**，各机器不同，留在本机、不进 git：
 
@@ -330,24 +329,6 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   `task.batch` 默认开，所以独立 slice 要在**一次** `task` 调用的 `tasks[]` 里并发抛。
 - 编排规则（合同写法、分区、验收、收尾）在 `omp/skills/toil-offloading-omp/SKILL.md`，对应 Codex
   侧 `codex/skills/toil-offloading/` + `codex/agents/{dspix,glmpix}.toml` 那套原生 team。
-
-## 扩展：`/deepen`
-
-`~/.omp/agent/extensions/` 是本机真目录（herdr 集成、`pi-fff.json` 也在里面），所以只链接单个
-文件，不链接整个目录。omp 直接加载该目录下的 `*.ts`。
-
-`/deepen` 是**旁路**提示词增强：
-
-1. 两种入口：输入框里写好提示词后按 **Alt+E**（增强输入框内容）；或执行 `/deepen <提示词>`。
-2. 用当前会话模型发一次独立请求：不带会话历史、不带工具、不写进 transcript。
-3. 模型先分析四项（专家会做而你没要求的事、原始素材、方法与工具、独立验证），
-   再写重写后的提示词；扩展只取 `<enhanced_prompt>` 段，**回填到输入框**，不自动发送，原文不保留。
-4. 运行期间输入框换成加载卡片（转圈 + 「正在用 <模型> 增强提示词…」），卡片占住键盘焦点，
-   不能输入。**Esc** 取消请求并恢复原文；请求失败或超过 5 分钟也恢复原文。
-5. 主会话正在运行时也能用：增强请求和主会话互不影响；卡片期间 Esc 只取消增强，不中断主会话。
-
-限制：旁路请求看不到文件和环境，所以依赖环境的路径和命令会写成「先核实」的步骤。
-只在交互式 TUI 下可用（print/RPC 模式没有输入框可回填）。
 
 ## Plugins（插件）
 
