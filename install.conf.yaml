@@ -220,8 +220,8 @@
     # cache/、terminal-sessions/、last-changelog-version）以及 ~/.omp/{logs,run,gpu_cache.json}
     # 都是运行时状态，各机器不同，留在本机、不进 git。
     # 插件同理：仓库只跟踪 omp/plugins.txt 里的 spec 清单，
-    # 缺失的插件由 scripts/post-install.d/40-omp-plugins.sh 在 ./install 时安装
-    # （需要网络，所以不进 15 分钟的 sync）。
+    # 缺失的插件由 scripts/omp-plugins.sh 在 ./install 的 Phase 2 安装
+    # （要联网、要有 bun，所以不进 15 分钟的 sync，也不能放 Phase 1 的 post-install.d）。
     #
     # 硬约束（见 omp/README.md）：
     #   1) config.yml 必须可写 —— omp 对它上 native file lock，repo 里保持普通可写文件。
@@ -512,15 +512,37 @@
 #       agent (npm/bun pkg @oh-my-pi/pi-coding-agent). It is NOT the prompt
 #       theme tool Oh My Posh (ohmyposh.dev). `omp` is an AI coding agent
 #       harness, not a prompt engine - it does NOT touch PROMPT.
-#       It installs via bun into ~/.bun/bin/omp.
+#       Two install paths: with bun (>=1.4.4) it runs `bun install -g` and
+#       produces ~/.bun/bin/omp (a `#!/usr/bin/env bun` shim); without bun it
+#       downloads a prebuilt ELF straight to ~/.local/bin/omp. See omp/README.md.
 #       Static config lives in the repo (omp/) and is symlinked into
 #       ~/.omp/agent/ by the link section above — see that block's comments
 #       re: file-lock requirement and secret handling.
 # ---------------------------------------------------------------------------
+# 安装顺序有讲究：bun → omp → omp 插件。
+#
+# bun 不是「可选工具」：omp 的插件安装器 spawn `bun install`，按名字查 PATH。
+# 若 omp 已经存在（本机是发行版 ELF 二进制装在 ~/.local/bin，不是 ~/.bun/bin 的
+# shim），下面的 `command -v omp` 会短路，omp.sh 安装器不跑，bun 就永远装不上，
+# 于是插件安装报 `Executable not found in $PATH: "bun"`。所以 bun 单独判一次。
+#
+# 不用 bun 官方脚本默认行为改 rc：`~/.zshrc` / `~/.bashrc` 都是指向本仓库的软链，
+# 脚本会往里追加 `# bun` + PATH 行，把受版本管理的文件弄脏。`SHELL=/bin/none`
+# 让脚本走 `case` 的 `*` 分支（只打印手动指引，不写文件）；PATH 由
+# oh-my-zsh/zshrc.d/40-runtime.zsh 导出 ~/.bun/bin，脚本自己也会解析该路径。
+# ---------------------------------------------------------------------------
 - shell:
+    - [
+          "command -v bun >/dev/null || [ -x \"$HOME/.bun/bin/bun\" ] || curl --connect-timeout 30 -fsSL https://bun.sh/install | SHELL=/bin/none bash || true",
+          Installing bun (needed by omp's plugin installer),
+      ]
     - [
           "command -v omp >/dev/null || curl --connect-timeout 30 -fsSL https://omp.sh/install | sh || true",
           Installing omp (Stencil coding agent harness),
+      ]
+    - [
+          "bash scripts/omp-plugins.sh || true",
+          Installing missing omp plugins (needs network + bun),
       ]
 
 # ---------------------------------------------------------------------------

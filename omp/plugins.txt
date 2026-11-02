@@ -1,4 +1,5 @@
-# omp plugins, installed by scripts/post-install.d/40-omp-plugins.sh.
+# omp plugins, installed by scripts/omp-plugins.sh (from install.conf Phase 2,
+# after bun and omp are installed — omp shells out to `bun install`).
 #
 # One `omp plugin install` spec per line; blank lines and # comments are
 # ignored. npm specs support the feature bracket syntax (`pkg[a,b]`, `pkg[]`,
