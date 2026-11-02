@@ -68,20 +68,15 @@ retry:
   fallbackChains:
     # 默认模型降级只走同为 1M 窗口的模型：中途切到 200K 窗口（mafia/kafara 兜底值）
     # 会把已经很长的一轮撑爆，所以这里不接 mafia 那条链。
+    mafia/claude-opus-5-5:
+      - kafara/devin/claude-opus-5-5
+      - minimax-test/MiniMax-M78
+    mafia/gpt-6-astra:
+      - kafara/gpt-6-astra
+      - minimax-test/MiniMax-M78
     minimax-test/MiniMax-M78:
       - minimax-test/MiniMax-M3.1-Flash
       - deepseek/deepseek-flash
-    mafia/claude-opus-5-5:
-      - devin/claude-opus-5-5
-      - kafara/devin/claude-opus-5-5
-      - kafara/claude-opus-5-5-high
-    mafia/gpt-6-astra:
-      - devin/gpt-6-astra
-      - kafara/devin/gpt-6-astra
-      - kafara/gpt-6-astra
-    mafia/*:
-      - devin/claude-opus-5-5
-      - kafara/devin/claude-opus-5-5
     default:
       - deepseek/deepseek-flash
 task:
