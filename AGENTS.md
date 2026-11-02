@@ -158,6 +158,22 @@ role-availability or model/provider probes.
 
 **Plugins** (in `settings.json`): superpowers (official), feishu, humanize — installed via marketplace system with `extraKnownMarketplaces` config.
 
+### Herdr and Herdr app (`herdr/`, `herdr-app/`)
+
+Two separate programs, two separate config homes:
+
+- **herdr** (`herdr/`) — the agent-aware terminal multiplexer (TUI). Config: `herdr/config.toml` → `~/.config/herdr/config.toml`, linked in both `install.conf.yaml` and `sync.conf.yaml`. Installed by `https://herdr.dev/install.sh` (the `herdr` binary in `~/.local/bin`).
+- **Herdr app** (`herdr-app/`) — the desktop window app (https://herdr.dev/download). It drives **herdr-core** (`hc`), which keeps terminals alive when the window closes. `herdr` (TUI) and `herdr-core` are not interchangeable.
+
+**Installation**: `scripts/install-herdr-app.sh` (macOS only; wired into `install.conf.yaml`'s network phase). It is idempotent and deliberately does *not* re-run upstream's `releases.herdr.dev/app/install.sh`:
+- upstream always installs the bundle into `~/Applications`; this machine already has `/Applications/Herdr.app` (dragged from the dmg), so running it would create a second bundle and split Launchpad / `herdr-app` across two locations. The script reuses whichever bundle exists and only downloads when none does.
+- the app self-updates, so an existing signed bundle is never overwritten.
+- a Developer ID–signed bundle is kept byte-identical (modifying it, e.g. injecting `LSEnvironment`, invalidates the signature and with it macOS' permission grants). Only unsigned/adhoc dev builds get `LSEnvironment` + an adhoc re-sign, matching upstream.
+
+**Config ownership** (`~/.config/herdr-app/`): `themes/dracula.json` is a real symlink (the app never writes theme files back); `settings.json` and `keys.json` are **seeded** instead of linked, because herdr-app writes them via temp-file + rename, which replaces a symlink with a regular file (verified 2026-11-02: one `herdr-app do app.zoom_in` after dotbot linked both turned them back into regular files). The app also drops keys it does not persist itself (`theme`, `appearance`) whenever it rewrites `settings.json`, so the theme is additionally pinned per-layout with `herdr-app do app.theme --name dracula`, which lands in `~/.config/herdr-app/layouts/.state/<layout>.json` — runtime state, untracked.
+
+Everything else under `~/.config/herdr-app/` (`AGENTS.md`, `*.d.ts`, `frame/`, `installed.json`, `data/`, `icons/`, `mods/`, `view.json`, `shared.json`, `layouts/`…) is written by the app and stays untracked.
+
 ### Chinese Mirrors
 
 Package managers are configured with Chinese mirrors for faster downloads:

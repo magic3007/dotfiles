@@ -533,6 +533,21 @@
       ]
 
 # ---------------------------------------------------------------------------
+# Herdr app - the desktop app (a separate program from the `herdr` TUI above).
+# It drives herdr-core (`hc`), which keeps terminals alive when the window
+# closes. The script is idempotent: it reuses an existing Herdr.app (including
+# one dragged into /Applications from the dmg) and only downloads when none is
+# found, so re-running ./install never clobbers a signed, running bundle.
+# The app's own config lives in ~/.config/herdr-app/ — see the link: section
+# above (themes/) and scripts/post-install.d/10-seed-configs.sh (settings/keys).
+# ---------------------------------------------------------------------------
+- shell:
+    - [
+          "bash scripts/install-herdr-app.sh || true",
+          Installing Herdr app (macOS desktop app + herdr-core),
+      ]
+
+# ---------------------------------------------------------------------------
 # iTerm2 configuration
 # ---------------------------------------------------------------------------
 - shell:
