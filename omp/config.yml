@@ -21,7 +21,7 @@ enabledModels:
   - kafara/*
   - volcengine/kimi-k3.1-pro
 modelRoles:
-  default: mafia/MiniMax-M78:auto
+  default: minimax-test/MiniMax-M78:auto
   tiny: mafia/claude-opus-5-5:medium
   smol: mafia/MiniMax-M3.1-Flash:auto
   slow: kafara/gpt-6-sol:max

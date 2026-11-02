@@ -7,9 +7,7 @@ providers:
     # omp 的 anthropic-messages 默认只发 Authorization: Bearer，所以这里显式
     # 补 X-Api-Key。apiKey 与头都用 !命令 读未跟踪的本地 shell 文件，原因同
     # volcengine：xmatrix daemon 拉起的 omp 没有 MINIMAX_MY_API_KEY 环境变量。
-    apiKey: "!grep -m1 '^export MINIMAX_MY_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'"
-    headers:
-      X-Api-Key: "!grep -m1 '^export MINIMAX_MY_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'"
+    apiKey: MINIMAX_MY_API_KEY 
     disableStrictTools: true
     models:
     - id: MiniMax-M78
