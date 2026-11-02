@@ -253,6 +253,15 @@
     # ---- Herdr (agent-aware terminal multiplexer) ----
     ~/.config/herdr/config.toml: herdr/config.toml
 
+    # ---- Herdr app (desktop window) ----
+    # 只链接 themes/。settings.json 与 keys.json 归 app 所有：它用「临时文件 +
+    # rename」写回，会把符号链接换成普通文件（实测：dotbot 链接成功后一次
+    # app.zoom_in 就把两个链接替换成了普通文件），而且写回时会丢掉 theme、
+    # appearance 这类它自己不持久化的键。所以这两个走 seed，不走 link：
+    # 见 scripts/post-install.d/10-seed-configs.sh。
+    # 主题文件 app 从不写回，符号链接可以稳定存活（实测保持为 lrwxr-xr-x）。
+    ~/.config/herdr-app/themes/dracula.json: herdr-app/themes/dracula.json
+
     # ---- Warp ----
     ~/.warp: warp
 

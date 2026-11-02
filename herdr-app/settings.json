@@ -1,0 +1,9 @@
+{
+  "zoom": 1,
+  "theme": "dracula",
+  "sounds": {
+    "enabled": false
+  },
+  "minimum_contrast": 1,
+  "appearance": "dark"
+}

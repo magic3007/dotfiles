@@ -19,6 +19,17 @@
 # feature, so the repo seeds a copy with its incompatible `autocomplete` feature
 # (which breaks omp's `@` completion) left out — see omp/README.md, "Plugins".
 #
+# The herdr-app entries are the same rename-over-symlink failure, verified
+# 2026-11-02: after dotbot linked settings.json and keys.json, a single
+# `herdr-app do app.zoom_in` turned both back into regular files. herdr-app also
+# drops keys it does not persist itself (`theme`, `appearance`) whenever it
+# rewrites settings.json, so the seeded copy only survives until the app first
+# writes — that is expected, and it is why the theme choice is additionally
+# pinned per-layout by `herdr-app do app.theme`, which lands in
+# ~/.config/herdr-app/layouts/.state/<layout>.json. Theme *files* under
+# themes/ are never written back by the app, so those are real symlinks in the
+# `link:` sections instead.
+#
 # Add one "repo-path:destination" pair per line. Both sides are expanded; the
 # destination's parent directory is created when seeding.
 set -euo pipefail
@@ -30,6 +41,8 @@ SEEDS=(
   "omp/pi-fff-features.json:$HOME/.omp/agent/extensions/pi-fff.json"
   "pi/herdr-agents/config.json:$HOME/.pi/agent/herdr-agents/config.json"
   "omp/herdr-agents/config.json:$HOME/.omp/agent/herdr-agents/config.json"
+  "herdr-app/settings.json:$HOME/.config/herdr-app/settings.json"
+  "herdr-app/keys.json:$HOME/.config/herdr-app/keys.json"
 )
 
 for entry in "${SEEDS[@]}"; do

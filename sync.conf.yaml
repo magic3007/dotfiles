@@ -135,6 +135,14 @@
     # ---- cmux ----
     ~/.config/cmux/cmux.json: cmux/cmux.json
 
+    # ---- Herdr + Herdr app ----
+    # install.conf.yaml 里有的 herdr/config.toml，这里此前整段缺失（15 分钟同步
+    # 只读本文件，缺了就永远不会重新链接）。补齐，遵守仓库约定：两边都要写。
+    # herdr-app 只链接 themes/；settings.json 与 keys.json 归 app 所有、会被
+    # rename 覆盖，走 seed（见 scripts/post-install.d/10-seed-configs.sh）。
+    ~/.config/herdr/config.toml: herdr/config.toml
+    ~/.config/herdr-app/themes/dracula.json: herdr-app/themes/dracula.json
+
 # Skill views are generated (per-skill links), not whole-dir links: see
 # scripts/sync-skills.py. Never exits non-zero on conflicts (prints warnings).
 - shell:
