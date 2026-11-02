@@ -55,6 +55,14 @@ cycleOrder:
   - deepseek-flash
 retry:
   fallbackChains:
+    mafia/claude-opus-5-5:
+      - devin/claude-opus-5-5
+      - kafara/devin/claude-opus-5-5
+      - kafara/claude-opus-5-5-high
+    mafia/gpt-6-astra:
+      - devin/gpt-6-astra
+      - kafara/devin/gpt-6-astra
+      - kafara/gpt-6-astra
     mafia/*:
       - devin/claude-opus-5-5
       - kafara/devin/claude-opus-5-5
