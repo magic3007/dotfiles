@@ -5,7 +5,7 @@
 - 官网: https://omp.sh
 - npm/bun 包: `@oh-my-pi/pi-coding-agent`
 - 安装: `curl -fsSL https://omp.sh/install | sh`（装到 `~/.bun/bin/omp`）
-- 版本: omp/18.6.1
+- 版本: omp/18.13.2
 
 ## 软链接
 
@@ -175,25 +175,44 @@ key 取得到（`VE_CODE_API_KEY`）。`enabledModels` 里也要有
 所以 `volcengine` 块同样不在。要在 profile 里复现这套配置，得先在该 profile 装插件、
 重建 `gateways-login.json`，并补上 `models.yml` 的 `volcengine` 块。
 
-默认模型由 `modelRoles.default` 决定（本机 `mafia/MiniMax-M78:auto`）。MiniMax-M78 有两个入口：
+默认模型由 `modelRoles.default` 决定（本机 `minimax-test/MiniMax-M78:auto`，1M 窗口）。
+MiniMax-M78 有两个入口，窗口不同：
 
 | 入口 | 窗口 | 凭据 | 本机用法 |
 |---|---|---|---|
-| `mafia/MiniMax-M78` | 200K | `MAFIA_API_KEY` | `default` / `minimax-pro` / `smol`（`mafia/MiniMax-M3.1-Flash`）走这里 |
-| `minimax-test/MiniMax-M78` | 1M | `MINIMAX_MY_API_KEY` | 显式 `--model minimax-test/MiniMax-M78` |
+| `minimax-test/MiniMax-M78` | 1M | `MINIMAX_MY_API_KEY` | `default` / `minimax-pro` / `task` 走这里 |
+| `mafia/MiniMax-M78` | 200K（插件兜底值） | `MAFIA_API_KEY` | 不再是默认；只有降级链才会用到 |
 
 `modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，不参与默认解析。
 
-`minimax-test` 的上游只认 `X-Api-Key` 头：`Authorization: Bearer` 会被忽略。所以
-`models.yml` 里显式写了 `headers.X-Api-Key`，两个字段的值都用 `!grep` 从
-`~/.common_shell_setup_local.sh` 的 `export MINIMAX_MY_API_KEY=` 读（理由同 `volcengine`：
-xmatrix daemon 拉起的 omp 没有这个环境变量）。key 没写进那个文件时，omp 直接报
-`No API key found for minimax-test`（以前是发出无 key 请求、上游回
-`401 login fail: Please carry the API secret key in the 'X-Api-Key' field`，再被
-`default` 链静默降级到 `deepseek/deepseek-flash`）。补上 key 之后把 `default` 切回
-`minimax-test/MiniMax-M78:auto` 即可拿回 1M 窗口。
+`minimax-test` 网关（`openplatform-sh-pre.xaminim.com/anthropic/v1`）的 key 写环境变量名
+`MINIMAX_MY_API_KEY`（在 `~/.common_shell_setup_local.sh` 里 export；xmatrix daemon 由
+`scripts/xmatrix-daemon-secrets.sh` 的 systemd drop-in 注入同一份环境，所以 daemon 拉起的
+omp 也拿得到）。上游现在 `Authorization: Bearer` 与 `X-Api-Key` 两种头都收（2026-11-02
+实测各只发一种都是 200），所以 `models.yml` 里不再手写 `headers.X-Api-Key`。key 没写进
+那个文件时，omp 直接报 `No API key found for minimax-test`，再被降级链静默降级。
 
-默认模型的降级写在 `retry.fallbackChains.default`（本机 `- deepseek/deepseek-flash`）：
+**网关真 id 与别名**：flash 模型的真 id 是 `MiniMax-M3.1-Flash`（点号）；横杠写法
+`MiniMax-3.1-Flash` 不是上游 id，网关把它模糊匹配到 `MiniMax-M3`——响应里的 `model`
+字段回显 `MiniMax-M3`，跑的根本不是 flash 模型。`GET /v1/models` 里列的是
+`MiniMax-M3.1-Flash-Preview`（preview 变体），点号写法虽不在该列表里，但网关照样接受
+并回显 `MiniMax-M3.1-Flash`。`models.yml` 现在声明 `MiniMax-M3.1-Flash`、
+`MiniMax-M3.1-Flash-Preview`、`MiniMax-M3` 三个真 id，并保留横杠写法那条（显示名标了
+`legacy id, serves MiniMax-M3`）只为旧会话里钉住它的记录还能解析。`smol` 角色已改指
+`minimax-test/MiniMax-M3.1-Flash`。
+
+**窗口是实测的**（2026-11-02 直连本网关发 prompt）：`MiniMax-M78` /
+`MiniMax-M3.1-Flash` / `MiniMax-M3.1-Flash-Preview` / `MiniMax-M3` 四个模型，
+950,205 与 1,010,205 token 的 prompt 都回 200，1,040,000 token 被上游回
+`529 overloaded_error`，边界与 1048576 一致；网关 `/v1/models` 不带 `token_limits`，
+所以 `contextWindow: 1048576` 只能手写。上游的 `max_tokens` 参数校验上限是 524288
+（`does not support max tokens > 524288`），那是参数上限不是生成上限，`models.yml` 里
+仍取 65536。
+
+默认模型的降级另有精确 key `minimax-test/MiniMax-M78`（本机
+`- minimax-test/MiniMax-M3.1-Flash → - minimax-test/MiniMax-M3 → - deepseek/deepseek-flash`），
+三级都是 1M 窗口：中途掉到 200K 窗口的模型（mafia/kafara 的兜底值）会把已经很长的一轮撑爆。
+`retry.fallbackChains.default`（本机 `- deepseek/deepseek-flash`）是其余角色共用的兜底：
 `default` 角色自己的链就是这条，其他没有单独配置链的角色也复用同一条。链路解析按
 「精确模型 key → `provider/*` 通配 key → 角色名 → `default`」定 key（源码
 `resolveRetryFallbackChainKey`），所以默认模型失败时（401/429/5xx 等，`retry.fallbackOn`
@@ -210,6 +229,7 @@ xmatrix daemon 拉起的 omp 没有这个环境变量）。key 没写进那个�
 
 | chain key | 顺序 |
 |---|---|
+| `minimax-test/MiniMax-M78` | `minimax-test/MiniMax-M3.1-Flash` → `minimax-test/MiniMax-M3` → `deepseek/deepseek-flash`（全是 1M 窗口） |
 | `mafia/*` | `devin/claude-opus-5-5` → `kafara/devin/claude-opus-5-5` |
 | `devin/*` | `kafara/devin/claude-opus-5-5` |
 | `default` | `deepseek/deepseek-flash`（未单独配链的角色共用这条兜底） |
@@ -229,6 +249,35 @@ kafara 与 mafia 一样不声明窗口（`/v1/models` 只回 `id/object/created/
 
 按需删掉的 provider：`devin-cliproxy`（本机 127.0.0.1:30288 的 CLIProxyAPI）已从
 `models.yml` 与 `enabledModels` 移除；`cliproxy-yanzhou.service` 仍在跑，供其他客户端使用。
+
+### 1M 窗口的压缩口径
+
+`compaction` 段决定「什么时候压缩、压缩后留多少原文」。本机按 1M 窗口（默认模型
+`minimax-test/MiniMax-M78`）写：
+
+| 设置 | 值 | 含义 |
+|---|---|---|
+| `compaction.thresholdPercent` | 85 | 触发线 = 窗口 × 85%，1M → 891,289 token |
+| `compaction.keepRecentTokens` | 400000 | 压缩后保留多少原文 |
+| `compaction.reserveTokens` | 20480 | 触发线以下留给一次回复的余量 |
+
+算法在 `@oh-my-pi/pi-agent-core/compaction`（`resolveThresholdTokens` /
+`resolveBudgetReserveTokens` / `prepareCompaction`），本机实测值：
+
+| 窗口 | 触发线 | 保留上限（自动夹紧后） |
+|---|---|---|
+| 1,048,576（`minimax-test/*`） | 891,289 | 400,000 |
+| 272,000（`devin/gpt-6-1-sol` 等） | 231,200 | 164,480 |
+| 200,000（mafia/kafara 兜底值） | 170,000 | 115,520 |
+
+保留上限 = 恢复带（触发线 × 0.8）减预留，所以 `keepRecentTokens` 写 400000 只对 1M
+窗口生效：200K 窗口的模型被夹到 115,520，与改动前一致。
+
+不写 `thresholdPercent` 时 omp 用「窗口 − 15% 预留」，在 1M 上与 85% 只差 1 token；
+写死百分比是让口径与窗口解耦，换模型时触发线按比例走。
+
+代价：保留的原文越多，压缩后剩下的上下文越大，下一次压缩来得更早，但每轮输入 token
+也更多。`keepRecentTokens` 从 150000 提到 400000 是「少丢细节、多花 token」的取舍。
 
 ### Gemini（Antigravity）要单独的出口节点
 

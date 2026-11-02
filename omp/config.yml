@@ -23,7 +23,7 @@ enabledModels:
 modelRoles:
   default: minimax-test/MiniMax-M78:auto
   tiny: mafia/claude-opus-5-5:medium
-  smol: minimax-test/MiniMax-3.1-Flash:auto
+  smol: minimax-test/MiniMax-M3.1-Flash:auto
   slow: kafara/gpt-6-sol:max
   vision: mafia/claude-opus-5-5:max
   mafia-opus: mafia/claude-opus-5-5:auto
@@ -55,6 +55,12 @@ cycleOrder:
   - deepseek-flash
 retry:
   fallbackChains:
+    # 默认模型降级只走同为 1M 窗口的模型：中途切到 200K 窗口（mafia/kafara 兜底值）
+    # 会把已经很长的一轮撑爆，所以这里不接 mafia 那条链。
+    minimax-test/MiniMax-M78:
+      - minimax-test/MiniMax-M3.1-Flash
+      - minimax-test/MiniMax-M3
+      - deepseek/deepseek-flash
     mafia/claude-opus-5-5:
       - devin/claude-opus-5-5
       - kafara/devin/claude-opus-5-5
@@ -79,7 +85,16 @@ compaction:
     - remote
     - snapcompact
     - soft
-  keepRecentTokens: 150000
+  # 1M 窗口（minimax-test/*、deepseek-flash）的压缩口径。
+  # thresholdPercent 85：触发线 = 窗口 × 85%（1M → 891,289 token）。
+  # 不写这一项时 omp 用「窗口 − 15% 预留」，两者在 1M 上只差 1 token；
+  # 写死百分比是为了让口径与窗口解耦，换模型时触发线按比例走而不是靠预留反推。
+  thresholdPercent: 85
+  # 压缩后保留多少原文。omp 按窗口自动夹紧：保留上限 = 恢复带（阈值 × 0.8）
+  # 减预留，1M 窗口 → 692,551，200K 窗口 → 115,520。
+  # 所以这个值只对 1M 窗口生效，小窗口模型夹紧后与原值一致，行为不变。
+  keepRecentTokens: 400000
+  # 预留 = 触发线以下留给一次回复的余量；小窗口模型仍走 15% 比例预留。
   reserveTokens: 20480
   handoffSaveToDisk: true
 dev:
