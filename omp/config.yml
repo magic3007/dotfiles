@@ -59,7 +59,6 @@ retry:
     # 会把已经很长的一轮撑爆，所以这里不接 mafia 那条链。
     minimax-test/MiniMax-M78:
       - minimax-test/MiniMax-M3.1-Flash
-      - minimax-test/MiniMax-M3
       - deepseek/deepseek-flash
     mafia/claude-opus-5-5:
       - devin/claude-opus-5-5

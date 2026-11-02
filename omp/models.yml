@@ -36,73 +36,13 @@ providers:
         - max
         defaultLevel: max
         requiresEffort: true
-    # 网关真 id 有两种写法，差别很大（2026-11-02 实测响应里的 model 回显）：
-    #   MiniMax-M3.1-Flash（点号）→ 真 MiniMax-M3.1-Flash，950,208 token 的 prompt 回 200
-    #   MiniMax-3.1-Flash（横杠）→ 被网关模糊匹配成 MiniMax-M3，跑的根本不是 flash 模型
-    # 所以 smol 角色指向前者，别指后者。
+    # flash 模型的真 id 是点号写法。横杠写法 MiniMax-3.1-Flash 不是上游 id：
+    # 网关把它模糊匹配到 MiniMax-M3，响应里的 model 字段回显 MiniMax-M3，
+    # 跑的根本不是 flash 模型，所以这里不声明；MiniMax-M3 与
+    # MiniMax-M3.1-Flash-Preview 同样不声明。minimax-test 只留 M78 与
+    # MiniMax-M3.1-Flash 两个 id。
     - id: MiniMax-M3.1-Flash
       name: MiniMax-M3.1-Flash
-      reasoning: true
-      supportsTools: true
-      input:
-      - text
-      - image
-      contextWindow: 1048576
-      maxTokens: 65536
-      thinking:
-        mode: anthropic-adaptive
-        efforts:
-        - low
-        - medium
-        - high
-        - xhigh
-        - max
-        defaultLevel: max
-        requiresEffort: true
-    # 网关 /v1/models 里列出的 preview 变体，同为 1M 窗口。
-    - id: MiniMax-M3.1-Flash-Preview
-      name: MiniMax-M3.1-Flash-Preview
-      reasoning: true
-      supportsTools: true
-      input:
-      - text
-      - image
-      contextWindow: 1048576
-      maxTokens: 65536
-      thinking:
-        mode: anthropic-adaptive
-        efforts:
-        - low
-        - medium
-        - high
-        - xhigh
-        - max
-        defaultLevel: max
-        requiresEffort: true
-    - id: MiniMax-M3
-      name: MiniMax-M3
-      reasoning: true
-      supportsTools: true
-      input:
-      - text
-      - image
-      contextWindow: 1048576
-      maxTokens: 65536
-      thinking:
-        mode: anthropic-adaptive
-        efforts:
-        - low
-        - medium
-        - high
-        - xhigh
-        - max
-        defaultLevel: max
-        requiresEffort: true
-    # 旧 id（横杠），不是上游 id：网关把它模糊匹配到 MiniMax-M3（响应里 model 字段
-    # 回显 MiniMax-M3）。保留这条只为让旧会话里钉住 `minimax-test/MiniMax-3.1-Flash`
-    # 的记录还能解析；新配置用上面几个真 id。
-    - id: MiniMax-3.1-Flash
-      name: MiniMax-3.1-Flash (legacy id, serves MiniMax-M3)
       reasoning: true
       supportsTools: true
       input:

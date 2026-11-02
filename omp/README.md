@@ -192,26 +192,25 @@ omp 也拿得到）。上游现在 `Authorization: Bearer` 与 `X-Api-Key` 两�
 实测各只发一种都是 200），所以 `models.yml` 里不再手写 `headers.X-Api-Key`。key 没写进
 那个文件时，omp 直接报 `No API key found for minimax-test`，再被降级链静默降级。
 
-**网关真 id 与别名**：flash 模型的真 id 是 `MiniMax-M3.1-Flash`（点号）；横杠写法
-`MiniMax-3.1-Flash` 不是上游 id，网关把它模糊匹配到 `MiniMax-M3`——响应里的 `model`
-字段回显 `MiniMax-M3`，跑的根本不是 flash 模型。`GET /v1/models` 里列的是
-`MiniMax-M3.1-Flash-Preview`（preview 变体），点号写法虽不在该列表里，但网关照样接受
-并回显 `MiniMax-M3.1-Flash`。`models.yml` 现在声明 `MiniMax-M3.1-Flash`、
-`MiniMax-M3.1-Flash-Preview`、`MiniMax-M3` 三个真 id，并保留横杠写法那条（显示名标了
-`legacy id, serves MiniMax-M3`）只为旧会话里钉住它的记录还能解析。`smol` 角色已改指
+**网关真 id**：flash 模型的真 id 是 `MiniMax-M3.1-Flash`（点号），点号写法虽不在
+`GET /v1/models` 列表里，但网关照样接受并回显 `MiniMax-M3.1-Flash`。横杠写法
+`MiniMax-3.1-Flash` 不是上游 id：网关把它模糊匹配到 `MiniMax-M3`，响应里的 `model`
+字段回显 `MiniMax-M3`，跑的根本不是 flash 模型，所以不再声明。`MiniMax-M3` 同样不再
+声明。`models.yml` 里 `minimax-test` 只留 `MiniMax-M78` 与 `MiniMax-M3.1-Flash`
+两个 id，`MiniMax-M3.1-Flash-Preview` 与 `MiniMax-M3` 都不出现。`smol` 角色指
 `minimax-test/MiniMax-M3.1-Flash`。
 
 **窗口是实测的**（2026-11-02 直连本网关发 prompt）：`MiniMax-M78` /
-`MiniMax-M3.1-Flash` / `MiniMax-M3.1-Flash-Preview` / `MiniMax-M3` 四个模型，
-950,205 与 1,010,205 token 的 prompt 都回 200，1,040,000 token 被上游回
+`MiniMax-M3.1-Flash` 两个模型，950,205 与 1,010,205 token 的 prompt 都回 200，
+1,040,000 token 被上游回
 `529 overloaded_error`，边界与 1048576 一致；网关 `/v1/models` 不带 `token_limits`，
 所以 `contextWindow: 1048576` 只能手写。上游的 `max_tokens` 参数校验上限是 524288
 （`does not support max tokens > 524288`），那是参数上限不是生成上限，`models.yml` 里
 仍取 65536。
 
 默认模型的降级另有精确 key `minimax-test/MiniMax-M78`（本机
-`- minimax-test/MiniMax-M3.1-Flash → - minimax-test/MiniMax-M3 → - deepseek/deepseek-flash`），
-三级都是 1M 窗口：中途掉到 200K 窗口的模型（mafia/kafara 的兜底值）会把已经很长的一轮撑爆。
+`- minimax-test/MiniMax-M3.1-Flash → - deepseek/deepseek-flash`），
+两级都是 1M 窗口：中途掉到 200K 窗口的模型（mafia/kafara 的兜底值）会把已经很长的一轮撑爆。
 `retry.fallbackChains.default`（本机 `- deepseek/deepseek-flash`）是其余角色共用的兜底：
 `default` 角色自己的链就是这条，其他没有单独配置链的角色也复用同一条。链路解析按
 「精确模型 key → `provider/*` 通配 key → 角色名 → `default`」定 key（源码
@@ -229,7 +228,7 @@ omp 也拿得到）。上游现在 `Authorization: Bearer` 与 `X-Api-Key` 两�
 
 | chain key | 顺序 |
 |---|---|
-| `minimax-test/MiniMax-M78` | `minimax-test/MiniMax-M3.1-Flash` → `minimax-test/MiniMax-M3` → `deepseek/deepseek-flash`（全是 1M 窗口） |
+| `minimax-test/MiniMax-M78` | `minimax-test/MiniMax-M3.1-Flash` → `deepseek/deepseek-flash`（都是 1M 窗口） |
 | `mafia/*` | `devin/claude-opus-5-5` → `kafara/devin/claude-opus-5-5` |
 | `devin/*` | `kafara/devin/claude-opus-5-5` |
 | `default` | `deepseek/deepseek-flash`（未单独配链的角色共用这条兜底） |
@@ -373,7 +372,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 - 例外要显式：某个 slice 常规档做不了（跨文件诊断、独立 review）时，在那一个 task 上写
   `model`，并在 contract 里说明原因。
 - `sonic` 走 `@smol`、`scout` 是只读 agent——它们是 agent，不是更便宜的模型；用之前确认
-  它们解析到谁（当前 `smol` = `minimax-test/MiniMax-3.1-Flash:auto`，实测 `scout` 也落这一档）。
+  它们解析到谁（当前 `smol` = `minimax-test/MiniMax-M3.1-Flash:auto`，实测 `scout` 也落这一档）。
 - 并发/嵌套上限：`task.maxConcurrency` 32（超出排队）、`task.maxRecursionDepth` 2。
   `task.batch` 默认开，所以独立 slice 要在**一次** `task` 调用的 `tasks[]` 里并发抛。
 - 编排规则（合同写法、分区、验收、收尾）在 `omp/skills/toil-offloading-omp/SKILL.md`，对应 Codex
