@@ -205,12 +205,22 @@
     # 用的是 shell 环境，看不出问题）。软链进该 PATH 已有的 ~/.local/bin。
     # bun 也要链：omp 的 shim 是 `#!/usr/bin/env bun`。
     # 不要改用改单元 PATH 的办法：`xmatrix setup daemon` 会用固定列表重写单元、覆盖手改。
+    #
+    # `force: true` 是必需的，不是保险：omp.sh 安装器按情况二选一 ——
+    #   有 bun 时走 `bun install -g`，产物是 ~/.bun/bin/omp（软链到 dist/cli.js）；
+    #   没有 bun 时退化为下载预编译 ELF，直接写 ~/.local/bin/omp（`PI_INSTALL_DIR` 默认值）。
+    # 后一种情况留下一个普通文件当目标，dotbot 会以
+    # 「already exists but is a regular file」中止整个 link 段（不是只跳过这一条）。
+    # force 只在 `if` 成立（~/.bun/bin/<name> 可执行）时才生效，所以不会凭空删掉
+    # 唯一的 omp；目标位置被 ELF 占用时先归档到 ~/.wastebasket 更稳妥，见 omp/README.md。
     ~/.local/bin/bun:
         if: '[ -x ~/.bun/bin/bun ]'
         path: ~/.bun/bin/bun
+        force: true
     ~/.local/bin/omp:
         if: '[ -x ~/.bun/bin/omp ]'
         path: ~/.bun/bin/omp
+        force: true
     # agent run 的凭据不由这里解决：daemon 的环境靠 systemd drop-in 注入，
     # 见 scripts/xmatrix-daemon-secrets.sh 与 scripts/post-install.d/50-xmatrix-daemon-secrets.sh。
 
