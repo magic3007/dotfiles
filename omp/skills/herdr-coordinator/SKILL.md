@@ -1,6 +1,6 @@
 ---
 name: herdr-coordinator
-description: 协调者工作流：本 omp 会话只做理解、规划、拆分、集成、终审，把大量实现、调试、修测试、多文件改动用 hc 委托给后台 omp worker（Opus 实现、Astra 审查），每个写代码的 worker 用独立 git worktree 分支，协调者亲自验 diff、跑测试、核实际模型。用户说"用协调者/委托工作流""交给 worker 做""开 worker 并行改""Opus 实现 Astra 审查"，或任务明显是多文件实现、需要并行或独立审查时使用；单文件小改动直接做，不用本 skill。
+description: 协调者工作流：本 omp 会话只做理解、规划、拆分、集成、终审，把大量实现、调试、修测试、多文件改动用 hc 委托给后台 omp worker（模型取 omp config 的 worker/reviewer 角色），每个写代码的 worker 用独立 git worktree 分支，协调者亲自验 diff、跑测试、核实际模型。用户说"用协调者/委托工作流""交给 worker 做""开 worker 并行改""起后台 worker 改代码"，或任务明显是多文件实现、需要并行或独立审查时使用；单文件小改动直接做，不用本 skill。
 ---
 
 # herdr-coordinator：协调者 + hc 后台 worker 工作流
@@ -15,13 +15,16 @@ hc 的具体命令（启动、就绪判断、发送、等待、读回、核实�
 
 ## worker 模型
 
-| 角色 | 命令 |
-|---|---|
-| 实现类 | `omp --model mafia/claude-opus-5-5 --thinking xhigh` |
-| 审查类、第二意见 | `omp --model kafara/gpt-6-astra --thinking xhigh` |
+模型不写死在命令里，取 `~/.omp/agent/config.yml` 的 `modelRoles` 角色：
+
+| 角色 | 命令 | 用途 |
+|---|---|---|
+| `worker` | `omp --model worker` | 实现、调试、修测试 |
+| `reviewer` | `omp --model reviewer` | 独立审查、第二意见 |
 
 - 只用 omp。不安装、不启动 Claude Code CLI 或 Codex CLI。
-- 启动前按 `herdr-desktop` 第 0 步确认模型存在且支持 xhigh。不可用时停下告诉用户，不要换模型、换 provider 或降档位。
+- 角色指向哪个 provider/model、档位是什么，由用户在 config 里定；启动前按 `herdr-desktop`
+  第 0 步读出实际值并冒烟确认。角色缺失或模型不可用时停下告诉用户，不要换模型、换 provider 或降档位。
 
 ## 1. 先判断要不要委托
 
@@ -67,13 +70,14 @@ worker 看不到本会话，合同必须自足。每个任务都写全下面六�
 回报：完成或卡住时执行 hc send <协调者地址> '<NONCE> <结果摘要 + 提交 sha>'；长内容写文件，发路径
 规则：
 - 不要为没人要求的罕见情况或未来情况做设计。
-- 不要启动 subagent、task 或其它 agent。
 - 不要改合同范围外的路径。
 ```
 
 - `<协调者地址>` 写字面值（`echo $HC_TERMINAL_ID` 的结果）。worker 自己的 `$HC_TERMINAL_ID` 指向它自己。
 - 每个 worker 用不同的 NONCE，后面靠它核对回报来源并找到会话 jsonl。
 - 前端任务额外写：优化布局、视觉细节和实际交互，并在浏览器里自测。
+- 不限制 worker 自己起 subagent 或 task。它需要并行探查、跑多个独立切片时，让它自己决定怎么分；
+  协调者只管合同范围和最终验收，多一层编排不需要额外授权。
 
 ## 5. 等待与反馈
 
@@ -88,11 +92,11 @@ worker 说"完成"只是一个说法，不是证据。逐项自己确认：
 2. 集成到当前分支（`git merge --no-ff hc/<task>` 或 cherry-pick），冲突由你解决。
 3. 集成后统一跑一次必要的 build/lint/test。不要让每个 worker 各跑一遍再拼结论。
 4. 页面改动要打开浏览器实测：真实操作一遍改动路径，截图看结果。
-5. 按 `herdr-desktop` 第 5 步，用 NONCE 找到每个 worker 的会话 jsonl，读 assistant 消息的 provider/model。与指定模型不一致时告诉用户。
+5. 按 `herdr-desktop` 第 5 步，用 NONCE 找到每个 worker 的会话 jsonl，读 assistant 消息的 provider/model。与角色指向的模型不一致时告诉用户。
 
 ## 7. 独立审查
 
-代码改动集成后，另开一个没参与实现的 Astra worker 做审查。审查合同里写明：
+代码改动集成后，另开一个没参与实现的 reviewer worker（`omp --model reviewer`）做审查。审查合同里写明：
 
 ```text
 审查范围：<repo> 上 <base>..<head> 的改动（给出命令 git diff <base>..<head>）。

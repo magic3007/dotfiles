@@ -43,6 +43,17 @@ modelRoles:
   zai-flash: zai/glm-5.3-flash:max
   task: minimax-test/MiniMax-M78:auto
   advisor: mafia/claude-opus-5-5:high
+  # herdr-coordinator 用 hc 起后台 worker 时按角色名取模型：`omp --model worker`。
+  # 写角色而不是写死 provider/model，是为了改模型只动这一处，skill 正文不用跟着改。
+  # 角色名走 omp 的 modelRoles 解析（实测 `--model task`、`--model mafia-opus` 都能解析），
+  # 所以自定义名字 worker/reviewer 同样可用。冒号后是 thinking 档位。
+  worker: minimax-test/MiniMax-M78:xhigh
+  # reviewer 故意用与 worker 不同家族的模型：审查的价值来自独立第二意见，
+  # 同一个模型审自己的实现容易顺着原思路点头。deepseek-flash 是 1M 窗口、
+  # 实测可出流量；devin/* 与 mafia/claude-opus-5-5 在 2026-11-02 实测均已降级
+  # （devin 周配额耗尽，mafia opus 走降级链回落到 minimax-test），所以不放这里。
+  # 该模型 thinking 只有 low/high/max，没有 xhigh。
+  reviewer: deepseek/deepseek-flash:max
 cycleOrder:
   - mafia-opus
   - devin-opus

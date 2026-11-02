@@ -427,6 +427,24 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 - 编排规则（合同写法、分区、验收、收尾）在 `omp/skills/toil-offloading-omp/SKILL.md`，对应 Codex
   侧 `codex/skills/toil-offloading/` + `codex/agents/{dspix,glmpix}.toml` 那套原生 team。
 
+## herdr worker 档位（`modelRoles.worker` / `modelRoles.reviewer`）
+
+`herdr-coordinator` 用 `hc run ... omp --model worker` 起后台 worker。模型不写在 skill 里，
+取这两个角色，所以换模型只改 `config.yml` 一处：
+
+    modelRoles:
+      worker: minimax-test/MiniMax-M78:xhigh      # 实现、调试、修测试
+      reviewer: deepseek/deepseek-flash:max        # 独立审查、第二意见
+
+- 角色名走 `modelRoles` 解析，`--model worker` 与 `--model task`、`--model mafia-opus` 同一条路径；
+  冒号后的档位写在角色值里，启动命令不带 `--thinking`。
+- `reviewer` 故意选与 `worker` 不同家族：审查的价值来自独立第二意见，同模型审自己的实现容易点头。
+  2026-11-02 实测 `devin/*` 周配额耗尽、`mafia/claude-opus-5-5` 走降级链回落到 minimax-test，
+  所以 reviewer 落在 deepseek；该模型档位只有 low/high/max，没有 xhigh。
+- 降级链会静默换模型（`retry.fallbackChains`），所以 skill 要求派任务后按 nonce 读 worker 会话
+  jsonl 里的 `provider/model` 复核，不能只信启动参数。
+- worker 自己起 subagent / task 不受限制；协调者只管合同范围与验收。
+
 ## Plugins（插件）
 
 插件本体**不入库**。`~/.omp/plugins/` 是运行时状态：`bun install` 会重写 `package.json`
