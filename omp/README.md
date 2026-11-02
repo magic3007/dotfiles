@@ -4,8 +4,12 @@
 
 - 官网: https://omp.sh
 - npm/bun 包: `@oh-my-pi/pi-coding-agent`
-- 安装: `curl -fsSL https://omp.sh/install | sh`（装到 `~/.bun/bin/omp`）
-- 版本: omp/18.13.2
+- 安装: `curl -fsSL https://omp.sh/install | sh`。两种落点：**有 bun**（≥1.4.4，架构匹配）时走
+  `bun install -g`，产物是 `~/.bun/bin/omp`（`#!/usr/bin/env bun` shim）；**没有 bun** 时退化为
+  下载预编译 ELF，直接写 `~/.local/bin/omp`（`PI_INSTALL_DIR` 的默认值）。
+- 版本: omp/18.15.0（本机 `omp --version` 与 npm 上的最新版一致）。低于 18.6 的 omp 装不了
+  `omp-herdr-agents` 3.5.0：扩展会报
+  `Export named 'getSupportedThinkingLevels' not found in module 'omp-legacy-pi-bundled:@oh-my-pi/pi-ai'`。
 
 ## 软链接
 
@@ -40,6 +44,18 @@ xmatrix 的 harness 探测只看 **daemon 进程的 PATH**。daemon 由 systemd 
 （PATH 含 `~/.bun/bin`），会显示 ok——两者不一致时问题在 daemon。
 
 bun 也要链：omp 的 shim 是 `#!/usr/bin/env bun`。
+
+两条 link 都带 `force: true`，这是**必需**而不是保险：没有 bun 的机器上，omp.sh 会把预编译 ELF
+直接写到 `~/.local/bin/omp`（正是软链的目的地），留下一个普通文件；dotbot 遇到
+「already exists but is a regular file」会中止**整个 link 段**，不是跳过这一条。
+`force` 只在 `if`（`~/.bun/bin/<name>` 可执行）成立时才生效，所以不会删掉唯一的 omp。
+
+从「ELF 装在 `~/.local/bin`」迁到「bun 版在 `~/.bun/bin`」时，先手工归档旧 ELF 再重链，
+`force` 帮你省掉的只是这一步的报错，旧文件仍会丢：
+
+    mv ~/.local/bin/omp ~/.wastebasket/omp-$(omp --version | tr / -)-elf
+    curl -fsSL https://omp.sh/install | sh      # 有 bun 时产出 ~/.bun/bin/omp
+    ./install --only link                       # 建 ~/.local/bin/omp 软链
 
 不要改用「改单元 PATH」的办法：`xmatrix setup daemon` 会用固定列表重写单元，覆盖手改；
 软链不受影响，也不用重启 daemon。改完 `xmatrix harness refresh`，用
@@ -401,11 +417,18 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 | `omp/pi-fff-features.json` | pi-fff 的 feature 状态种子（关掉 `autocomplete`），由下面的 seed 钩子拷到 `~/.omp/agent/extensions/pi-fff.json` |
 | `pi/herdr-agents/config.json` | pi-herdr-agents（pi 侧）的配置种子（`models.default` 等），同上由 seed 钩子拷到 `~/.pi/agent/herdr-agents/config.json` |
 | `omp/herdr-agents/config.json` | omp-herdr-agents 的配置种子，同上由 seed 钩子拷到 `~/.omp/agent/herdr-agents/config.json` |
-| `scripts/post-install.d/40-omp-plugins.sh` | `./install` 时对比 `omp plugin list --json`，只安装缺失的插件 |
+| `scripts/omp-plugins.sh` | `./install` 的 Phase 2 对比 `omp plugin list --json`，只安装缺失的插件 |
 
 要点：
 
 - **只在 `./install` 跑**，不进 15 分钟的 `sync.sh`：安装需要网络和 `bun`。
+- **bun 是硬前置**：omp 的插件安装器 spawn `bun install`（按名字查 PATH）。`./install` 的
+  Phase 2 会先装 bun（`command -v bun` 与 `~/.bun/bin/bun` 都缺失时）；
+  脚本自己也按 `PATH` → `$BUN_INSTALL/bin` → `~/.bun/bin` → Homebrew/`/usr/local` 的顺序解析，
+  并把所在目录前置进 `PATH`。都没有时只告警跳过（外部依赖缺失不算安装失败）。
+- **不能放 `post-install.d/`**：那批钩子在 Phase 1（纯本地）跑，早于 bun/omp 的网络安装，
+  会以 "omp not on PATH" 跳过，或在 bun 缺失时让 omp 抛
+  `Executable not found in $PATH: "bun"`。
 - 已安装的插件**不重装**。重复 `omp plugin install` 不是空操作：它会重新解析包，并把 feature
   选择重置回 manifest 默认值。
 - npm spec 与**本地路径**都支持；路径用于尚未发布的 fork（判断是否已装看目录名）。git spec 告警跳过。
@@ -455,7 +478,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 - 模型选择：不给 `model` 时子 agent 继承父会话选择器（同样是 omp，所以 `volcengine/…` 也有效）；
   `models.default` 种子固定为 `deepseek/deepseek-flash`，避免默认烧贵模型。
 
-加插件：把 spec 写进 `omp/plugins.txt`，再跑 `bash scripts/post-install.d/40-omp-plugins.sh`
+加插件：把 spec 写进 `omp/plugins.txt`，再跑 `bash scripts/omp-plugins.sh`
 （或 `./install`）。
 
 ## 状态栏（`statusLine`）
