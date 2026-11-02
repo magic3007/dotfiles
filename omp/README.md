@@ -318,14 +318,14 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 本机配置：
 
     modelRoles:
-      task: minimax-test/MiniMax-3.1-Flash:auto     # 廉价执行档；root 用默认模型做判断
+      task: minimax-test/MiniMax-M78:auto           # subagent 执行档；root 用 default 做判断
 
 - 只改这一处。`tasks[].model` 或自定义 agent frontmatter 里再钉模型，就会出现第二个真相源，
   而且会静默覆盖本角色。
-- 例外要显式：某个 slice 廉价档做不了（跨文件诊断、独立 review）时，在那一个 task 上写
+- 例外要显式：某个 slice 常规档做不了（跨文件诊断、独立 review）时，在那一个 task 上写
   `model`，并在 contract 里说明原因。
 - `sonic` 走 `@smol`、`scout` 是只读 agent——它们是 agent，不是更便宜的模型；用之前确认
-  它们解析到谁（当前 `smol` = `mafia/claude-opus-5-5:max`，不便宜）。
+  它们解析到谁（当前 `smol` = `minimax-test/MiniMax-3.1-Flash:auto`，实测 `scout` 也落这一档）。
 - 并发/嵌套上限：`task.maxConcurrency` 32（超出排队）、`task.maxRecursionDepth` 2。
   `task.batch` 默认开，所以独立 slice 要在**一次** `task` 调用的 `tasks[]` 里并发抛。
 - 编排规则（合同写法、分区、验收、收尾）在 `omp/skills/toil-offloading/SKILL.md`，对应 Codex
