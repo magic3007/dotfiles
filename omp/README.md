@@ -196,17 +196,40 @@ MiniMax-M78 有两个入口，窗口不同：
 
 | 入口 | 窗口 | 凭据 | 本机用法 |
 |---|---|---|---|
-| `minimax-test/MiniMax-M78` | 1M | `MINIMAX_MY_API_KEY` | `default` / `minimax-pro` / `task` 走这里 |
-| `mafia/MiniMax-M78` | 200K（插件兜底值） | `MAFIA_API_KEY` | 不再是默认；只有降级链才会用到 |
+| `minimax-test/MiniMax-M78` | 1M | `!命令` 读 `MINIMAX_MY_API_KEY` | `default` / `minimax-pro` / `task` 走这里 |
+| `mafia/MiniMax-M78` | 200K（插件兜底值） | `!命令` 读 `MAFIA_API_KEY` | 不再是默认；只有降级链才会用到 |
 
 `modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，不参与默认解析。
 
-`minimax-test` 网关（`openplatform-sh-pre.xaminim.com/anthropic/v1`）的 key 写环境变量名
-`MINIMAX_MY_API_KEY`（在 `~/.common_shell_setup_local.sh` 里 export；xmatrix daemon 由
-`scripts/xmatrix-daemon-secrets.sh` 的 systemd drop-in 注入同一份环境，所以 daemon 拉起的
-omp 也拿得到）。上游现在 `Authorization: Bearer` 与 `X-Api-Key` 两种头都收（2026-11-02
-实测各只发一种都是 200），所以 `models.yml` 里不再手写 `headers.X-Api-Key`。key 没写进
-那个文件时，omp 直接报 `No API key found for minimax-test`，再被降级链静默降级。
+**provider key 一律写 `!命令`，不写环境变量名**。`minimax-test`、`mafia`、`kafara`
+（`models.yml` 与 `gateways-login.json` 两处）、`volcengine` 都是这条：
+
+```yaml
+apiKey: "!grep -m1 '^export MINIMAX_MY_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'"
+```
+
+真值仍只在未入库的 `~/.common_shell_setup_local.sh` 里，命令只是去那里取。为什么不能
+写环境变量名：omp 的 `resolveConfigValue()` 顺序是 `!命令` → 环境变量名 → 字面量，
+**环境变量缺失时它把变量名本身当 key 发出去**。而 herdr 起的 pane 恰好就缺这些
+export——`herdr-core` 是 systemd --user 的 transient unit（`hc-serve-<hash>.service`），
+环境来自 systemd --user manager，不 source `~/.common_shell_setup.sh`，manager 自己
+也没有这些 key。2026-11-02 的故障链（session `01a19bfc`，herdr worktree
+`frontcs2-wt/review`）：主模型 `kafara/gpt-6-astra` 撞 `429 usage_limit_reached` →
+降级到 `minimax-test/MiniMax-M78` → 网关回
+`401 login fail: Please carry the API secret key in the 'X-Api-Key' field` →
+再降 `MiniMax-M3.1-Flash` 同样 401 → 整条 fallback 链断掉。同一时刻别的会话（环境
+里有 export）用同一个 key 是 200 的，所以不是 key 失效，是那份进程环境里没有它。
+`!命令` 由 omp 用 `/bin/sh -c` 执行（10s 超时、成功缓存、失败 30s 退避），因此
+herdr pane、systemd unit、xmatrix daemon 拉起的 omp 都取得到 key。
+上游现在 `Authorization: Bearer` 与 `X-Api-Key` 两种头都收（2026-11-02 实测各只发一种
+都是 200），所以 `models.yml` 里不再手写 `headers.X-Api-Key`。
+
+改这条命令时注意 YAML 引号：`tr -d '"'` 处在双引号标量里，必须写成 `tr -d '\""'"`。
+少写末尾那个 `'`，YAML 仍能解析，但解出来的 shell 串引号不闭合，`/bin/sh` 报
+`Syntax error: Unterminated quoted string`，omp 侧只表现为
+`No API key found for <provider>`，看不出是配置写错。改完用
+`env -u <VAR> omp -p --no-session --mode=json --model <provider>/<model> "reply ok"`
+验证（去掉环境变量才是 herdr pane 的真实条件）。
 
 **网关真 id**：flash 模型的真 id 是 `MiniMax-M3.1-Flash`（点号），点号写法虽不在
 `GET /v1/models` 列表里，但网关照样接受并回显 `MiniMax-M3.1-Flash`。横杠写法
@@ -524,30 +547,34 @@ omp 会对 config.yml 上 native file lock，只读符号链接或只读 store �
 2. 整串是一个**精确匹配的环境变量名**（`$envExact`）→ 读该环境变量
 3. 都不是 → 当**字面量**用
 
-所以入库写法是**只写变量名**：
+所以入库写法是**只写引用**。本机统一用第 1 条（`!命令` 去未入库的 secrets 文件里取值）：
 
     providers:
       mafia:
-        apiKey: MAFIA_API_KEY      # 真实 key 在 ~/.common_shell_setup_local.sh 里 export
+        apiKey: "!grep -m1 '^export MAFIA_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'"
 
 `gateways-login.json` 的 `apiKey` 走**同一套规则**（omp-model-gateway 插件把引用原样交给
 omp，不自己解析），所以入库写法同样是引用：
 
     { "name": "kafara", "baseUrl": "https://ai.kafara.men",
-      "api": "anthropic-messages", "apiKey": "KAFARA_API_KEY", "extraModels": [] }
+      "api": "anthropic-messages",
+      "apiKey": "!grep -m1 '^export KAFARA_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'",
+      "extraModels": [] }
 
-想更进一步（密钥在磁盘上也是密文）就用命令形式，让 omp 执行命令取 stdout：
+只写环境变量名（`apiKey: MAFIA_API_KEY`）也能工作，但**只在那个 export 真的在进程环境里
+时**。⚠️ 变量未设置时 `$envExact` 返回 `undefined`，omp 落到第 3 条，把字面量
+`MAFIA_API_KEY` 当 key 发出去 → 网关 401。herdr pane 就是这种环境（见上文
+「provider key 一律写 `!命令`」），所以本机不再用变量名写法。
+（`omp-model-gateway` 插件在登录时会提示这种情况：「Nothing sets X, so omp sends that name
+itself as the key.」）
+
+密钥在磁盘上也要密文的话，把命令换成解密器即可：
 
     "apiKey": "!gpg -q -d ~/.omp/keys/kafara.gpg"     # 或 !pass show llm/kafara、!op read op://…
 
-代价是每次启动多一次命令调用（结果缓存），且命令必须非交互——omp 用隔离 stdio 跑它，
-`gpg`/`pass` 不能弹 tty 提示（gpg-agent 已缓存口令，或口令来自 `--passphrase-file`）。
-
-`~/.common_shell_setup_local.sh` 不入库，所以密钥不跟仓库走。
-⚠️ 若该环境变量未设置，`$envExact` 返回 `undefined`，omp 会退化成把字面量
-`MAFIA_API_KEY` 当 key 用 → 401。排查时先确认 `MAFIA_API_KEY` 已 export。
-（`omp-model-gateway` 插件在登录时会提示这种情况：「Nothing sets X, so omp sends that name
-itself as the key.」）
+命令必须非交互：omp 用隔离 stdio 跑它，`gpg`/`pass` 不能弹 tty 提示（gpg-agent 已缓存
+口令，或口令来自 `--passphrase-file`）。`~/.common_shell_setup_local.sh` 不入库，所以
+密钥不跟仓库走。
 
 ### 4. 用户级 `AGENTS.md` 会遮蔽其他工具的用户级上下文
 
