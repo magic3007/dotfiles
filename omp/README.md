@@ -351,8 +351,18 @@ omp 读 `~/.agents/skills`（`skills.enableAgentsUser`）和 `~/.omp/agent/skill
 `enableCodexUser` 保持 `false`，否则会和 `~/.agents/skills` 重名。
 
 - 共享 skill（repo `skills/`）由 `scripts/sync-skills.py` 逐个链进 `~/.agents/skills`，omp 原生可见。
-- omp 专属 skill 放 repo `omp/skills/<name>/`，同一脚本链进 `~/.omp/agent/skills`。当前只有
-  `toil-offloading-omp`（委派工作给 subagent 的编排规则，见下节）。
+- omp 专属 skill 放 repo `omp/skills/<name>/`，同一脚本链进 `~/.omp/agent/skills`。当前有
+  `toil-offloading-omp`（委派工作给 subagent 的编排规则，见下节）和 `herdr-desktop`
+  （主会话用 `hc` 启动、分发、等待、读回 omp 后台 worker，核实实际模型，放进 Herdr 侧边栏），以及
+  `herdr-coordinator`（协调者工作流：本会话规划/集成/终审，Opus worker 在独立 worktree 实现，
+  Astra worker 独立审查，命令沿用 `herdr-desktop`）。
+- `skill-creator`（`omp/skills/skill-creator/`）是 Anthropic 官方 plugin
+  `claude-plugins-official/plugins/skill-creator` 的 omp 副本（Apache-2.0，随包带
+  `LICENSE.txt`）。上游把评测脚本写死成 `claude -p`；这里抽到 `scripts/harness.py`，
+  默认调 `omp -p`，`SKILL_CREATOR_CLI=claude` 或 `--cli claude` 才回退上游行为。
+  临时探针 skill 造在 `<cwd>/.omp/skills/`（omp 的 `native:project` 目录），用完即删。
+  升级方式：重新解包上游 plugin，覆盖 `SKILL.md`/`agents`/`assets`/`eval-viewer`/
+  `references`/其余脚本，只保留本地这个 `harness.py` 及三处调用它的改动。
 
 omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<entry>/SKILL.md`，不递归、
 不读裸 `*.md`；所以视图里每个 skill 都必须是一个目录条目（脚本已保证，嵌套 bundle
