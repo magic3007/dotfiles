@@ -5,4 +5,4 @@
 - 委派前写完整合同：目标、输入、可改范围、验收条件、回报格式。subagent 看不见本会话。
 - 禁止用 `bash` 冒充 subagent，禁止把 `claude`/`codex`/`omp -p` 等 CLI 当 worker 起。
 - 重叠写入禁止：同一 checkout 内按路径分区，集成后统一跑一次 build/lint/test。
-- 编排细则读 `skill://toil-offloading`。
+- 编排细则读 `~/.omp/agent/skills/toil-offloading-omp/SKILL.md`。

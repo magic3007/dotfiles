@@ -305,7 +305,7 @@ omp 读 `~/.agents/skills`（`skills.enableAgentsUser`）和 `~/.omp/agent/skill
 
 - 共享 skill（repo `skills/`）由 `scripts/sync-skills.py` 逐个链进 `~/.agents/skills`，omp 原生可见。
 - omp 专属 skill 放 repo `omp/skills/<name>/`，同一脚本链进 `~/.omp/agent/skills`。当前只有
-  `toil-offloading`（委派工作给廉价 subagent 的编排规则，见下节）。
+  `toil-offloading-omp`（委派工作给 subagent 的编排规则，见下节）。
 
 omp 的 loader 只扫一层，对每个「目录或软链接」条目探测 `<entry>/SKILL.md`，不递归、
 不读裸 `*.md`；所以视图里每个 skill 都必须是一个目录条目（脚本已保证，嵌套 bundle
@@ -328,7 +328,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   它们解析到谁（当前 `smol` = `minimax-test/MiniMax-3.1-Flash:auto`，实测 `scout` 也落这一档）。
 - 并发/嵌套上限：`task.maxConcurrency` 32（超出排队）、`task.maxRecursionDepth` 2。
   `task.batch` 默认开，所以独立 slice 要在**一次** `task` 调用的 `tasks[]` 里并发抛。
-- 编排规则（合同写法、分区、验收、收尾）在 `omp/skills/toil-offloading/SKILL.md`，对应 Codex
+- 编排规则（合同写法、分区、验收、收尾）在 `omp/skills/toil-offloading-omp/SKILL.md`，对应 Codex
   侧 `codex/skills/toil-offloading/` + `codex/agents/{dspix,glmpix}.toml` 那套原生 team。
 
 ## 扩展：`/deepen`
@@ -494,7 +494,7 @@ itself as the key.」）
 `RULES.md` 只认 native 位置（本目录，以及项目最近的 `.omp/`）。它是 always-apply 常驻规则：正文随**每次请求**携带，长会话被压缩后仍然生效，因此必须保持很短；与 `AGENTS.md` 内容重复时会被去重。
 
 当前 `RULES.md` = 回复风格一行 + 委派硬规则（`task` 并发抛 `tasks[]`、subagent 默认档 `modelRoles.task`、禁止 `bash`/CLI 冒充 worker、禁止重叠写入）。硬规则只留**可判定**的条目，合同写法、路由、验收这些细则放在
-`omp/skills/toil-offloading/SKILL.md`，按需用 `skill://toil-offloading` 读，避免每次请求重复付费。
+`omp/skills/toil-offloading-omp/SKILL.md`，按需用 `skill://toil-offloading-omp` 读，避免每次请求重复付费。
 
 ## 常用命令
 

@@ -1,5 +1,5 @@
 ---
-name: toil-offloading
+name: toil-offloading-omp
 description: "Orchestrate decomposable workloads with omp subagents: the root agent analyzes, decides, partitions, integrates, and accepts while subagents execute bounded investigation, implementation, testing, and repetitive work. Use when the user asks for toil offloading, broad delegation, multi-project fan-out, or substantial work that can be split; do not use for a small task that is faster to complete directly."
 ---
 
