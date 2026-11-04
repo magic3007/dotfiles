@@ -484,12 +484,17 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   源码在 `~/projects/omp-herdr-agents`，未发布时可直接写该路径）。上游 `pi-herdr-agents`
   仍留在 pi 侧（`pi/settings.json`），两者互不干扰。
   `github:magic3007/omp-prompt-polish`（提示词润色：`/polish [style] [draft]` 与 `ctrl+alt+p`
-  把输入框草稿交给**旁路回合** `ctx.runEphemeralTurn()` 改写后回填；四种风格
-  balanced/concise/detailed/code 沿用 DSH 版提示词；结果不进会话历史，所以不污染 agent 上下文。
-  slash command 会消费整行输入，所以命令行形态要把草稿写在参数里，润色**已在输入框里的**草稿用
-  `ctrl+alt+p`。可选配置 `~/.omp/agent/extensions/prompt-polish.json`：`style`（默认风格，
-  不设则弹选择器）、`maxTokens`、`system`（整体替换内置指令）。DSH 原插件是
-  `magic3007/dsh-prompt-polish`）。
+  把输入框草稿改写后回填；四种风格 balanced/concise/detailed/code 沿用 DSH 版提示词。
+  **默认模型 `deepseek/deepseek-flash`**，直连 DeepSeek 的 OpenAI 兼容端点
+  `https://api.deepseek.com/chat/completions`，凭据取环境变量 `DEEPSEEK_API_KEY`（所以拉起
+  omp 的那个进程要有这个变量，herdr pane / xmatrix daemon 这类不 source
+  `~/.common_shell_setup_local.sh` 的环境会失败并提示缺哪个变量）；该调用关掉思考，单次约 1 秒、
+  prompt_tokens 几十。slash command 会消费整行输入，所以命令行形态要把草稿写在参数里，
+  润色**已在输入框里的**草稿用 `ctrl+alt+p`。可选配置
+  `~/.omp/agent/extensions/prompt-polish.json`：`model`（默认 `deepseek/deepseek-flash`，
+  设 `"session"` 改走 `ctx.runEphemeralTurn()` 用会话模型，结果不进会话历史）、`apiKeyEnv`、
+  `baseUrl`、`style`（默认风格，不设则弹选择器）、`maxTokens`、`system`（整体替换内置指令）。
+  DSH 原插件是 `magic3007/dsh-prompt-polish`）。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
   `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
   `{ signal }` 对象（`options.signal.aborted`）；omp 的 `@oh-my-pi/pi-tui` 同位置直接传

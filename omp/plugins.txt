@@ -30,8 +30,11 @@ npm:omp-model-gateway
 npm:omp-herdr-agents
 #
 # omp-prompt-polish: `/polish [style] [draft]` and `ctrl+alt+p` rewrite the
-# composer draft into a better prompt through an ephemeral side turn (session
-# model, result never enters the transcript) and write it back into the
-# composer. Port of the DSH plugin magic3007/dsh-prompt-polish; optional config
-# at ~/.omp/agent/extensions/prompt-polish.json — see the repo README.
+# composer draft into a better prompt and write it back into the composer.
+# Default model is deepseek/deepseek-flash called directly through DeepSeek's
+# OpenAI-compatible endpoint with DEEPSEEK_API_KEY (so the omp process needs
+# that variable); "model": "session" in the config switches to the session
+# model's ephemeral side turn. Port of the DSH plugin
+# magic3007/dsh-prompt-polish; optional config at
+# ~/.omp/agent/extensions/prompt-polish.json — see the repo README.
 github:magic3007/omp-prompt-polish
