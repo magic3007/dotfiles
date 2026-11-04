@@ -454,7 +454,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 
 | repo 文件 | 作用 |
 |---|---|
-| `omp/plugins.txt` | 每行一个 `omp plugin install` spec（`npm:` 前缀、版本后缀、`[features]` 括号均可）；空行与 `#` 注释忽略 |
+| `omp/plugins.txt` | 每行一个 `omp plugin install` spec（`npm:` 前缀、版本后缀、`[features]` 括号、`github:user/repo[#ref]` 这类 git spec 均可）；空行与 `#` 注释忽略 |
 | `omp/pi-fff-features.json` | pi-fff 的 feature 状态种子（关掉 `autocomplete`），由下面的 seed 钩子拷到 `~/.omp/agent/extensions/pi-fff.json` |
 | `pi/herdr-agents/config.json` | pi-herdr-agents（pi 侧）的配置种子（`models.default` 等），同上由 seed 钩子拷到 `~/.pi/agent/herdr-agents/config.json` |
 | `omp/herdr-agents/config.json` | omp-herdr-agents 的配置种子，同上由 seed 钩子拷到 `~/.omp/agent/herdr-agents/config.json` |
@@ -472,7 +472,9 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   `Executable not found in $PATH: "bun"`。
 - 已安装的插件**不重装**。重复 `omp plugin install` 不是空操作：它会重新解析包，并把 feature
   选择重置回 manifest 默认值。
-- npm spec 与**本地路径**都支持；路径用于尚未发布的 fork（判断是否已装看目录名）。git spec 告警跳过。
+- npm spec、**git spec**（`github:user/repo[#ref]`、`https://…/repo.git[#ref]`、`git+ssh://…`）与
+  **本地路径**都支持；路径用于尚未发布的 fork（判断是否已装看目录名），git spec 的判重名取仓库名
+  （omp 装完的插件名来自仓库 `package.json` 的 `name`，与仓库名一致）。
 - 当前清单：`npm:pi-fff`（FFF 模糊查找、内容搜索；默认**覆盖内建 `read`/`grep`**，用会话内
   `/fff-features` 开关）、`npm:omp-model-gateway`（`/login` 的 gateway 入口；本机 `mafia`、
   `kafara` 两个 provider 来自它；`volcengine` 已改为 `models.yml` 静态 provider——见
@@ -481,6 +483,13 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   窗格里的 **omp** 进程；工具 `subagent`/`subagent_send`/`worktree_*` 等；条件与限制见下；
   源码在 `~/projects/omp-herdr-agents`，未发布时可直接写该路径）。上游 `pi-herdr-agents`
   仍留在 pi 侧（`pi/settings.json`），两者互不干扰。
+  `github:magic3007/omp-prompt-polish`（提示词润色：`/polish [style] [draft]` 与 `ctrl+alt+p`
+  把输入框草稿交给**旁路回合** `ctx.runEphemeralTurn()` 改写后回填；四种风格
+  balanced/concise/detailed/code 沿用 DSH 版提示词；结果不进会话历史，所以不污染 agent 上下文。
+  slash command 会消费整行输入，所以命令行形态要把草稿写在参数里，润色**已在输入框里的**草稿用
+  `ctrl+alt+p`。可选配置 `~/.omp/agent/extensions/prompt-polish.json`：`style`（默认风格，
+  不设则弹选择器）、`maxTokens`、`system`（整体替换内置指令）。DSH 原插件是
+  `magic3007/dsh-prompt-polish`）。
 - **`pi-fff` 的 `autocomplete` feature 必须保持关闭**。pi-fff 0.1.13 的
   `FffAtAutocompleteProvider` 按上游 `@mariozechner/pi-tui` 0.73 的签名实现，第 4 个参数取
   `{ signal }` 对象（`options.signal.aborted`）；omp 的 `@oh-my-pi/pi-tui` 同位置直接传

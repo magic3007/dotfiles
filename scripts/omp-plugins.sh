@@ -95,7 +95,16 @@ while IFS= read -r line || [[ -n $line ]]; do
     name="$(printf '%s' "$spec" | sed -E 's/\[[^]]*\]$//; s/^npm://; s/@[^@/]+$//')"
 
     if [[ ! $name =~ ^(@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$ ]]; then
-      printf 'warn  %s: not an npm spec or an existing path (git specs are not tracked here)\n' "$spec" >&2
+      # git spec（`github:user/repo[#ref]`、`https://host/user/repo.git[#ref]`、
+      # `git+ssh://…`）：omp 用 bun 把它装进 node_modules，装完的插件名来自仓库
+      # package.json 的 `name`，实践中与仓库名一致，所以判重也用仓库名。
+      # 类比 Python：这里只取 URL 的最后一段当 distribution 名，和 `pip install git+…`
+      # 之后 `pip list` 显示的名字同源。
+      name="$(printf '%s' "$spec" | sed -E 's/^git\+//; s/#.*$//; s#/$##; s#^.*[/:]##; s/\.git$//')"
+    fi
+
+    if [[ ! $name =~ ^[a-z0-9][a-z0-9._-]*$ ]]; then
+      printf 'warn  %s: not an npm spec, git spec or an existing path\n' "$spec" >&2
       continue
     fi
     target="$spec"

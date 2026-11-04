@@ -28,3 +28,10 @@ npm:omp-model-gateway
 # is the only copy that runs children as omp. A filesystem path also works here
 # (for an unpublished local build) — see omp/README.md, "Plugins".
 npm:omp-herdr-agents
+#
+# omp-prompt-polish: `/polish [style] [draft]` and `ctrl+alt+p` rewrite the
+# composer draft into a better prompt through an ephemeral side turn (session
+# model, result never enters the transcript) and write it back into the
+# composer. Port of the DSH plugin magic3007/dsh-prompt-polish; optional config
+# at ~/.omp/agent/extensions/prompt-polish.json — see the repo README.
+github:magic3007/omp-prompt-polish
