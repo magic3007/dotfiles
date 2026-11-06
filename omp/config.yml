@@ -114,3 +114,7 @@ autolearn:
   autoContinue: true
 contextPromotion:
   enabled: true
+astGrep:
+  enabled: true
+plan:
+  autosave: true
