@@ -1,4 +1,4 @@
-setupVersion: 2
+setupVersion: 3
 startup:
   quiet: true
 enabledModels:
@@ -118,3 +118,5 @@ astGrep:
   enabled: true
 plan:
   autosave: true
+update:
+  auto: true
