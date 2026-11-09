@@ -395,6 +395,10 @@ omp 读 `~/.agents/skills`（`skills.enableAgentsUser`）和 `~/.omp/agent/skill
   （主会话用 `hc` 启动、分发、等待、读回 omp 后台 worker，核实实际模型，放进 Herdr 侧边栏），以及
   `herdr-coordinator`（协调者工作流：本会话规划/集成/终审，Opus worker 在独立 worktree 实现，
   Astra worker 独立审查，命令沿用 `herdr-desktop`）。
+- omp TUI 扩展分两篇：`omp-tui-extension-authoring`（机制：先读
+  `dist/types/index.d.ts` 枚举 API 面，`runEphemeralTurn` 旁路调用，入口/打包/typecheck/
+  tmux 真机验证）与 `omp-tui-extension-ux`（交互契约：默认非阻塞只写状态栏、失败不覆盖
+  草稿、`abort` 必须有触发入口、先列状态机再写代码）。写新扩展时两篇一起读。
 - `skill-creator`（`omp/skills/skill-creator/`）是 Anthropic 官方 plugin
   `claude-plugins-official/plugins/skill-creator` 的 omp 副本（Apache-2.0，随包带
   `LICENSE.txt`）。上游把评测脚本写死成 `claude -p`；这里抽到 `scripts/harness.py`，
