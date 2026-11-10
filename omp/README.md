@@ -23,6 +23,7 @@
 | `omp/WATCHDOG.yml` | `~/.omp/agent/WATCHDOG.yml` | advisor（`--advisor`）的 reviewer 花名册 |
 | `omp/AGENTS.md` | `~/.omp/agent/AGENTS.md` | 用户级上下文文件：回复风格（ASD-STE100 + 中文） |
 | `omp/RULES.md` | `~/.omp/agent/RULES.md` | always-apply 常驻规则：同一句回复风格，长会话压缩后仍生效 |
+| `omp/extensions/deepen.ts` | `~/.omp/agent/extensions/deepen.ts` | `/deepen` 扩展，见下文「扩展：`/deepen`」 |
 
 `~/.omp/agent/` 下其余内容是**运行时状态**，各机器不同，留在本机、不进 git：
 
@@ -448,6 +449,47 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 - 降级链会静默换模型（`retry.fallbackChains`），所以 skill 要求派任务后按 nonce 读 worker 会话
   jsonl 里的 `provider/model` 复核，不能只信启动参数。
 - worker 自己起 subagent / task 不受限制；协调者只管合同范围与验收。
+
+## 扩展：`/deepen`
+
+`~/.omp/agent/extensions/` 是本机真目录（herdr 集成、`pi-fff.json` 也在里面），所以只链接单个
+文件，不链接整个目录。omp 直接加载该目录下的 `*.ts`。
+
+`/deepen` 把一句话需求**旁路加深**成可执行、可验收的提示词，再回填输入框：
+
+1. 两种入口共用一个内部函数：`/deepen [deep|quick|spec] [提示词…]`（无参数时回落到输入框），
+   或在输入框里写好草稿后按 **alt+e**。
+2. 默认直连便宜的 `deepseek-flash`（`POST https://api.deepseek.com/chat/completions`，
+   OpenAI 兼容），凭据取环境变量 `DEEPSEEK_API_KEY`。不走会话模型：加深是「写作」，
+   固定便宜模型更可预测，也省掉 agent 的系统提示词与工具定义。
+3. **非阻塞**：请求期间不换输入框、不锁键盘，进度只写状态栏
+   （`🔍 deepening (deep · deepseek-flash) 7s · alt+shift+e cancel`）。
+   取消入口是 **alt+shift+e** 或 `/deepen cancel`，两者 abort 同一个 `AbortController`；
+   120 秒超时与 `session_shutdown` 也走同一条 abort。
+4. 回填前比对 `getEditorText()`：草稿没变才写回（`success`）；变了就进 `draft-changed`，
+   结果暂存不覆盖，按 alt+e 或 `/deepen apply` 才取回。失败、取消、缺凭据一律不动输入框。
+5. 模型输出按不可信处理：剥掉整段 Markdown 围栏、空结果报错、不要求任何标签协议
+   （旧版要模型吐 `<analysis>` + `<enhanced_prompt>`，模型不照做就解析失败）。
+6. 只在交互式 TUI 可用；print/RPC/JSON 模式没有输入框可回填，会写日志并给出明确告警。
+
+状态机：`idle → running → {success | failure | cancel | draft-changed}`，另有 `headless`
+（非交互模式直接返回）。`/deepen config` 打印当前生效配置与所处状态。
+
+配置文件 `~/.omp/agent/extensions/deepen.json`（可选，路径可用 `OMP_DEEPEN_CONFIG` 覆盖；
+坏字段逐项退回默认并在运行时提示）：
+
+    {
+      "style": "deep",                    // deep | quick | spec，也可用 /deepen style 选并落盘
+      "model": "deepseek/deepseek-flash", // <provider>/<id>，直连只取 / 后面的 wire id
+      "baseUrl": "https://api.deepseek.com",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "maxTokens": 8192,
+      "system": "…"                       // 整体替换内置风格提示词
+    }
+
+「备用模型」通道：配置指向的模型请求失败（HTTP 错 / 无内容 / 空结果）时，自动改用内置默认
+三元组重试一次，成功后状态栏与 notify 标 `(fallback)`。缺凭据**不**退备用 —— 备用可能用另一个
+环境变量的 key，静默换凭据会掩盖配置错误。
 
 ## Plugins（插件）
 
