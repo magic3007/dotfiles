@@ -270,6 +270,7 @@
     # appearance 这类它自己不持久化的键。所以这两个走 seed，不走 link：
     # 见 scripts/post-install.d/10-seed-configs.sh。
     # 主题文件 app 从不写回，符号链接可以稳定存活（实测保持为 lrwxr-xr-x）。
+    ~/.config/herdr-app/themes/noir.json: herdr-app/themes/noir.json
     ~/.config/herdr-app/themes/dracula.json: herdr-app/themes/dracula.json
 
     # ---- Warp ----

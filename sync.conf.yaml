@@ -147,6 +147,7 @@
     # herdr-app 只链接 themes/；settings.json 与 keys.json 归 app 所有、会被
     # rename 覆盖，走 seed（见 scripts/post-install.d/10-seed-configs.sh）。
     ~/.config/herdr/config.toml: herdr/config.toml
+    ~/.config/herdr-app/themes/noir.json: herdr-app/themes/noir.json
     ~/.config/herdr-app/themes/dracula.json: herdr-app/themes/dracula.json
 
 # Skill views are generated (per-skill links), not whole-dir links: see
