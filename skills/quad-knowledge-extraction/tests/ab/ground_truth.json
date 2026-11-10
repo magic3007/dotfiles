@@ -1,0 +1,23 @@
+{
+  "S1": {
+    "q1_keywords": ["vitest.config", "tsconfigPaths", "tsconfig-paths"],
+    "q2_keywords": ["dist", "exports", "构建", "build"],
+    "q2_applicable": false,
+    "q4_keywords": ["CI", "workspace", "vitest --workspace"],
+    "q5_keywords": ["vitest.config", "vite.config", "dist", "构建", "CJS", "alias"]
+  },
+  "S2": {
+    "q1_keywords": ["compose config", "depends_on", "service_healthy", "service_started", "pg_isready"],
+    "q2_keywords": ["listen_addresses", "回环", "localhost", "每次都失败", "永远连不上"],
+    "q2_applicable": false,
+    "q4_keywords": ["Kubernetes", "k8s", "restart", "retries", "errno", "推断"],
+    "q5_keywords": ["listen_addresses", "每次都失败", "healthcheck", "K8s", "非容器"]
+  },
+  "S3": {
+    "q1_keywords": ["npm ls", "restore-keys", "actions/cache", "npm ci", "hashFiles"],
+    "q2_keywords": ["EINTEGRITY", "integrity", "重新发布", "重发", "cache clean"],
+    "q2_applicable": false,
+    "q4_keywords": ["pnpm", "淘汰", "7 天", "restore-keys 保留", "对照"],
+    "q5_keywords": ["EINTEGRITY", "pnpm", "yarn", "缓存命中", "本地也失败"]
+  }
+}

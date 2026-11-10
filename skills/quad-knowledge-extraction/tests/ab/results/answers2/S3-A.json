@@ -1,0 +1,22 @@
+{
+  "q6": {
+    "answer": "技能把它列为「未验证变体」，不要假定行为相同：cache: 'pnpm' 是否有同一失效模式未做对照实验（pnpm 的 store 与 node_modules 布局不同，但缓存机制相似）。因此本技能的经验不能直接套用到 pnpm 上；技能没有给 pnpm 的判定或修复步骤。",
+    "grounded_in_skill": true,
+    "quote": "Untested variants — do not assume they behave the same: whether `cache: 'pnpm'` has the"
+  },
+  "q7": {
+    "answer": "技能的全部结论都绑定在一套固定环境上：Node 20.11.1 / npm 10.8.2、runs-on: ubuntu-24.04、actions/checkout@v4、actions/cache@v4、actions/setup-node@v4。换 runner、换 actions/cache 大版本、换 npm 大版本后，缓存键前缀匹配行为、setup-node 的 cache: 'npm' 只管 ~/.npm、以及 npm ci 从 lockfile 干净安装这三点都要重新验证。技能给出的验证命令：1) npm ls @acme/pricing（本地与 CI 各跑一次，比对版本）；2) rm -rf node_modules && npm ci && npm test（本地干净安装复现）；3) CI 临时步骤 npm ls @acme/pricing 与 rm -rf node_modules && npm ci && npm ls @acme/pricing 做前后对照；4) 修复后连推多个只改测试文件的 commit，确认 CI 全绿。",
+    "grounded_in_skill": true,
+    "quote": "- Environment: Node 20.11.1 / npm 10.8.2, `runs-on: ubuntu-24.04`, `actions/checkout@v4`,"
+  },
+  "q8": {
+    "answer": "不适用。技能明确排除本地同样失败的情形：本地与 CI 同样红说明不是 CI 侧被恢复的旧 node_modules 造成。要按技能走，前提是本地 npm test 反复全绿。",
+    "grounded_in_skill": true,
+    "quote": "- Do not use this skill when CI fails identically locally, when the failure is a genuine"
+  },
+  "q9": {
+    "answer": "技能未提供",
+    "grounded_in_skill": false,
+    "quote": ""
+  }
+}

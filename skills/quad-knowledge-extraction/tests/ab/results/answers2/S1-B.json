@@ -1,0 +1,22 @@
+{
+  "q6": {
+    "answer": "技能里有对应分支和边界说明：没有 vitest.config.ts 时 vitest 直接复用 vite.config.ts，根因 A（配置入口分裂）不成立，不能按本技能挂插件。对应 Procedure 决策表分支 B4「无 `vitest.config.ts`（vitest 复用 vite.config.ts）→ B4 根因 A 不成立，重新定位」；Model 的边界段也把它列为不适用情形。此时应按判别标准表重新分流到根因 B/C/D/E。",
+    "grounded_in_skill": true,
+    "quote": "不适用于没有 `vitest.config.ts`（此时 vitest 直接复用 `vite.config.ts`，根因 A 不成立）"
+  },
+  "q7": {
+    "answer": "技能要求重跑 Facts 里 F1、F6、F8、F9 的复核命令（复审日期 2027-05-10，到期重跑这几条），并且证伪条件里点名了 vitest 3.x：一旦 vitest 3.x 及以上调整配置解析优先级或弃用 defineConfig 的 plugins 透传，本技能即失效或需重写。命令：(1) `npx vitest --version`（F2 版本复核）；(2) `pnpm -F @acme/web test`（F1 报错逐字复核 / F8 修复后通过）；(3) `grep -n \"tsconfigPaths\" apps/web/vite.config.ts apps/web/vitest.config.ts`（F6 配置分裂复核）；(4) `rm -rf apps/web/node_modules/.vite && pnpm -F @acme/web test`（F9 非缓存假象复核）。技能未针对 node 版本升级单独给出复核命令，只把 node v20.11.1 记为 F2 的会话环境版本与 F1 的生效条件。",
+    "grounded_in_skill": true,
+    "quote": "vitest 3.x 及以上调整配置解析优先级或弃用 `defineConfig` 的 plugins 透传。"
+  },
+  "q8": {
+    "answer": "不适用。技能的适用条件（Use when）明确要求「dev 与 build 都正常只有测试失败」，而 dev 也失败说明连走 vite.config.ts 的那条解析链都没成功，前提被推翻；F11 与机制链也都以「vite dev 之所以能跑，是因为 apps/web/vite.config.ts 挂了 vite-tsconfig-paths()」为前提。技能未给「dev 与测试同时失败」的专门分支，应按分类树/判别标准重新分流（根因 B 构建产物缺失、根因 C 链接缺失、根因 D 映射写错、根因 E 包名不一致）。",
+    "grounded_in_skill": true,
+    "quote": "dev 与 build 都正常只有测试失败, (3) 被依赖包 package.json 的 main 指向 src 源码"
+  },
+  "q9": {
+    "answer": "按 B1 步骤 1 的「不匹配」分支走：期望只在 vite.config.ts 命中、vitest.config.ts 零命中；若两个文件都有 tsconfigPaths，则根因 A 不成立，转停止条件 S1。S1 的处置是：按 B1 挂上插件后报错一字不变 → 根因不是配置入口分裂（大概率是被依赖包 dist 未构建），停止本路径，按判别标准表重新分流。后续步骤同样各有不匹配出口：步骤 2 映射本身错 → 转分支 B4 重新定位；步骤 3 若 vite-tsconfig-paths 未安装会 import 失败 → 先在 apps/web 装 devDependency 再重试；步骤 4 仍报 Failed to load url → 转 S1；步骤 5 清缓存后失败 → 转 S2（改为在 vitest.config.ts 里写显式 resolve.alias 硬映射，或升级为人工复核 vitest 版本行为）。",
+    "grounded_in_skill": true,
+    "quote": "不匹配：两个文件都有 → 根因 A 不成立，转停止条件 S1"
+  }
+}

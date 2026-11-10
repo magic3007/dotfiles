@@ -1,0 +1,78 @@
+{
+  "q1": {
+    "applicable": true,
+    "first_command": "在 `actions/cache` 步骤之后、`npm test` 之前插一步 `npm ls @acme/pricing`（换成被怀疑的包），推 commit 触发 CI 后读 CI 日志",
+    "expected_output": "打印 `@acme/pricing@1.9.0`，与 lockfile 一致；若打印旧版本（如 `@acme/pricing@1.8.3`）则确认走 B1 清缓存 + 显式安装；一致但测试仍失败则转停止条件 S1",
+    "reason": "场景与技能 description 的 Use when 全部命中：同一 commit 重跑必挂且本地 `npm test` 连续多次全绿（F6：本地 20 次全绿、重跑必失败，失败是确定性的不是 flake，根因 D 可直接排除），报错串 `AssertionError: expected 1999 to be 2000` 与 `FAIL  test/billing.spec.ts` 完全对应 F7，且本次 PR 只改测试断言文案属于 F8 描述的“改了测试才红是相关不是因果”。因此适用，入口走决策表第一行：CI 里 `npm ls <pkg>` 版本 ≠ `package-lock.json` 版本 → B1。",
+    "confidence": "high"
+  },
+  "q2": {
+    "applicable": false,
+    "reason": "不适用。技能分类树把这条列为根因 B：lockfile 里的 tarball integrity 与 registry 实际发布不一致（上游重发同版本），可观测区分信号是报错串为 `npm ERR! code EINTEGRITY` 与 `integrity checksum failed when using sha512`，且 `npm ls` 版本与 lockfile 一致、删 `restore-keys` + `npm ci` 无效。决策表对该入口的分支是 B2，指向停止条件 S2（本技能不适用）。See also 明确写：修法是 `npm cache clean --force` + 锁定到未被重发的版本，或 `npm ci --prefer-online`；本技能对其无效。另外校准表把“`EINTEGRITY` 那次根因是上游重发 `1.9.0`”标为 inferred，未复核，未知清单里也列为未复核项。"
+  },
+  "q3": {
+    "commands": [
+      "在 `actions/cache` 步骤之后、`npm test` 之前插一步 `npm ls @acme/pricing` 并读 CI 日志",
+      "grep -n \"npm ci\" .github/workflows/ci.yml",
+      "grep -n '\"@acme/pricing\"' package.json package-lock.json",
+      "rm -rf node_modules && npm ci && npm ls @acme/pricing && npm test",
+      "rm -rf node_modules && npm ci && npm test",
+      "for i in $(seq 1 20); do npm test; done",
+      "npx vitest run test/billing.spec.ts",
+      "git diff HEAD~1 -- test/billing.spec.ts",
+      "grep -n -A3 \"restore-keys\" .github/workflows/ci.yml",
+      "rm -rf node_modules && npm ci && npm test 后推一个只改测试文件的 commit 看 CI",
+      "node -v && npm ls --all"
+    ],
+    "note": "复审日期 2027-05-10：到期重跑 Facts 表的复核命令，跑不通的事实降级进未知清单。上面命令逐条对应 F1–F8 的“复核命令”列，最后两条对应 Procedure B1 步骤 2 与停止条件 S3 要求的 runner 环境 dump。"
+  },
+  "q4": {
+    "unverified": [
+      "“pnpm 有同样问题” —— inferred，机制类比，未实测",
+      "“托管 runner 缓存淘汰（7 天/10 GB）会让问题自愈” —— inferred，未观察缓存生命周期",
+      "“保留 `restore-keys` 但加 `npm ci` 也足够” —— inferred，直接删了前缀，没做这个对照",
+      "“`EINTEGRITY` 那次根因是上游重发 `1.9.0`” —— inferred，来自另一次会话，本次未复核",
+      "pnpm（`cache: 'pnpm'`）是否有同样问题：未验证（验证方法 = 在 pnpm 项目里复刻同样的 `restore-keys` 前缀缓存配置，CI 里打印 `pnpm ls <pkg>` 对比 lockfile）",
+      "GitHub 托管 runner 缓存淘汰策略（7 天 / 10 GB）是否让问题自愈：未验证（验证方法 = 记录缓存 key 创建时间，观察超期后是否 miss）",
+      "保留 `restore-keys` 只加 `npm ci` 是否也足够：未验证（验证方法 = 开两个分支各跑 3 个只改测试的 commit 做 A/B）",
+      "`npm ERR! code EINTEGRITY` 那次的根因与修法本次未复核",
+      "F1–F8 本身标注为 verified（逐条有 CI/本地实测证据）"
+    ]
+  },
+  "q5": {
+    "boundaries": [
+      {
+        "signal": "报错含 `npm ERR! code EINTEGRITY` 或 `integrity checksum failed when using sha512`",
+        "meaning": "根因 B（integrity 不一致），本技能不适用，转停止条件 S2 / See also 的 integrity-registry 方向"
+      },
+      {
+        "signal": "本地也失败（本地 `rm -rf node_modules && npm ci && npm test` 同样红）",
+        "meaning": "边界明确排除：不适用于本地也失败的场景"
+      },
+      {
+        "signal": "CI 里 `npm ls <pkg>` 版本与 `package-lock.json` 已一致，但测试仍失败",
+        "meaning": "边界明确排除（依赖版本已与 lockfile 一致的场景）；按停止条件 S1 转 B3 环境差异 / B4 flake"
+      },
+      {
+        "signal": "workflow 里没有 `path: node_modules` 与 `restore-keys` 前缀兜底（`grep -n -A3 \"restore-keys\"` 无输出）但版本仍不符",
+        "meaning": "不是缓存污染形态，转停止条件 S2"
+      },
+      {
+        "signal": "同一 commit 重跑结果不稳定",
+        "meaning": "根因 D 真 flake，本技能不适用（分支 B4）"
+      },
+      {
+        "signal": "依赖版本一致，报错随 `TZ`/runner 版本变化",
+        "meaning": "根因 C 环境差异，本技能不适用（分支 B3）"
+      },
+      {
+        "signal": "使用 pnpm（`cache: 'pnpm'`）或 yarn",
+        "meaning": "未实测，不适用；pnpm 是否有同样问题在未知清单里"
+      },
+      {
+        "signal": "非 npm + GitHub Actions 的组合",
+        "meaning": "边界：只适用于 npm + GitHub Actions 且 workflow 缓存了 `node_modules` 的场景"
+      }
+    ]
+  }
+}

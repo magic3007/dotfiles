@@ -1,0 +1,63 @@
+{
+  "q1": {
+    "applicable": true,
+    "first_command": "grep -n \"tsconfigPaths\" apps/web/vite.config.ts apps/web/vitest.config.ts",
+    "expected_output": "只在 apps/web/vite.config.ts 命中（第 3 行 import、第 7 行使用 tsconfigPaths），apps/web/vitest.config.ts 零命中",
+    "reason": "报错逐字为 `Error: Failed to load url @acme/core (resolved id: @acme/core). Does the file exist?`，抛出点 src/lib/cart.ts:1:23；目标是 workspace 内部包；dev 与 build 都正常、只有 vitest 失败——命中技能的 Use when 三条与根因 A（vitest 配置入口分裂：vite-tsconfig-paths 只挂在 vite.config.ts，vitest.config.ts 无 plugins）。这是 Procedure 决策表 B1 分支，步骤 1 即上述 grep。"
+  },
+  "q2": {
+    "applicable": false,
+    "reason": "这是分类树里的根因 B（构建产物缺失），不是本技能覆盖的根因 A。判别信号全部命中：被依赖包 package.json 的 main 指向 `./dist/index.js` 且带 `exports` 字段、`dist/` 未构建（`ls packages/core/dist` 会报不存在）；技能明确写「此时在 vitest.config.ts 加 tsconfigPaths 无效」，对应决策表分支 B2「修构建顺序（本技能不适用，见 See also）」。另对照 F5：本例根因 A 的前提是被依赖包 main 指向 `./src/index.ts` 且没有 exports 字段，本场景不满足。"
+  },
+  "q3": {
+    "commands": [
+      "pnpm -F @acme/web test",
+      "grep -n \"tsconfigPaths\" apps/web/vite.config.ts apps/web/vitest.config.ts",
+      "rm -rf apps/web/node_modules/.vite && pnpm -F @acme/web test"
+    ]
+  },
+  "q4": {
+    "unverified": [
+      "「同事 CI 上的同一报错是同一根因」——inferred，只有转述，会话内未在 CI 复现",
+      "「vitest --workspace 多包模式下同样是这个根因」——inferred，未跑过该模式",
+      "「对照仓库那次是构建顺序问题、加 tsconfigPaths 无效」——inferred，来自会话末尾另一次经历描述，无命令输出佐证",
+      "「CI 用 `pnpm -F @acme/web test --run` 无 jsdom 差异」——assumed，转述的 CI 命令行，未验证",
+      "CI 环境是否同根因：未验证（将来验证法：在 CI 上按 B1 步骤 3 加插件后重跑 `pnpm -F @acme/web test --run`）",
+      "`vitest --workspace`（vitest 2.x 多包模式）下配置继承行为：未验证（将来验证法：建最小双包 workspace 复现本例）",
+      "非 jsdom 环境（`environment: 'node'`）是否表现一致：未验证，本例只跑过 jsdom",
+      "Windows / 非 pnpm（npm、yarn workspaces）下软链与解析表现：未验证"
+    ]
+  },
+  "q5": {
+    "boundaries": [
+      {
+        "signal": "仓库里没有 apps/web/vitest.config.ts（vitest 直接复用 vite.config.ts）",
+        "meaning": "根因 A 不成立，决策表分支 B4「重新定位」"
+      },
+      {
+        "signal": "被依赖包 package.json 的 main/exports 指向 ./dist/...，且 `ls packages/core/dist` 报不存在",
+        "meaning": "根因 B 构建产物缺失，决策表分支 B2，本技能不适用"
+      },
+      {
+        "signal": "`ls -la apps/web/node_modules/@acme/` 没有该软链；`pnpm -F @acme/web why @acme/core` 无输出",
+        "meaning": "根因 C 链接缺失，决策表分支 B3，需重装依赖"
+      },
+      {
+        "signal": "apps/web/tsconfig.json 的 paths 目标路径 `ls` 不存在；加插件后仍报同一错",
+        "meaning": "根因 D 映射写错，本技能不适用"
+      },
+      {
+        "signal": "被依赖包入口是纯 JS/CJS 且已构建（裸解析本就能成功）",
+        "meaning": "本技能整条路径失效"
+      },
+      {
+        "signal": "vitest 1.x 以前的配置合并行为；或使用 `vitest --workspace` 多包模式",
+        "meaning": "前者配置合并语义不同、后者配置继承未验证，均超出技能边界"
+      },
+      {
+        "signal": "按 B1 挂上插件后报错一字不变；或清缓存后回归失败；或需要动 pnpm-workspace.yaml / 根 tsconfig",
+        "meaning": "命中停止条件 S1 / S2 / S3，停止本路径并重新分流"
+      }
+    ]
+  }
+}

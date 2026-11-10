@@ -1,0 +1,22 @@
+{
+  "q6": {
+    "answer": "技能判定 pnpm 不适用：边界一节写明只适用于 npm + GitHub Actions 且 workflow 缓存了 node_modules 的场景，pnpm 与 yarn 未实测、不适用。校准表把「pnpm 有同样问题」标为 inferred（机制类比，未实测），未知清单里也把它列为未验证项。按技能该怎么办：技能给出的唯一动作是验证方法 —— 在 pnpm 项目里复刻同样的 `restore-keys` 前缀缓存配置，CI 里打印 `pnpm ls <pkg>` 对比 lockfile；技能没有给出 pnpm 版本的修复步骤或决策表分支。",
+    "grounded_in_skill": true,
+    "quote": "pnpm（`cache: 'pnpm'`）与 yarn 未实测，不适用"
+  },
+  "q7": {
+    "answer": "技能里每条 Fact 都带「生效条件」列，本次升级改动的正是这些生效条件，因此相关结论必须重新验证：F1（actions/cache@v4，restore-keys 前缀匹配语义）—— actions/cache v4→v5 直接落在证伪条件上（`actions/cache` 改变 `restore-keys` 语义则 F1 失效）；F1/F3/F5 的 runner 由 ubuntu-24.04 换成 macos 失效；F1/F4/F5 的 npm 10.x/10.8.2 由 npm 11 替换失效；F2 的 actions/setup-node@v4 `cache: 'npm'` 语义也在证伪条件里（若它开始负责安装依赖则 F2 失效）；F6/F7 的 vitest + node 20.11.1 条件需复核。要跑的命令 = Facts 表的复核命令列逐条重跑：在 `actions/cache` 步骤之后、`npm test` 之前插一步 `npm ls @acme/pricing` 并读 CI 日志；`grep -n \"npm ci\" .github/workflows/ci.yml`；`grep -n '\"@acme/pricing\"' package.json package-lock.json`；`rm -rf node_modules && npm ci && npm ls @acme/pricing && npm test`；`rm -rf node_modules && npm ci && npm test`；`for i in $(seq 1 20); do npm test; done`；`npx vitest run test/billing.spec.ts`；`git diff HEAD~1 -- test/billing.spec.ts`。技能另有复审制度：复审日期 2027-05-10，到期重跑 Facts 的复核命令，跑不通的事实降级进未知清单。",
+    "grounded_in_skill": true,
+    "quote": "actions/cache@v4, ubuntu-24.04 runner, npm 10.8.2, node 20.11.1"
+  },
+  "q8": {
+    "answer": "不适用。技能的边界一节明确排除本地也失败的场景；机制链的前提是「CI 必失败而本地永远绿 → 差异只可能来自依赖树或环境」，本地同样红说明差异不来自 CI 缓存恢复这一步。技能对该情形没有给决策表分支，边界只写「不适用」。",
+    "grounded_in_skill": true,
+    "quote": "不适用于本地也失败的场景、不适用于依赖版本已与 lockfile 一致的场景"
+  },
+  "q9": {
+    "answer": "技能对第一步（插一步 `npm ls @acme/pricing`，期望打印 `@acme/pricing@1.9.0` 与 lockfile 一致）给了分支处置：若打印旧版本（如 `@acme/pricing@1.8.3`）则确认走 B1，继续步骤 2–4；若版本一致（期望输出之外的另一种落点）则转停止条件 S1 —— `npm ls` 版本与 lockfile 一致但测试仍失败 → 根因不是缓存污染，停止并按决策表转 B3/B4。后续步骤同样有兜底：步骤 2 没有 `restore-keys` 但版本仍不符 → 转 S2；步骤 3 改完仍打印旧版本 → 转 S2；步骤 4 推两个只改测试文件的 commit 后仍红 → 转 S3（停止改 workflow，改为在 runner 上 dump 完整环境 `node -v`、`npm ls --all`、打印实际命中的 cache key 后再定位）。",
+    "grounded_in_skill": true,
+    "quote": "不匹配：打印旧版本（如 `@acme/pricing@1.8.3`）→ 确认走 B1；一致 → 转停止条件 S1"
+  }
+}

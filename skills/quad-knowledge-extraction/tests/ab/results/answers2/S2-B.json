@@ -1,0 +1,22 @@
+{
+  "q6": {
+    "answer": "不适用。技能把这种情形归入 C 类「连接串主机名错」——主机名指向 localhost 而不是 compose 服务名 `db`，属于本技能不适用的分支，按决策表应转分支 B3 修连接串。技能未讨论「api 跑在宿主机而非容器内」这种部署形态本身，也未给出宿主机侧的任何操作步骤。",
+    "grounded_in_skill": true,
+    "quote": "C 连接串主机名错：`DATABASE_URL` 指向 localhost 或别的服务"
+  },
+  "q7": {
+    "answer": "按技能必须重新验证的是 F2（裸 `depends_on` 是否仍等价 `condition: service_started`）、F5（postgres 日志是否仍出现两条 ready 消息）、F7（`condition: service_healthy` 修复是否仍 30 轮全绿）——复审日期条目明确要求到期重跑 Facts 的复核命令，重点即这三条；证伪条件也点名：Compose 若改变裸 `depends_on` 默认条件则 F2 失效、机制链需重写，postgres 官方镜像若取消初始化期临时实例、只出现一条 ready 消息则 F5 与机制链需重写。要跑的命令：`docker compose version`、`docker --version`（复核 F9 版本）、`docker compose config`（复核 F2）、`docker compose logs db`（复核 F5，数 ready 消息条数）、`docker compose logs api`（复核 F1）、`docker compose exec api printenv DATABASE_URL`（复核 F4）、`docker compose exec api node -e \"require('net').connect(5432,'db').on('error',e=>console.log('ERR',e.code)).on('connect',()=>console.log('OK'))\"`（复核 F3）、`for i in $(seq 30); do docker compose down -v; docker compose up -d; sleep 1; curl -s -o /dev/null -w \"%{http_code}\\n\" localhost:3000/healthz; done > /tmp/codes.txt; sort /tmp/codes.txt`（复核 F7）。",
+    "grounded_in_skill": true,
+    "quote": "到期重跑 Facts 的复核命令，重点 F2、F5、F7"
+  },
+  "q8": {
+    "answer": "不适用。技能只覆盖 A 类启动竞态，其判别信号是「概率性失败、等待即好」；本例失败出现在稳定运行 3 天后且持续不恢复，不具备该特征。按技能应改走其它分支定位（如 B2 查 `listen_addresses`、B4 查 db 容器状态），本技能不适用。",
+    "grounded_in_skill": true,
+    "quote": "A 启动竞态：`depends_on` 条件太松，db 未就绪（概率性失败，等待即好）——本技能覆盖"
+  },
+  "q9": {
+    "answer": "第一步是 `docker compose config`，期望看到 `depends_on` 下 `db: condition: service_started`。若期望输出没有出现，按技能走停止条件 S1：`docker compose config` 已经是 `condition: service_healthy` 且仍报同样错误，说明根因不是启动竞态，停止本路径，转 B2/B4 重新定位。",
+    "grounded_in_skill": true,
+    "quote": "S1：`docker compose config` 已是 `condition: service_healthy` 且仍报同样错误 → 根因不是启动竞态，转 B2/B4 重新定位。"
+  }
+}

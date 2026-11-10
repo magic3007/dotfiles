@@ -1,0 +1,52 @@
+{
+  "q1": {
+    "applicable": true,
+    "first_command": "ls -la apps/web/node_modules/@acme/",
+    "expected_output": "core -> ../../../../packages/core   (symlink present); 再跑 `pnpm -F @acme/web why @acme/core` 应输出 `dependencies:` 与 `@acme/core 0.3.1`。symlink 与依赖条目都在，说明 workspace 链接不是问题；再重建一次（`pnpm -w build`）后重跑测试，若报错逐字不变，则缺失构建产物也不是原因。",
+    "reason": "报错文本是 `Failed to load url @acme/core (resolved id: @acme/core)`，指向 Vite 的模块解析而非 pnpm；且 dev 与 `pnpm -w build` 都正常。技能的真正诊断是配置优先级：存在 `vitest.config.ts` 时 Vitest 用它且不合并 `vite.config.ts`，只在 vite.config.ts 里注册的 `tsconfigPaths()`/alias 在测试期不生效，而内部包 `main` 指向 `./src/index.ts`（TS 源码），没有别的东西能解析裸 specifier。第一步是按技能 Step 1 排除链接与构建这两个错误假设。"
+  },
+  "q2": {
+    "applicable": false,
+    "reason": "技能 Notes 明确记录了这个近似场景：另一个仓库同样的 `import { x } from '@acme/core'` 报 `Cannot find module '@acme/core'`，那里 `packages/core/package.json` 的 `main` 是 `./dist/index.js` 且带 `exports` map，而 `dist/` 从未构建（被 gitignore、CI 无 build 步骤）——这是 build-order 问题，往 `vitest.config.ts` 加 `tsconfigPaths()` 完全无效。技能的判据是：先读内部包的 `main`/`exports`，`main` → `src/*.ts` 才是 alias/resolver 问题；`main` → `dist/*` 且 `dist/` 缺失是构建问题。本场景属后者，且每次必失败（不是仅测试期失败）。"
+  },
+  "q3": {
+    "commands": [
+      "ls -la apps/web/node_modules/@acme/",
+      "pnpm -F @acme/web why @acme/core",
+      "cat packages/core/package.json",
+      "cat apps/web/tsconfig.json | grep -A3 paths",
+      "cat apps/web/vitest.config.ts",
+      "grep -n \"tsconfigPaths\\|alias\" apps/web/vite.config.ts",
+      "pnpm -w build",
+      "pnpm -F @acme/web test",
+      "rm -rf apps/web/node_modules/.vite && pnpm -F @acme/web test"
+    ]
+  },
+  "q4": {
+    "unverified": [
+      "CI 场景未验证：同事在 CI 里跑 `pnpm -F @acme/web test --run` 遇到同样报错，但本地从未复现该 CI 失败，所以 CI 侧根因未确认。",
+      "Vitest 2.x 多包模式（`vitest --workspace`）下的行为未测试。",
+      "Notes 里那条 build-order 反例中，`packages/core` 带 `exports` map 且 `dist/` 未构建的具体修复过程未被完整记录（只说明加 `tsconfigPaths()` 无效，未给出已验证的解法）。"
+    ]
+  },
+  "q5": {
+    "boundaries": [
+      {
+        "signal": "失败的 specifier 是外部 npm 包（不是 `@acme/*` 这类 workspace 内部包）",
+        "meaning": "不要用本技能；应去查该包的安装与 `exports` 字段。"
+      },
+      {
+        "signal": "内部包 `package.json` 的 `main` 指向 `dist/*`（如 `./dist/index.js`）且 `dist/` 不存在",
+        "meaning": "这是构建/构建顺序问题，不是 alias 问题；加 `tsconfigPaths()` 到 `vitest.config.ts` 无效。先补 build 步骤。"
+      },
+      {
+        "signal": "报错文本是 `Cannot find module '@acme/core'`（而非 `Failed to load url @acme/core (resolved id: @acme/core)`），且 dev/build 之外也一直失败",
+        "meaning": "指向 Node/pnpm 解析与产物缺失，属 build-order 类问题，超出本技能范围。"
+      },
+      {
+        "signal": "内部包已经正常产出编译后的 `dist` 输出，只是尚未构建",
+        "meaning": "技能自述的 “When NOT to use” 情形：先构建即可，不要改配置。"
+      }
+    ]
+  }
+}

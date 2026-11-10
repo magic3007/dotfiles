@@ -1,0 +1,22 @@
+{
+  "q6": {
+    "answer": "技能未提供",
+    "grounded_in_skill": false,
+    "quote": ""
+  },
+  "q7": {
+    "answer": "技能里必须重新验证的结论有两类。(1) 版本绑定的环境事实：技能所有复现与验证都是在 Docker 27.3.1 / Compose v2.29.7 / postgres:16.4 / Node pg 驱动下取得的，升级到 postgres 17 与 compose v2.32 后这些结论不再自动成立。(2) 技能自己标注为未验证/推断的内容也要复核：关于报错里 127.0.0.1 的解释是推断（读 pg 源码，未实测）；未验证项包括 readinessProbe/initContainer 等价物、restart: unless-stopped 是否也掩盖竞态、以及把 retries: 30 调低对启动时延的影响。要跑的命令（技能给出的原样命令）：`docker compose config | grep -A4 depends_on` 看是否仍是 `condition: service_started`；`docker compose exec api printenv DATABASE_URL`、`docker compose exec api node -e \"require('dns').lookup('db',(e,a)=>console.log(e,a))\"`、`docker compose exec api node -e \"require('net').connect(5432,'db').on('error',e=>console.log('ERR',e.code)).on('connect',()=>console.log('OK'))\"` 三条判别探针；30 轮重建复现循环 `docker compose down -v` / `docker compose up -d` / `sleep 1` / `curl -s -o /dev/null -w \"%{http_code}\\n\" localhost:3000/healthz` 后 `sort | uniq -c`，期望 `30 200`；以及 `docker compose logs api | grep -c ECONNREFUSED` 期望 0。",
+    "grounded_in_skill": true,
+    "quote": "- Docker 27.3.1 / Docker Compose v2.29.7, `postgres:16.4`, Node app using the `pg` driver"
+  },
+  "q8": {
+    "answer": "不适用。技能明确给出判别式：间歇且自愈 = 启动竞态（本技能）；持续不恢复 = 服务端 bind/listen 配置问题。技能还记录了同错误文本的另一个根因案例：另一台机器上同样的 compose 栈每个请求都失败且从不恢复，原因是 postgres 镜像被换成自定义构建、postgresql.conf 设了 listen_addresses = 'localhost'，Postgres 只在自己网络命名空间的 loopback 上监听，api 容器根本连不上；此时 condition: service_healthy 无效，因为 healthcheck 在 db 容器内部执行照样通过。已稳定运行 3 天且持续不恢复属于后者，不属于本技能的启动竞态。",
+    "grounded_in_skill": true,
+    "quote": "startup race (this skill); permanent failure means server bind/listen configuration."
+  },
+  "q9": {
+    "answer": "技能未提供",
+    "grounded_in_skill": false,
+    "quote": ""
+  }
+}

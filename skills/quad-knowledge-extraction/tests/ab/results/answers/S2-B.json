@@ -1,0 +1,68 @@
+{
+  "q1": {
+    "applicable": true,
+    "first_command": "docker compose config",
+    "expected_output": "depends_on 下显示 `db: condition: service_started`（裸列表写法展开后的等价条件）",
+    "reason": "命中本技能覆盖的 A 类启动竞态：失败是概率性的（40%），等待 5~10 秒后同一请求成功，报错串与栈帧 `Error: connect ECONNREFUSED 127.0.0.1:5432` / `at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)` 与 F1 逐字一致；`docker compose ps` 显示 db 为 healthy 也符合 F3 的观测。根因是裸 `depends_on` 只等价 `condition: service_started`，不等 Postgres healthcheck。"
+  },
+  "q2": {
+    "applicable": false,
+    "reason": "这是分类树里的 B 类「Postgres 只监听回环」，不是 A 类启动竞态。判别信号：每次都失败、等多久都不行（排除 A 的概率性特征）；`postgresql.conf` 的 `listen_addresses = 'localhost'` 使跨 network namespace 永远连不上；容器内 healthcheck 仍能通过，所以 `condition: service_healthy` 骗人、无效，加条件也治不好。决策表对应分支 B2「查 `listen_addresses`（本技能不适用）」。"
+  },
+  "q3": {
+    "commands": [
+      "docker compose logs api",
+      "docker compose config",
+      "docker compose exec api node -e \"require('net').connect(5432,'db').on('error',e=>console.log('ERR',e.code)).on('connect',()=>console.log('OK'))\"",
+      "docker compose exec api printenv DATABASE_URL",
+      "docker compose logs db",
+      "for i in $(seq 20); do docker compose down -v; docker compose up -d; sleep 1; curl -s -o /dev/null -w \"%{http_code}\\n\" localhost:3000/healthz; done > /tmp/retry-codes.txt; sort /tmp/retry-codes.txt",
+      "for i in $(seq 30); do docker compose down -v; docker compose up -d; sleep 1; curl -s -o /dev/null -w \"%{http_code}\\n\" localhost:3000/healthz; done > /tmp/codes.txt; sort /tmp/codes.txt",
+      "docker compose version",
+      "docker --version"
+    ]
+  },
+  "q4": {
+    "unverified": [
+      "\"报错里的 `127.0.0.1` 是 socket 本地端点而非目标地址\" — inferred，会话未实测 errno 文案与远端地址的对应关系",
+      "\"初始化期临时实例只监听回环，所以 ready 消息出现两次\" — inferred，只观察到两条 ready 消息，未验证临时实例的 `listen_addresses`",
+      "\"对照机器的根因是 `listen_addresses = 'localhost'`\" — inferred，诊断发生在另一台机器，本会话未复现该配置",
+      "\"`restart: unless-stopped` 也能掩盖该竞态\" — assumed，未测试",
+      "Kubernetes 等价做法（readinessProbe + initContainer）未验证",
+      "把 healthcheck `retries` 从 30 调小对启动时长的影响未验证",
+      "未在 Docker Desktop（Windows/macOS）验证"
+    ]
+  },
+  "q5": {
+    "boundaries": [
+      {
+        "signal": "每次都失败、等多久都不行，且 db 容器内 healthcheck 仍报 healthy",
+        "meaning": "B 类「Postgres 只监听回环」，加 `condition: service_healthy` 无效，本技能不适用"
+      },
+      {
+        "signal": "`docker compose exec api printenv DATABASE_URL` 的主机名不是 `db`",
+        "meaning": "C 类连接串主机名错，走分支 B3 修连接串，本技能不适用"
+      },
+      {
+        "signal": "报错端口不是 5432，或 db 容器内 `pg_isready -p <port>` 失败而 5432 成功",
+        "meaning": "D 类端口不匹配，本技能不适用"
+      },
+      {
+        "signal": "`docker compose ps` 中 db 不是 healthy 或状态为 restarting；`docker compose logs db` 无第二次 ready 消息",
+        "meaning": "E 类 db 容器异常，走分支 B4 查 db 日志与 OOM，本技能不适用"
+      },
+      {
+        "signal": "`docker compose config` 已经是 `condition: service_healthy` 却仍报同样错误",
+        "meaning": "停止条件 S1：根因不是启动竞态，转 B2/B4 重新定位"
+      },
+      {
+        "signal": "db 服务没有 healthcheck，或镜像内无 `pg_isready`",
+        "meaning": "停止条件 S3：本技能不适用，先补 healthcheck 或改用显式等待脚本"
+      },
+      {
+        "signal": "运行环境是 Docker Swarm 或 Kubernetes",
+        "meaning": "Swarm 无 `depends_on` 条件语义；Kubernetes 等价做法是 readinessProbe + initContainer，本会话未验证"
+      }
+    ]
+  }
+}

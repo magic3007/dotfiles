@@ -1,0 +1,22 @@
+{
+  "q6": {
+    "answer": "技能没有「项目里根本没有 vitest.config.ts、只有 vite.config.ts 且插件已挂上、测试仍报同样错」的分支。技能的诊断前提是双配置文件并存且 vitest.config.ts 里没有 plugins（触发条件要求同时存在 vitest.config.ts 和单独的 vite.config.ts）。而技能 Step 3 恰好把「删掉 vitest.config.ts、把 test 块放进 vite.config.ts、让单一配置同时服务两者」列为可选修法之一，并给出不变式：测试依赖的每个 plugin 或 alias 必须位于 Vitest 实际加载的那个配置文件里。按技能，你描述的状态本应属于已修好的形态，因此该失败不落在此技能的成因内；技能能给的只是 Notes 的分流动作——先读内部包的 main/exports 再选修法（main 指向 src/*.ts 属 alias/resolver 问题，main 指向 dist/* 且 dist 缺失属 build 问题），以及 When NOT to use 列出的两种不适用情形（外部 npm 包则查安装/exports；内部包只是尚未构建出 dist）。",
+    "grounded_in_skill": true,
+    "quote": "delete `vitest.config.ts` and put the `test` block inside `vite.config.ts` so a single config"
+  },
+  "q7": {
+    "answer": "技能把自身范围限定为 Vitest 2.x，并把观察环境钉在 Node v20.11.1、pnpm 9.12.3、Vitest 2.1.8。升到 Vitest 3.0 与 Node 22 后，技能全部结论都落在观察环境之外，必须重新验证：(1) 配置优先级结论——存在 vitest.config.ts 时 Vitest 用它且不合并 vite.config.ts；(2) 在 vitest.config.ts 里注册 tsconfigPaths() 能让 paths 映射在测试期生效；(3) Verification 的两条通过结论（含清 Vite 缓存后仍通过）；(4) 技能自述未验证的 Vitest 2.x multi-package 模式（vitest --workspace）。要跑的命令（均为技能给出的）：ls -la apps/web/node_modules/@acme/ ; pnpm -F @acme/web why @acme/core ; cat packages/core/package.json ; cat apps/web/tsconfig.json | grep -A3 paths ; cat apps/web/vitest.config.ts ; grep -n tsconfigPaths\\|alias apps/web/vite.config.ts ; pnpm -w build ; pnpm -F @acme/web test ; rm -rf apps/web/node_modules/.vite && pnpm -F @acme/web test。技能未给出任何版本升级后的专门复核流程或升级命令。",
+    "grounded_in_skill": true,
+    "quote": "Environment in the observed case: Node v20.11.1, pnpm 9.12.3, Vitest 2.1.8."
+  },
+  "q8": {
+    "answer": "不适用。技能的触发条件要求 pnpm --filter <app> dev 正常且页面在浏览器中能渲染（并且 pnpm -w build 成功），你的情形里 dev 也失败，直接违反该前提，因此不是「vitest.config.ts 遮蔽 vite.config.ts、导致测试期缺少 resolver」这条路径。技能的 When NOT to use 只列了两种不适用情形（外部 npm 包；内部包已编译 dist 但尚未构建），并没有覆盖 dev 也失败的情况，技能未给出该场景的排查步骤。",
+    "grounded_in_skill": true,
+    "quote": "`pnpm --filter <app> dev` works and the page renders in the browser."
+  },
+  "q9": {
+    "answer": "技能未提供",
+    "grounded_in_skill": false,
+    "quote": ""
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "q1": {
+    "applicable": true,
+    "first_command": "git diff",
+    "expected_output": "diff shows only a string literal changed in the test file; numeric expectations untouched (nothing in the diff can explain the failure)",
+    "reason": "Matches every trigger in the skill: CI fails on the PR while local `npm test` is green 20/20, the same commit fails deterministically on re-run, the previous commit was green and the diff only changes test text/assertion wording, and the output is a value mismatch (`AssertionError: expected 1999 to be 2000` in `test/billing.spec.ts`) rather than a compile or import error. The skill's Step 1 is 'Rule out the test itself': run `git diff` to confirm the diff cannot explain the failure, then rule out environmental suspects with a local A/B (in the skill's case `TZ=UTC npm test` stayed green, eliminating timezone/float explanations). Subsequent steps are `npm ls @acme/pricing` locally and as a temporary CI step to expose the version mismatch, then `grep -n '\"@acme/pricing\"' package.json package-lock.json`."
+  },
+  "q2": {
+    "applicable": false,
+    "reason": "The skill's Notes explicitly flag this as a look-alike with a different root cause: `npm ERR! code EINTEGRITY` / `sha512-... integrity checksum failed when using sha512` also shows as 'CI red, local green', but there the lockfile's tarball integrity does not match the registry because the upstream republished that version. Deleting `restore-keys` and adding `npm ci` do NOT help. The skill says to fix it with `npm cache clean --force` plus pinning to a version that was not republished (or `npm ci --prefer-online`), and to check for this error before applying the cache fix."
+  },
+  "q3": {
+    "commands": [
+      "rm -rf node_modules && npm ci && npm test",
+      "npm ls @acme/pricing",
+      "grep -n '\"@acme/pricing\"' package.json package-lock.json",
+      "TZ=UTC npm test",
+      "git diff",
+      "npm cache clean --force",
+      "npm ci --prefer-online",
+      "vitest run"
+    ]
+  },
+  "q4": {
+    "unverified": [
+      "Whether `cache: 'pnpm'` has the same failure mode (pnpm's store and `node_modules` layout differ, but the cache mechanism is similar).",
+      "Whether GitHub-hosted runner cache eviction (7 days / 10 GB) would make the problem self-heal.",
+      "Whether keeping `restore-keys` and only adding `npm ci` is sufficient — no controlled comparison was run; the prefix fallback was removed outright."
+    ]
+  },
+  "q5": {
+    "boundaries": [
+      {
+        "signal": "CI fails identically locally (local `npm test` also red)",
+        "meaning": "Not this skill — the failure is reproducible outside CI, so it is not a restored-artifact problem."
+      },
+      {
+        "signal": "The failure is a genuine flake (re-running the same commit does not fail the same way)",
+        "meaning": "Not this skill — this skill's failure is deterministic, not a flake."
+      },
+      {
+        "signal": "`npm ls <pkg>` already matches the lockfile on CI",
+        "meaning": "Not this skill — the wrong dependency version is the core evidence; without it the stale-cache diagnosis does not apply."
+      },
+      {
+        "signal": "CI log contains `npm ERR! code EINTEGRITY` / `sha512-... integrity checksum failed when using sha512`",
+        "meaning": "Look-alike with a different root cause (upstream republished the version); the cache fix does not help — use `npm cache clean --force` plus a non-republished pin, or `npm ci --prefer-online`."
+      },
+      {
+        "signal": "Workflow has no `restore-keys` prefix fallback and/or already runs `npm ci`, or does not cache `path: node_modules`",
+        "meaning": "The three combining causes in the skill are absent, so the mechanism described cannot produce the failure."
+      }
+    ]
+  }
+}

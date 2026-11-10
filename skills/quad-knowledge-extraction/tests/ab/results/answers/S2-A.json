@@ -1,0 +1,55 @@
+{
+  "q1": {
+    "applicable": true,
+    "first_command": "docker compose exec api printenv DATABASE_URL",
+    "expected_output": "postgres://postgres:dev@db:5432/app",
+    "reason": "技能描述的正是这个场景：docker compose up 后第一个请求间歇性（约 40%）报 connect ECONNREFUSED 127.0.0.1:5432、等 5-10 秒自愈、docker compose ps 显示 db healthy 而 api running。技能 Solution 的 Step 1 标题是「证明依赖被拒绝而不是地址写错」，从 app 容器内先确认配置与 DNS 无辜、端口本身关闭，第一条命令即 docker compose exec api printenv DATABASE_URL，期望看到正确的 db:5432 主机（示例值 postgres://postgres:dev@db:5432/app）。同一步随后还要跑容器内 dns.lookup('db')（期望 null '172.20.0.2'）与 net.connect(5432,'db')（期望 ERR ECONNREFUSED）；可解析主机名上出现 ERR ECONNREFUSED 说明 Postgres 还没在监听，而不是 DNS、网络或凭据问题。之后 Step 2 用 docker compose config | grep -A4 depends_on 确认短列表形式被展开为 condition: service_started，Step 3 改为 condition: service_healthy。"
+  },
+  "q2": {
+    "applicable": false,
+    "reason": "技能在 Notes 里明确写了「同错误文本的不同根因」：另一台机器上同一套 compose 栈每个请求都失败且永不恢复，原因是 Postgres 镜像被换成自建构建，其 postgresql.conf 设了 listen_addresses = 'localhost'，Postgres 只在自己的网络命名空间的 loopback 上监听，从 api 容器不可达；condition: service_healthy 在那里无效，因为 healthcheck 在 db 容器内运行并照样通过。技能给出的判别标准：间歇性且自愈 = 启动竞态（本文范围）；永久失败 = 服务端 bind/listen 配置。所以这份技能不适用于该场景，且技能也没有给出修复 listen_addresses 的步骤。"
+  },
+  "q3": {
+    "commands": [
+      "docker compose exec api printenv DATABASE_URL",
+      "docker compose exec api node -e \"require('dns').lookup('db',(e,a)=>console.log(e,a))\"",
+      "docker compose exec api node -e \"require('net').connect(5432,'db').on('error',e=>console.log('ERR',e.code)).on('connect',()=>console.log('OK'))\"",
+      "docker compose config | grep -A4 depends_on",
+      "docker compose logs db",
+      "for i in $(seq 30); do\n  docker compose down -v >/dev/null 2>&1\n  docker compose up -d >/dev/null 2>&1\n  sleep 1\n  curl -s -o /dev/null -w \"%{http_code}\\n\" localhost:3000/healthz\ndone | sort | uniq -c",
+      "docker compose logs api | grep -c ECONNREFUSED"
+    ]
+  },
+  "q4": {
+    "unverified": [
+      "错误信息里的 127.0.0.1 来源：技能称 pg 驱动似乎打印 socket 的本地端点配系统 errno 文本（读 packages/pg/lib/connection.js 得到 Error: connect ECONNREFUSED <localAddress>:<localPort>），但明确标注「未实测」，因此「错误里的地址有误导性」只是推论；应改用容器内 net.connect 探针诊断。",
+      "Kubernetes 等价做法（readinessProbe + initContainer）未在本次会话中验证。",
+      "restart: unless-stopped 是否也能掩盖这个竞态，未验证。",
+      "把 healthcheck 的 retries: 30 调低（interval: 2s 时最多 60 秒后依赖被判定 unhealthy）对启动延迟的影响，未验证。"
+    ]
+  },
+  "q5": {
+    "boundaries": [
+      {
+        "signal": "失败是永久性的：每个请求都失败、等多久都不恢复（而技能描述的竞态是约 40% 失败且 5-10 秒自愈）",
+        "meaning": "服务端 bind/listen 配置问题，不是启动竞态；典型是 listen_addresses = 'localhost'。condition: service_healthy 无效，因为 healthcheck 在 db 容器内照样通过。技能不含该修复步骤。"
+      },
+      {
+        "signal": "容器内 net.connect(5432,'db') 打印 OK（连接成功）",
+        "meaning": "端口在监听，不是本技能的依赖就绪竞态；ECONNREFUSED 来自别处，需另找根因。"
+      },
+      {
+        "signal": "容器内 dns.lookup('db') 失败或 DATABASE_URL 指向的不是 db:5432",
+        "meaning": "属于 DNS/网络/配置写错，不在本技能范围（技能 Step 1 先排除这两项）。"
+      },
+      {
+        "signal": "docker compose config | grep -A4 depends_on 已经显示 condition: service_healthy，且 db 服务的 healthcheck 块存在",
+        "meaning": "已经按本技能修复过了；若仍报错，说明是另一个根因，不要重复套用本技能。"
+      },
+      {
+        "signal": "依赖服务没有定义 healthcheck 块",
+        "meaning": "condition: service_healthy 无效（技能明确要求保留 healthcheck），须先补 healthcheck 再用本技能的修法。"
+      }
+    ]
+  }
+}
