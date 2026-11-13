@@ -6,8 +6,8 @@ description: |
   (2) `npx madge --circular --extensions ts src` 报出环, (3) `tsc --noEmit` 与构建均通过但请求触发即抛错,
   (4) 报错在冷启动首次请求必现、热重载后偶发消失。
 author: yanzhou
-version: 1.0.0
-date: 2026-11-10
+version: 1.1.0
+date: 2026-11-13
 ---
 
 # ESM 循环导入导致的运行期 TDZ 报错
@@ -41,6 +41,19 @@ ESM 规范要求先完成实例化再求值，A 求值到访问点时 B 的绑�
 | bundler 重排 | `npm run dev`（不打包）不报错，只有 `npm run build && npm start` 报错 |
 
 **边界**：仅适用于 ESM（`"type": "module"` 或 `.mts`）。纯 CJS 走 F4 的另一条表现，不适用本技能的修复路径。
+
+## Checks
+
+| # | 纠正 | 形态 | 接线位置 | 检查命令 | 通过判据 | 负控 | 记录日期 |
+|---|---|---|---|---|---|---|---|
+| X1 | 顶层具名互导重新被引入，构建仍绿但运行期抛 TDZ | lint | `package.json` 的 `scripts.lint:cycles`，由 `.github/workflows/ci.yml` 的 lint job 调用 | `npx madge --circular --extensions ts src` | exit=0，输出 `✔ No circular dependency found!` | 在 `src/b.ts` 还原 `import { a } from './a'` 后 exit=1，输出 `✖ Found 1 circular dependency!  1) a.ts > b.ts > a.ts` | 2026-11-13 |
+| X2 | 冷启动首个请求 500，但只有手测才发现 | test | `tests/e2e/tdz.spec.ts`，由 `npm test` 调用 | `npx vitest run tests/e2e/tdz.spec.ts` | exit=0，1 passed | 还原 `src/a.ts` 的顶层具名导入后 exit=1，断言失败信息含 `Cannot access 'x' before initialization` | 2026-11-13 |
+
+**无法自动化的纠正**：
+
+| # | 纠正 | 为何 L1–L7 都不可行 | 退而求其次 | 复审触发 |
+|---|---|---|---|---|
+| X3 | 打断环时应改"被调用次数少"的一侧，而不是随手改报错那一侧 | 选边依赖模块所有权与调用频度的权衡，没有可判定的机器信号；强行按调用数自动选会在共享工具模块上选错 | 写进 `## Procedure` B1 步骤 2 的判断依据 | 出现能按调用图给出选边建议的工具时重评 |
 
 ## Procedure
 
@@ -80,10 +93,13 @@ ESM 规范要求先完成实例化再求值，A 求值到访问点时 B 的绑�
 | F3 | verified | 20 次请求计数 |
 | F4 | verified | 对照实验 |
 | "生产构建（vite build）行为相同" | inferred | 只在 dev 模式验证过 |
+| X1 负控 | verified | 还原 `src/b.ts` 后 madge exit=1 |
+| X2 负控 | verified | 还原 `src/a.ts` 后 vitest 断言失败 |
 
 **证伪条件**（出现即本技能失效或需重写）：
 - `madge` 7.x 改变 `--circular` 对 ESM 的检测语义，导致步骤 1 的期望输出不再成立。
 - tsx 切换到原生 ESM loader 后 TDZ 抛出时机变化，F1 的"冷启动必现"不再成立。
+- `src/` 布局调整后 X1 的 `--extensions ts src` 不再覆盖全部源码（环会被漏报）。
 
 **未知清单**：
 - 未验证 Windows 平台 madge 行为；验证方法：Windows CI 上跑复核命令。
@@ -99,4 +115,4 @@ ESM 规范要求先完成实例化再求值，A 求值到访问点时 B 的绑�
 ## See also
 
 - [madge 文档](https://github.com/pahen/madge)
-- `quad-knowledge-extraction/resources/skill-template.md`（结构模板）
+- `metaception/resources/skill-template.md`（结构模板）

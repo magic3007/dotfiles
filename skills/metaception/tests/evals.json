@@ -1,0 +1,88 @@
+{
+  "skill_name": "metaception",
+  "evals": [
+    {
+      "id": 0,
+      "name": "corrections-to-checks",
+      "prompt": "会话里用户纠正了 4 次（sed -i 吞行尾、perl -pi 重犯、提交前漏跑 config_sync.py --check、systemd 写相对路径）。运行 /metaception 把值得留存的东西固化下来。",
+      "expected_output": "按 metaception 契约的五块结构产出，或明确拒绝抽取",
+      "files": [
+        "tests/scenarios/S1-corrections.md"
+      ],
+      "assertions": [
+        "产出含 ## Checks 章节",
+        "Checks 表至少 3 行（会话有 ≥3 条可自动化纠正）",
+        "每条检查都有非空负控（非 MISSING/TODO）",
+        "形态词全部取自受控词表",
+        "「禁止用流编辑器改源码」落成一条检查，而不只是散文",
+        "「提交前跑 config_sync.py --check」落成检查（hook/ci/command 形态）",
+        "validate_skill.py 退出码 0",
+        "未出现「记得/务必」类人肉提醒"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "debug-plus-taste",
+      "prompt": "会话里排查 40 分钟定位 CI 偶发红：astimezone() 用进程本地时区，UTC 与东八区跨日界渲染不同。另有一条审美纠正：报告先给结论再给过程。运行 /metaception。",
+      "expected_output": "按 metaception 契约的五块结构产出，或明确拒绝抽取",
+      "files": [
+        "tests/scenarios/S2-debug-and-taste.md"
+      ],
+      "assertions": [
+        "产出含 ## Checks 章节",
+        "时区 bug 落成一条检查（回归测试/类型约束等）",
+        "每条检查都有非空负控",
+        "「报告先给结论」这条审美纠正落进「无法自动化」表并写明理由",
+        "Facts 逐字保留 CI 断言串 '2026-03-02' == '2026-03-01'",
+        "validate_skill.py 退出码 0"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "trivial-no-extract",
+      "prompt": "会话只是改了 README 的一个错别字 intall->install，无纠正、无调试。运行 /metaception。",
+      "expected_output": "按 metaception 契约的五块结构产出，或明确拒绝抽取",
+      "files": [
+        "tests/scenarios/S3-trivial.md"
+      ],
+      "assertions": [
+        "未产出新技能文件（避免过度抽取）",
+        "report 明确判定为不抽取",
+        "report 给出拒绝理由（引用拒绝条款）"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "attribution-trap",
+      "prompt": "用户断言 sed -i 吞 CRLF，实测是 Makefile 里 s/[[:space:]]*$// 干的，sed -i 本身保留 CR。运行 /metaception。",
+      "expected_output": "推翻错误归因，把检查打在真因上，并记录归因差异",
+      "files": [
+        "tests/scenarios/S4-attribution-trap.md"
+      ],
+      "assertions": [
+        "产出含 ## Checks 章节",
+        "指出真因是行尾 strip 正则/Makefile，而非 sed -i 本身",
+        "检查打在真因上（行尾 strip 正则 / Makefile 生成规则）",
+        "每条检查都有非空负控",
+        "validate_skill.py 退出码 0"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "taste-vs-type",
+      "prompt": "类型化重构会话：重命名 dosmth->Reconcile、挪 internal/util 到 internal/settlement、Status 裸 string 改枚举、零值加 Validate。运行 /metaception。",
+      "expected_output": "枚举化与零值校验落成 type/test，命名与目录归属给出归宿",
+      "files": [
+        "tests/scenarios/S5-taste-and-type.md"
+      ],
+      "assertions": [
+        "产出含 ## Checks 章节",
+        "枚举化落成 type 或更强的检查",
+        "Status 零值语义有检查",
+        "命名/目录归属类纠正有了归宿",
+        "每条检查都有非空负控",
+        "validate_skill.py 退出码 0"
+      ]
+    }
+  ]
+}

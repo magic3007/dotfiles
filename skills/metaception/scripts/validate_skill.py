@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-"""四维知识结构校验器（quad-knowledge-extraction）。
+"""结构校验器（metaception）。
 
 用途
 ----
-校验一份"抽取出来的技能"是否把认知心理学的四类知识都落到了位：
+校验一份"抽取出来的产出"是否把纠正与知识都落到了位：
 
     事实性知识 -> ## Facts        每行带证据 + 复核命令 + 生效条件 + 记录日期
     概念性知识 -> ## Model        机制链 + 分类树 + 判别标准 + 边界
+    可执行化   -> ## Checks       每条纠正对应一条检查：形态 + 接线位置 + 命令 + 判据 + 负控
     程序性知识 -> ## Procedure    决策表 + 每步期望输出 + 回滚 + 停止条件
     元认知知识 -> ## Calibration  逐条置信度 + 证伪条件 + 未知清单 + 复审日期
 
 外加两个横切门：检索面（description 与 Facts 的报错串一致性）与卫生（无凭据/内网地址）。
+
+可执行化门的存在理由：把纠正写成散文规则，依赖未来读者的注意力；写成检查则无条件执行。
+负控列是硬要求——一条从没见过失败的检查，可能因为路径/glob 写错而永远 PASS，
+这比没有检查更糟，因为它提供虚假安全感。
 
 设计思路
 --------
@@ -39,6 +44,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 DIM_FACTUAL = "factual"          # 事实性知识
 DIM_CONCEPTUAL = "conceptual"    # 概念性知识
+DIM_EXECUTABLE = "executable"    # 可执行化（纠正 -> 确定性检查）
 DIM_PROCEDURAL = "procedural"    # 程序性知识
 DIM_METACOG = "metacognitive"    # 元认知知识
 DIM_RETRIEVAL = "retrieval"      # 检索面（横切）
@@ -47,6 +53,7 @@ DIM_HYGIENE = "hygiene"          # 卫生（横切）
 DIM_ORDER = [
     DIM_FACTUAL,
     DIM_CONCEPTUAL,
+    DIM_EXECUTABLE,
     DIM_PROCEDURAL,
     DIM_METACOG,
     DIM_RETRIEVAL,
@@ -57,6 +64,7 @@ DIM_ORDER = [
 SECTION_ALIASES = {
     "facts": ["facts", "事实", "事实性知识"],
     "model": ["model", "模型", "概念", "概念性知识", "mechanism"],
+    "checks": ["checks", "check", "检查", "可执行", "确定性检查", "guards", "guardrails"],
     "procedure": ["procedure", "solution", "步骤", "程序", "程序性知识", "procedure / solution"],
     "calibration": ["calibration", "置信", "元认知", "元认知知识", "confidence"],
 }
@@ -92,6 +100,45 @@ FACT_COLUMNS = [
     ("复核命令", r"复核|验证命令|verify|reproduce|check command"),
     ("生效条件", r"生效条件|适用条件|condition|scope|版本"),
     ("记录日期", r"日期|date"),
+]
+
+# Checks 表必需列
+CHECK_COLUMNS = [
+    ("纠正", r"纠正|correction|mistake|错误|issue"),
+    ("形态", r"形态|form|kind|type of check|机制"),
+    ("接线位置", r"接线|位置|location|wired|where|文件"),
+    ("检查命令", r"命令|command|how to run"),
+    ("通过判据", r"判据|通过|pass|expected"),
+    ("负控", r"负控|negative|反向验证|故意"),
+]
+
+# 形态受控词表：从强到弱。越靠前，越不依赖人的注意力。
+FORM_VOCAB = [
+    "eliminate",
+    "type",
+    "test",
+    "lint",
+    "hook",
+    "ci",
+    "runtime-assert",
+    "command",
+]
+# 选了这些弱形态，必须解释为什么更强的形态不可行。
+WEAK_FORMS = {"runtime-assert", "command"}
+
+# 负控列里的空话：写了等于没写。
+EMPTY_EVIDENCE = re.compile(r"^(missing|todo|tbd|n/?a|待补|待验证|无|没做|-+|—+|\?+)$", re.I)
+
+# "人肉提醒"措辞。出现它们，说明一条本该自动化的纠正被写成了散文。
+REMINDER_PATTERNS = [
+    r"记得(先|要|别|不要)?",
+    r"务必",
+    r"切记",
+    r"不要忘[记了]",
+    r"别忘[记了]",
+    r"remember to\b",
+    r"don'?t forget\b",
+    r"be sure to\b",
 ]
 
 SECRET_PATTERNS = [
@@ -310,6 +357,127 @@ def check_section_keywords(sections: dict, key: str) -> list[Check]:
     return out
 
 
+def check_checks(sections: dict) -> list[Check]:
+    """可执行化门：每条纠正都要落成一条带负控的检查。"""
+    out: list[Check] = []
+    title, content = find_section(sections, "checks")
+    if not content.strip():
+        out.append(Check("X0", DIM_EXECUTABLE, "存在 ## Checks 章节", "FAIL", "未找到可执行层章节"))
+        for cid, desc in [
+            ("X1", "Checks 表含全部 6 列（纠正/形态/接线位置/命令/判据/负控）"),
+            ("X2", "每条检查的负控为实测失败输出，而非 MISSING/TODO"),
+            ("X3", "形态取自受控词表"),
+            ("X4", "选用弱形态时写明更强形态为何不可行"),
+        ]:
+            out.append(Check(cid, DIM_EXECUTABLE, desc, "FAIL", "无 Checks 章节"))
+        return out
+
+    out.append(Check("X0", DIM_EXECUTABLE, "存在 ## Checks 章节", "PASS", f"标题: {title}"))
+
+    # 明确声明"本次无纠正项"时，后续各项跳过而不是判负——没有纠正就没有可自动化的东西。
+    if re.search(r"本次无纠正项|no corrections this session", content, re.I):
+        for cid, desc in [
+            ("X1", "Checks 表含全部 6 列"),
+            ("X2", "每条检查的负控为实测失败输出"),
+            ("X3", "形态取自受控词表"),
+            ("X4", "选用弱形态时写明更强形态为何不可行"),
+        ]:
+            out.append(Check(cid, DIM_EXECUTABLE, desc, "SKIP", "声明本次无纠正项"))
+        return out
+
+    header, rows = parse_md_table(content)
+    col_idx: dict[str, int] = {}
+    for label, pat in CHECK_COLUMNS:
+        for i, h in enumerate(header):
+            if re.search(pat, h, re.I):
+                col_idx[label] = i
+                break
+    missing = [label for label, _ in CHECK_COLUMNS if label not in col_idx]
+    out.append(
+        Check(
+            "X1",
+            DIM_EXECUTABLE,
+            "Checks 表含全部 6 列（纠正/形态/接线位置/命令/判据/负控）",
+            "FAIL" if missing or not rows else "PASS",
+            f"缺列: {missing}" if missing else (f"{len(rows)} 行" if rows else "无数据行"),
+        )
+    )
+
+    neg_idx = col_idx.get("负控")
+    with_neg = 0
+    bad_neg: list[str] = []
+    for n, row in enumerate(rows, start=1):
+        val = row[neg_idx].strip() if neg_idx is not None and neg_idx < len(row) else ""
+        if val and not EMPTY_EVIDENCE.match(val):
+            with_neg += 1
+        else:
+            bad_neg.append(f"X{n}")
+    out.append(
+        Check(
+            "X2",
+            DIM_EXECUTABLE,
+            "每条检查的负控为实测失败输出，而非 MISSING/TODO",
+            "PASS" if rows and with_neg == len(rows) else "FAIL",
+            f"{with_neg}/{len(rows)} 条有负控" + (f"，缺: {','.join(bad_neg[:5])}" if bad_neg else ""),
+        )
+    )
+
+    form_idx = col_idx.get("形态")
+    forms: list[str] = []
+    unknown_forms: list[str] = []
+    for row in rows:
+        val = row[form_idx].strip().strip("`").lower() if form_idx is not None and form_idx < len(row) else ""
+        if val in FORM_VOCAB:
+            forms.append(val)
+        elif val:
+            unknown_forms.append(val)
+    out.append(
+        Check(
+            "X3",
+            DIM_EXECUTABLE,
+            "形态取自受控词表（eliminate/type/test/lint/hook/ci/runtime-assert/command）",
+            "PASS" if rows and not unknown_forms else "FAIL",
+            f"表外形态: {unknown_forms[:3]}" if unknown_forms else f"{len(forms)} 条合法",
+        )
+    )
+
+    # 弱形态需要降级理由：要么本节写了理由，要么在"无法自动化"表里给了判定。
+    weak = [f for f in forms if f in WEAK_FORMS]
+    has_reason = bool(re.search(r"不可行|无法自动化|为何|理由|why not|degrad|降级", content, re.I))
+    out.append(
+        Check(
+            "X4",
+            DIM_EXECUTABLE,
+            "选用弱形态（runtime-assert/command）时写明更强形态为何不可行",
+            "PASS" if not weak or has_reason else "FAIL",
+            f"{len(weak)} 条弱形态" + ("" if not weak or has_reason else "，未见降级理由"),
+        )
+    )
+    return out
+
+
+def check_no_prose_reminders(sections: dict) -> list[Check]:
+    """人肉提醒门：Procedure/Model 里出现"记得/务必"这类措辞，说明纠正该变成检查而没变。"""
+    hits: list[str] = []
+    for key in ("model", "procedure"):
+        _, content = find_section(sections, key)
+        if not content:
+            continue
+        for pat in REMINDER_PATTERNS:
+            m = re.search(pat, content, re.I)
+            if m:
+                hits.append(f"{key}:{m.group(0)}")
+    return [
+        Check(
+            "X5",
+            DIM_EXECUTABLE,
+            "Model/Procedure 无「记得/务必」类人肉提醒（应改成检查）",
+            "FAIL" if hits else "PASS",
+            f"命中: {hits[:3]}" if hits else "",
+        )
+    ]
+
+
 def check_retrieval(meta: dict, sections: dict) -> list[Check]:
     out: list[Check] = []
     desc = (meta.get("description") or "").strip()
@@ -404,6 +572,8 @@ def validate(path: Path) -> dict:
     checks += check_facts(sections)
     for key in ("model", "procedure", "calibration"):
         checks += check_section_keywords(sections, key)
+    checks += check_checks(sections)
+    checks += check_no_prose_reminders(sections)
     checks += check_retrieval(meta, sections)
     checks += check_hygiene(text)
 
@@ -430,7 +600,7 @@ def validate(path: Path) -> dict:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="四类知识结构校验器")
+    ap = argparse.ArgumentParser(description="metaception 产出结构校验器")
     ap.add_argument("paths", nargs="+", help="技能目录或 SKILL.md 路径")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
     args = ap.parse_args()
