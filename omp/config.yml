@@ -72,6 +72,9 @@ retry:
 task:
   agentModelOverrides:
     reviewer: devin/gpt-6-1-sol:auto
+  autoParallel: suggest
+  structured: true
+  enableEffort: true
 defaultThinkingLevel: auto
 compaction:
   methodOrder:
@@ -128,3 +131,5 @@ bash:
       approval: allow
     - match: git clean*
       approval: deny
+title:
+  generator: fork
