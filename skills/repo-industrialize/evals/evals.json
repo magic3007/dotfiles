@@ -1,0 +1,43 @@
+{
+  "skill_name": "repo-industrialize",
+  "fixture": "python evals/fixture.py <run-dir>",
+  "grader": "python evals/grade.py <run-dir>",
+  "evals": [
+    {
+      "id": 1,
+      "name": "full-cleanup-and-spec",
+      "prompt": "帮我整理一下这个仓库：清掉过时的代码和文档，统一真相源，让没用 agent 的人也能快速上手，最后给这个 repo 留一份流程和规范文档。另外 AGENTS.md 和 NOTES.md 里是我以前纠正过的点，别只写在文档里。",
+      "expected_output": "删除重复文档与死代码；修掉悬挂引用；纠正变成可执行检查并登记台账；产出规范文档与本地 skill；基线测试仍绿。",
+      "files": ["evals/fixture.py"],
+      "assertions": [
+        "删除了重复文档副本 docs/SETUP_old.md",
+        "死代码 src/legacy_api.py 被删除或登记为带复查日期的待裁决项",
+        "README 不再指向不存在的 docs/DEPLOY.md",
+        "fetch_rate 带上了超时（纠正落到代码）",
+        "src 下无行内注释、无 print 调试、无硬编码家目录",
+        "存在可执行的仓库级检查入口",
+        "干净仓库上检查全过",
+        "注入违规能被检查抓到（≥3/4）",
+        "产出了流程/规范文档",
+        "产出了本地 skill",
+        "文档标题无跨文件重复（单一真相源）",
+        "无悬挂引用"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "corrections-to-checks",
+      "prompt": "AGENTS.md 和 NOTES.md 里记了一堆我以前纠正过的点，但大家老是忘，连 agent 也老犯。帮我把这些纠正固化下来，别只写在文档里。",
+      "expected_output": "每条纠正写成可判定规则，配确定性检查与违规样本，登记台账并接入本地/CI 入口；文档只留指针。",
+      "files": ["evals/fixture.py"],
+      "assertions": [
+        "存在可执行的仓库级检查入口",
+        "干净仓库上检查全过",
+        "注入违规能被检查抓到（≥3/4）",
+        "fetch_rate 带上了超时（纠正落到代码）",
+        "src 下无行内注释、无 print 调试、无硬编码家目录"
+      ]
+    }
+  ],
+  "baseline": "同一提示词，禁止读取或使用 repo-industrialize skill。"
+}

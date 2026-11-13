@@ -1,0 +1,31 @@
+version: 1
+corrections:
+  - id: C001
+    date: 2026-11-13
+    origin: "2026-11-10 对话：用户指出 src/ 下不该有行内注释"
+    rule: "src/ 下的 Python 不得出现行内 # 注释（docstring 除外）"
+    status: enforced
+    enforcement:
+      kind: script
+      run: "python3 .repo-std/checks/no_inline_comments.py src"
+      prove: "python3 .repo-std/checks/no_inline_comments.py .repo-std/checks/fixtures/no_inline_comments"
+
+  - id: C002
+    date: 2026-11-13
+    origin: "2026-11-11 code review：同一个空列表分支又漏了一次"
+    rule: "collect() 在输入为空时返回空结果且不抛异常"
+    status: enforced
+    enforcement:
+      kind: test
+      run: "pytest -q tests/test_collect.py::test_empty_input"
+      prove_evidence: "2026-11-11 在修复前运行该用例，失败于 IndexError；修复后通过"
+
+  - id: C003
+    date: 2026-11-13
+    origin: "2026-11-12 对话：用户要求提交信息必须说明动机"
+    rule: "提交信息正文必须说明为什么改，而不仅是改了什么"
+    status: waived
+    waiver:
+      reason: "动机是否说清属于语义判断，机器无法可靠判定；模式匹配会产生假阳并被绕过"
+      surfaced_in: "PR 模板必填项『本次改动的动机』+ CODEOWNERS 强制评审"
+      revisit: 2027-02-01
