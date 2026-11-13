@@ -26,10 +26,10 @@ MIXED_PORT = 17891  # 与 proxy.env 中的端口保持一致
 V6_HOST_MARKERS = ("v6",)
 
 # 订阅中的组名（按实际订阅修改）。
-PINNED_GROUP = "\U0001f680 节点选择"
-AUTO_GROUP = "♻️ 自动选择"
+PINNED_GROUP = "苏菲家宽"
+AUTO_GROUP = "自动选择"
 # 主选择组默认选中的固定节点。
-PINNED_NODE = "🇺🇸美国-T(通用)"
+PINNED_NODE = "【3x】中转|美国一🇺🇸"
 
 # 进入自动故障转移组的协议及优先顺序（排在前面的优先）。
 STABLE_PROXY_TYPES = ("vless", "hysteria2")
