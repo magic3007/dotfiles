@@ -36,6 +36,7 @@
     - ~/.codex
     - ~/.gemini
     - ~/.pi/agent
+    - ~/.minimax
 
 # ---------------------------------------------------------------------------
 # Git submodules (local if already initialized)
@@ -192,6 +193,14 @@
     # pi/agents 是 pi 专属 subagent 定义（dspix / glmpix）。
     # ~/.pi/agent/agents 不存在，故整目录链接，与 extensions 一致。
     ~/.pi/agent/agents: pi/agents
+    # mcode（minimax Code）的 ~/.minimax/config.yaml 不 link：mcode 保存配置是「写
+    # .config-tmp-<hex> 临时文件 + rename 覆盖配置路径本身」，主写入路径不解析 realpath，
+    # 所以 symlink 会被顶成普通文件（kimi / codex 的 config 同款问题），下次 dotbot 会
+    # 直接报错。改由 scripts/mcode-config-sync.py 把 mcode/config.yaml 合并进本地文件
+    # （scripts/post-install.d/40-mcode-config.sh + sync.conf.yaml 的 shell 段）：
+    # 仓库定义的键覆盖本地，本地独有键（模型发现结果、TUI 状态）原样保留。
+    # ~/.minimax 下只有 config.yaml 是用户配置，auth / sessions / cache / packages /
+    # v2 / model-access 等都由运行时自管，不入库。
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json

@@ -23,6 +23,7 @@
     - ~/.config/ghostty
     - ~/.config/cmux
     - ~/.config/bat
+    - ~/.minimax
 
 - link:
     # ---- Shell ----
@@ -105,6 +106,8 @@
     ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
     ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
+    # ~/.minimax/config.yaml 不 link：mcode 用「临时文件 + rename 覆盖配置路径」保存配置，
+    # symlink 会被顶成普通文件。改由 scripts/mcode-config-sync.py 合并（见下方 shell 段）。
     ~/.omp/agent/extensions/deepen.ts: omp/extensions/deepen.ts
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
@@ -159,4 +162,5 @@
       stderr: true
     - [python3 scripts/sync-skills.py, Building skill views from skills/ and <tool>/skills/]
     - [python3 scripts/codex-config-sync.py, Merging shared codex/config.toml into ~/.codex/config.toml]
+    - [python3 scripts/mcode-config-sync.py, Merging shared mcode/config.yaml into ~/.minimax/config.yaml]
     - [bash scripts/xmatrix-daemon-secrets.sh, Refreshing the xmatrix daemon secrets drop-in]
