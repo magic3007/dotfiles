@@ -121,3 +121,10 @@ plan:
   autosave: true
 update:
   auto: true
+bash:
+  gitGuard: true
+  patterns:
+    - match: git clean -n*
+      approval: allow
+    - match: git clean*
+      approval: deny
