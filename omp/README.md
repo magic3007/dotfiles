@@ -202,6 +202,17 @@ MiniMax-M78 有两个入口，窗口不同：
 
 `modelRoles` 里的自定义角色名（`devin-opus` 等）只是别名，不参与默认解析。
 
+Gemini 系走 `mafia-carbon`（`mafia/gemini-4-carbon:auto`）。`mafia/*` glob 已在
+`enabledModels` 里，所以不用再加白名单条目。窗口与输出上限在 `models.yml` 的
+mafia 块显式声明为 1M / 944K（`contextWindow: 1048576`、`maxTokens: 943718`），
+值取自 openrouter 同 id 的真实元数据——mafia 网关 `/v1/models` 不返回
+`token_limits`，不声明就落插件兜底 200K/64K。thinking 档位与 headers 不写，
+沿用发现结果（`minimal…xhigh`）。
+
+实测（2026-11-13）：`omp --model mafia-carbon` 与 `--model mafia/gemini-4-carbon`
+都回 200，且声明 943718 输出上限后上游不报参数越界。首次请求常撞
+`529 The model is overloaded`，omp 自动重试一次就过（单次约 72 s）。
+
 **provider key 一律写 `!命令`，不写环境变量名**。`minimax-test`、`mafia`、`kafara`
 （`models.yml` 与 `gateways-login.json` 两处）、`volcengine` 都是这条：
 
