@@ -99,8 +99,43 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
+    # claude-opus-5 与 claude-opus-5-5 是上游两个不同的 id，但同属 1M 窗口的
+    # Claude 家族。不在这里声明时它只是「发现结果」，窗口/输出上限会落到插件兜底
+    # 200000/64000，thinking 档位也只有发现到的 minimal…xhigh。声明体照抄
+    # claude-opus-5-5（值取自内置目录 anthropic 的同名/同族模型），只换 id。
+    - id: claude-opus-5
+      name: claude-opus-5
+      reasoning: true
+      contextWindow: 1000000
+      headers:
+        X-Sub-Module: claude-code-internal
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
     - id: claude-opus-5-5
       name: claude-opus-5-5
+      reasoning: true
+      contextWindow: 1000000
+      headers:
+        X-Sub-Module: claude-code-internal
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
+    # -agy 变体（同上游 id 带 -agy 后缀，义指网关侧固定某种代理/agency 形态）
+    # 同属 Claude 家族 1M 窗口；不声明就落 200000/64000。条目体照 claude-opus-5-5，
+    # 只换 id：-high/-low 的档位由 id 自身决定，与 kafara 的 -high 处理一致，
+    # 所以 thinking 仍声明完整 low…max，不按后缀裁剪。
+    - id: claude-opus-5-5-high-agy
+      name: claude-opus-5-5-high-agy
+      reasoning: true
+      contextWindow: 1000000
+      headers:
+        X-Sub-Module: claude-code-internal
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
+    - id: claude-opus-5-5-low-agy
+      name: claude-opus-5-5-low-agy
       reasoning: true
       contextWindow: 1000000
       headers:
@@ -129,6 +164,15 @@ providers:
     # 变量名，否则 herdr pane（环境里没有 shell secrets）里会退化成把变量名当 key 发出去。
     apiKey: "!grep -m1 '^export KAFARA_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'"
     models:
+    # 同理补 devin/claude-opus-5（kafara 发现结果里真实存在的 id，窗口靠兜底
+    # 只有 200000）。条目体与 devin/claude-opus-5-5 完全一致，只换 id。
+    - id: devin/claude-opus-5
+      name: devin/claude-opus-5
+      reasoning: true
+      contextWindow: 1000000
+      thinking:
+        mode: anthropic-adaptive
+        efforts: ["low","medium","high","xhigh","max"]
     - id: devin/claude-opus-5-5
       name: devin/claude-opus-5-5
       reasoning: true
@@ -150,6 +194,19 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
+    # gpt-6.1-sol 是 OpenAI 家族，不是 Claude：窗口/输出上限照 openrouter 目录里
+    # 同一个底层模型 openai/gpt-6.1-sol 的 1,050,000 / 128,000，不照 anthropic 的 1M/64K。
+    # 两个数字的来源分强弱：128,000 有网关实测（2026-11-12 直连 /v1/messages，
+    # max_tokens=128000 与 200000 都回 200，说明中继不设上限、也不报错，128000 只是
+    # 上游真实生成上限）；1,050,000 只是目录值，没做百万 token 实测（一次探针就是
+    # 几十万输入 token 的真金白银），当成声明值而不当已验证事实。
+    # thinking 不写：发现值已是 low…max（OpenAI 家族不认 anthropic-adaptive 的
+    # budget 语义），写了反而要用错的 mode 覆盖对的档位。
+    - id: gpt-6.1-sol
+      name: gpt-6.1-sol
+      reasoning: true
+      contextWindow: 1050000
+      maxTokens: 128000
   # 火山引擎方舟 Coding Plan（Pro 订阅）。本机只用 Kimi-K3.1-Pro，所以这里写成
   # 静态 provider（不经 gateways-login.json 发现）：发现结果会把账号下 38 个模型
   # 全拉进来，deepseek/doubao/glm 就仍可被选中。apiKey 用 `!命令` 引用，理由同

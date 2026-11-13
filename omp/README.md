@@ -286,6 +286,19 @@ kafara 与 mafia 一样不声明窗口（`/v1/models` 只回 `id/object/created/
 `low…max`，值取自内置目录 anthropic 的同名模型。覆盖按 **provider+id** 生效，kafara 其余
 ~90 个发现模型仍是 200000/64000。
 
+`claude-opus-5`（`mafia/claude-opus-5` 与 `kafara/devin/claude-opus-5`）也按同法钉成 1M，
+thinking 档位 `low…max`：它是发现结果里与 `claude-opus-5-5` 并列的另一个上游 id，
+不声明就落兜底 200000/64000。`mafia/claude-opus-5-5-{high,low}-agy` 一并覆盖成 1M、
+`low…max`；`-high`/`-low` 的档位由网关按 id 自行决定，条目里不按后缀裁剪 thinking 档位。
+
+`kafara/gpt-6.1-sol` 是 OpenAI 家族，取值口径与 Claude 那批不同：照 openrouter 目录里
+同一个底层模型 `openai/gpt-6.1-sol`，钉成 **1,050,000 / 128,000**，thinking 不声明
+（沿用发现值 `low…max`；OpenAI 家族不认 `anthropic-adaptive` 的 budget 语义，写了是用错的
+mode 覆盖对的档位）。两个数字证据强度不同：128,000 有网关实测（2026-11-12 直连
+`POST /v1/messages`，`max_tokens` 128000 与 200000 都回 200——中继不设上限也不报错，
+128,000 只是上游真实生成上限）；1,050,000 只有目录值，没做百万 token 输入实测。
+同一网关上 `devin/gpt-6-1-sol`、`gpt-6-sol` 等其余 GPT 变体仍是兜底 200000/64000。
+
 按需删掉的 provider：`devin-cliproxy`（本机 127.0.0.1:30288 的 CLIProxyAPI）已从
 `models.yml` 与 `enabledModels` 移除；`cliproxy-yanzhou.service` 仍在跑，供其他客户端使用。
 
