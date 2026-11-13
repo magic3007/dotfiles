@@ -165,6 +165,34 @@ GRADERS = {
 }
 
 
+def compute_delta(run_summary: dict) -> dict:
+    """delta 永远是 with_skill 减 old_skill。
+
+    aggregate_benchmark.py 按 run_summary 的键序取前两个 config 相减，而
+    `old_skill` 字典序在前，直接用它的输出符号会反。符号由参数名决定，
+    不由键序决定，所以这里显式取两个臂。
+    """
+    a, b = run_summary["with_skill"], run_summary["old_skill"]
+    return {
+        "pass_rate": f'{a["pass_rate"]["mean"] - b["pass_rate"]["mean"]:+.2f}',
+        "time_seconds": f'{a["time_seconds"]["mean"] - b["time_seconds"]["mean"]:+.1f}',
+        "tokens": f'{a["tokens"]["mean"] - b["tokens"]["mean"]:+.0f}',
+    }
+
+
+def fix_benchmark(path: Path) -> dict:
+    """重写 benchmark.json 的 run_summary：with_skill 在前，delta 符号正确。"""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    rs = data["run_summary"]
+    data["run_summary"] = {
+        "with_skill": rs["with_skill"],
+        "old_skill": rs["old_skill"],
+        "delta": compute_delta(rs),
+    }
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return data["run_summary"]["delta"]
+
+
 def main() -> int:
     root = Path(sys.argv[1])
     for eval_dir in sorted(root.iterdir()):
@@ -201,6 +229,12 @@ def main() -> int:
             print(f"{data['run_id']}: {passed}/{len(exps)}")
             for e in exps:
                 print(f"  [{'OK  ' if e['passed'] else 'FAIL'}] {e['text']}  ({e['evidence']})")
+
+    # aggregate_benchmark.py 之后跑本脚本即可把 delta 符号纠正过来，省掉手工改键序。
+    benchmark = root / "benchmark.json"
+    if benchmark.is_file():
+        delta = fix_benchmark(benchmark)
+        print(f"\nbenchmark.json delta 已修正: {delta}")
     return 0
 
 

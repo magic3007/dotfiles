@@ -31,5 +31,6 @@ python3 <skill-creator>/eval-viewer/generate_review.py <workspace>/iteration-N \
 ## 已知判分口径
 
 - `aggregate_benchmark.py` 只认 `<arm>/run-1/grading.json`，且 pass_rate 读 `grading.json` 的 `summary.pass_rate`；两处不匹配时它静默出 0。`grade_runs.py` 已按它期望的结构写。
-- 它按目录名排序取前两个 config 算 delta，`old_skill` 排在 `with_skill` 前面会导致 delta 符号反向；跑完要手工把 `run_summary` 的键顺序改成 `with_skill` 在前。
+- 它按目录名排序取前两个 config 算 delta，`old_skill` 排在 `with_skill` 前面会导致 delta 符号反向。用 `grade_runs.fix_benchmark(<benchmark.json>)` 修正，别手改。
+- 上面两条已由 `python3 tests/test_eval_harness.py` 锁成回归用例（表格解析只吃段内第一个表格；delta 恒为 with_skill 减 old_skill，不随键序变）。
 - `S3` 两臂都拒绝抽取，不区分；保留作过度抽取的护栏，不进识别力统计。
