@@ -684,8 +684,8 @@ itself as the key.」）
 
 `RULES.md` 只认 native 位置（本目录，以及项目最近的 `.omp/`）。它是 always-apply 常驻规则：正文随**每次请求**携带，长会话被压缩后仍然生效，因此必须保持很短；与 `AGENTS.md` 内容重复时会被去重。
 
-当前 `RULES.md` = 回复风格一行 + 委派硬规则（`task` 并发抛 `tasks[]`、subagent 默认档 `modelRoles.task`、禁止 `bash`/CLI 冒充 worker、禁止重叠写入）。硬规则只留**可判定**的条目，合同写法、路由、验收这些细则放在
-`omp/skills/toil-offloading-omp/SKILL.md`，按需用 `skill://toil-offloading-omp` 读，避免每次请求重复付费。
+当前 `RULES.md` = 回复风格一行 + 委派硬规则：判定时点（首个工具调用前）、`委派：<切片数>` / `直做：<理由>` 首行标记、默认委派、三条可判定的触发条件（≥2 切片 / ≥3 文件 / ≥2 条独立检索线）、例外只认「≤2 次工具调用」、强制先读 `skill://toil-offloading-omp`、`task` 并发抛 `tasks[]`、subagent 默认档 `modelRoles.task`、禁止 `bash`/CLI 冒充 worker、禁止重叠写入、根 agent 保留的职责。硬规则只留**可判定**的条目，合同写法、路由、验收这些细则放在
+`omp/skills/toil-offloading-omp/SKILL.md`，用 `skill://toil-offloading-omp` 读，避免每次请求重复付费。
 
 ## 常用命令
 
