@@ -534,8 +534,12 @@ fi
 # uv installs to ~/.local/bin by default
 export PATH="$HOME/.local/bin:$PATH"
 
-# uv Python mirror for China
-export UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+# No UV_INDEX_URL here, deliberately. It becomes uv's *default index*, and uv writes the index it resolved from into
+# every lockfile it touches (`source = { registry = ... }` plus each wheel URL), so any project's uv.lock would carry
+# this machine's mirror — thousands of lines of diff with no version change, unreproducible elsewhere. The proxies
+# exported above already reach pypi.org; pass `--index-url` to the one command that needs a mirror instead.
+# Check a checkout with: env -u UV_INDEX_URL uv lock --check
+# Local-only override (untracked): ~/.common_shell_setup_local.sh
 
 # Activate global uv venv at ~/.venv
 if [ -d "$HOME/.venv" ]; then

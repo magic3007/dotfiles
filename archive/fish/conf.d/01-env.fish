@@ -22,7 +22,8 @@ set -gx PUB_HOSTED_URL "https://pub.flutter-io.cn"
 set -gx FLUTTER_STORAGE_BASE_URL "https://storage.flutter-io.cn"
 
 # uv - Python package manager
-set -gx UV_INDEX_URL "https://pypi.tuna.tsinghua.edu.cn/simple"
+# No UV_INDEX_URL: it becomes uv's default index, and uv writes that index into every uv.lock it touches. See
+# common_shell_setup.sh; use `uv --index-url <mirror>` for the one command that needs a mirror.
 
 # Bun
 set -gx BUN_INSTALL "$HOME/.bun"
