@@ -150,6 +150,63 @@ def pane_details(pane_id):
     return details
 
 
+def agent_entry(pane_id):
+    result = herdr_command("agent", "list")
+    agents = (result or {}).get("agents")
+    if not isinstance(agents, list):
+        return {}
+    for agent in agents:
+        if isinstance(agent, dict) and agent.get("pane_id") == pane_id:
+            return agent
+    return {}
+
+
+def last_assistant_reply(session_path):
+    path = Path(session_path)
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return ""
+    for raw in reversed(lines):
+        try:
+            row = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        if row.get("type") != "message":
+            continue
+        message = row.get("message")
+        if not isinstance(message, dict) or message.get("role") != "assistant":
+            continue
+        blocks = message.get("content")
+        if not isinstance(blocks, list):
+            continue
+        text = "\n".join(
+            block.get("text", "").strip()
+            for block in blocks
+            if isinstance(block, dict) and block.get("type") == "text" and block.get("text")
+        ).strip()
+        if text:
+            return text
+    return ""
+
+
+def agent_reply(pane_id):
+    agent = agent_entry(pane_id)
+    if first_text(agent.get("agent")).lower() != "omp":
+        return ""
+    session = agent.get("agent_session")
+    if not isinstance(session, dict) or session.get("kind") != "path":
+        return ""
+    return last_assistant_reply(first_text(session.get("value")))
+
+
+def truncate_reply(reply):
+    limit = int(os.environ.get("HERDR_WECHAT_REPLY_CHARS") or 800)
+    if limit <= 0 or len(reply) <= limit:
+        return reply
+    return reply[:limit].rstrip() + "…"
+
+
 def first_text(*values):
     for value in values:
         if isinstance(value, str) and value.strip():
@@ -170,7 +227,7 @@ def format_location(context, event_data, details):
     return " · ".join(part for part in (workspace, tab, pane) if part)
 
 
-def format_message(status, context, event_data, details):
+def format_message(status, context, event_data, details, reply=""):
     agent_kind = first_text(event_data.get("agent"), context.get("focused_pane_agent"))
     display_agent = first_text(event_data.get("display_agent"), agent_kind, "Agent")
     agent = display_agent
@@ -196,6 +253,9 @@ def format_message(status, context, event_data, details):
         lines.append(f"**面板标题**: {title}")
     if cwd:
         lines.append(f"**目录**: {cwd}")
+    if reply:
+        lines.append("**回复**:")
+        lines.extend(reply.splitlines())
     lines.append(f"**时间**: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     return "\n".join(lines)
 
@@ -299,7 +359,10 @@ def handle_event():
 
     context = read_json_env("HERDR_PLUGIN_CONTEXT_JSON")
     details = pane_details(pane_id)
-    body = format_message(status, context, event_data, details)
+    reply = ""
+    if status != "blocked" and env_flag("HERDR_WECHAT_INCLUDE_REPLY", True):
+        reply = truncate_reply(agent_reply(pane_id))
+    body = format_message(status, context, event_data, details, reply)
     if status == "blocked":
         title = "⚠️ Herdr 需要人工介入"
         color = "orange"

@@ -26,6 +26,13 @@ poll. `notify.py` keeps the previous status per pane under
 event for the same status is ignored and a plugin/server restart does not
 re-notify an unchanged state.
 
+Completion and `done` messages include the agent's final reply (`**回复**`).
+The reply comes from the agent's own transcript, not the terminal screen:
+`herdr agent list` gives the pane's `agent_session` path and `notify.py` reads
+the last `assistant` message from it. Only `omp` sessions are adapted so far;
+other agent kinds send without a reply block until their transcript format is
+added to `agent_reply()`.
+
 OMP reports precise lifecycle state only through Herdr's lifecycle hook; install
 it with `herdr integration install omp` (the install network phase does this
 when `omp` is present). Claude Code and Codex use Herdr's built-in screen
@@ -48,6 +55,8 @@ Optional flags, readable from the process environment or that `.env`:
 | `HERDR_WECHAT_NOTIFY_BLOCKED` | on | notify on `blocked` |
 | `HERDR_WECHAT_NOTIFY_COMPLETION` | on | notify on `done` / `working`→`idle` |
 | `HERDR_WECHAT_DRY_RUN` | off | print instead of sending |
+| `HERDR_WECHAT_INCLUDE_REPLY` | on | append the agent's final reply |
+| `HERDR_WECHAT_REPLY_CHARS` | 800 | reply character cap (`0` = unlimited) |
 
 If the agent's own reminder is already enabled inside the pane
 (`END_REMINDER_ENABLE=1`), set `HERDR_WECHAT_NOTIFY_COMPLETION=0` to keep only
