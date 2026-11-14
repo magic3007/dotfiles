@@ -1,0 +1,19 @@
+id = "magic.wechat-notify"
+name = "WeChat Notify"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "Send a wechat-reminder message when an agent needs attention or finishes."
+platforms = ["linux", "macos"]
+
+[[actions]]
+id = "test"
+title = "Send test notification"
+command = ["python3", "notify.py", "--test"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["python3", "notify.py"]
+
+[[events]]
+on = "pane.closed"
+command = ["python3", "notify.py"]

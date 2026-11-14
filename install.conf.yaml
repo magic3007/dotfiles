@@ -576,6 +576,14 @@
           "command -v herdr >/dev/null || curl --connect-timeout 10 -fsSL https://herdr.dev/install.sh | sh || true",
           Installing Herdr (agent-aware terminal multiplexer),
       ]
+    - [
+          "bash scripts/herdr-plugin-link.sh || true",
+          Linking local Herdr plugins (magic.wechat-notify),
+      ]
+    - [
+          "command -v omp >/dev/null && herdr integration install omp || true",
+          Installing Herdr omp state integration,
+      ]
 
 # ---------------------------------------------------------------------------
 # Herdr app - the desktop app (a separate program from the `herdr` TUI above).
