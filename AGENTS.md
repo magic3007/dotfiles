@@ -179,6 +179,8 @@ Two separate programs, two separate config homes:
 
 Everything else under `~/.config/herdr-app/` (`AGENTS.md`, `*.d.ts`, `frame/`, `installed.json`, `data/`, `icons/`, `mods/`, `view.json`, `shared.json`, `layouts/`…) is written by the app and stays untracked.
 
+**Local plugins** (`herdr/plugins/`): registered by `scripts/herdr-plugin-link.sh` from `scripts/post-install.d/70-herdr-plugin.sh` and the Herdr network-phase step; both are idempotent. `magic.wechat-notify` listens to Herdr's `pane.agent_status_changed` event and sends `wechat-reminder` messages for `blocked` (needs an answer) and completion (`done`, or `working`→`idle`), with per-pane state under `HERDR_PLUGIN_STATE_DIR` to suppress repeated notifications. See `herdr/README.md` for flags and verification; when `END_REMINDER_ENABLE=1` already covers completion inside the pane, set `HERDR_WECHAT_NOTIFY_COMPLETION=0` to keep only `blocked` and avoid duplicates.
+
 ### Chinese Mirrors
 
 Package managers are configured with Chinese mirrors for faster downloads:
@@ -202,7 +204,7 @@ When adding new platform packages, edit the relevant `install-scripts/{linux,mac
 
 ### wechat-reminder (`wechat-reminder/`)
 
-通知工具，支持 WeChat (PushDeer) 和飞书双通道。通过 Claude Code hook（Stop/StopFailure/TaskCompleted）、Codex hook（Stop）和 Pi 扩展（`agent_settled`）自动发送任务完成通知。
+通知工具，支持 WeChat (PushDeer) 和飞书双通道。通过 Claude Code hook（Stop/StopFailure/TaskCompleted）、Codex hook（Stop）、Pi 扩展（`agent_settled`）和 Herdr 插件（`pane.agent_status_changed`，见 `herdr/README.md`）自动发送任务完成/需人工介入通知。
 
 **开关（默认关闭）**：环境变量 `END_REMINDER_ENABLE` 控制 Claude Code（`claude/hooks/claude-end-reminder.sh`）、Codex（`~/.codex/hooks/claude-end-reminder.sh`，本地未入库）和 Pi（`pi/extensions/pi-end-reminder.ts`）三个发送端。未设置 / 空 / `0` / `false` / `no` / `off` → 不发送；设置为 `1` / `yes` / `true` / `on` → 发送。启用示例：`END_REMINDER_ENABLE=1 claude` 或 `export END_REMINDER_ENABLE=1`。
 
