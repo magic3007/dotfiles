@@ -213,6 +213,19 @@ mafia 块显式声明为 1M / 944K（`contextWindow: 1048576`、`maxTokens: 9437
 都回 200，且声明 943718 输出上限后上游不报参数越界。首次请求常撞
 `529 The model is overloaded`，omp 自动重试一次就过（单次约 72 s）。
 
+kafara 侧同族两个 id 也一并声明：`kafara/devin/gemini-4-carbon`（devin 前缀，
+上游同 mafia 的 carbon）与 `kafara/gemini-4-hydrogen-xhigh`（只有 -xhigh 变体）。
+窗口/输出上限同样取 openrouter `top_provider` 的 1048576 / 943718，roles 是
+`kafara-carbon`、`kafara-hydrogen`。两者受网关侧配额限制，与 omp 配置无关：
+
+| 模型 | 实测（2026-11-14） |
+|---|---|
+| `kafara/devin/gemini-4-carbon` | 恒 429 `devin upstream error (failed_precondition): Your weekly usage quota has been exhausted`，需在 app.devin.ai 购买 on-demand 或等周配额重置 |
+| `kafara/gemini-4-hydrogen-xhigh` | 短 system prompt / 通用 60k token 输入回 200；omp 默认 system prompt 前 70 字符即触发 429 `Resource has been exhausted (e.g. check quota)`，属网关内容过滤，同内容重复必现，换 prompt 内容即 200 |
+
+hydrogen 的 429 不是窗口或大小问题：60k token 通用输入 200，`[0:30]`、`[30:60]`
+片段各自 200，`[0:70]` 失败——只与 system prompt 内容有关，omp 侧无可配开关。
+
 **provider key 一律写 `!命令`，不写环境变量名**。`minimax-test`、`mafia`、`kafara`
 （`models.yml` 与 `gateways-login.json` 两处）、`volcengine` 都是这条：
 

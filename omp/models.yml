@@ -219,6 +219,19 @@ providers:
       reasoning: true
       contextWindow: 1050000
       maxTokens: 128000
+    # Gemini 4 家族的 kafara 侧两个 id：carbon 带 devin/ 前缀（同 mafia 的
+    # gemini-4-carbon，走 google 上游），hydrogen 只有 -xhigh 变体。窗口/输出上限
+    # 照 openrouter 同底层模型的 top_provider（2026-11-14 查 /api/v1/models：
+    # context_length 1048576、max_completion_tokens 943718）。只写这两项：
+    # thinking 档位与 input 沿用发现结果。
+    - id: devin/gemini-4-carbon
+      name: devin/gemini-4-carbon
+      contextWindow: 1048576
+      maxTokens: 943718
+    - id: gemini-4-hydrogen-xhigh
+      name: gemini-4-hydrogen-xhigh
+      contextWindow: 1048576
+      maxTokens: 943718
   # 火山引擎方舟 Coding Plan（Pro 订阅）。本机只用 Kimi-K3.1-Pro，所以这里写成
   # 静态 provider（不经 gateways-login.json 发现）：发现结果会把账号下 38 个模型
   # 全拉进来，deepseek/doubao/glm 就仍可被选中。apiKey 用 `!命令` 引用，理由同

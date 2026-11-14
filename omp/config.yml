@@ -40,6 +40,8 @@ modelRoles:
   deepseek-flash: deepseek/deepseek-flash:auto
   mafia-minimax: mafia/MiniMax-M3.1-Flash:auto
   mafia-carbon: mafia/gemini-4-carbon:auto
+  kafara-carbon: kafara/devin/gemini-4-carbon:auto
+  kafara-hydrogen: kafara/gemini-4-hydrogen-xhigh:auto
   minimax-pro: minimax-test/MiniMax-M78:auto
   zai-flash: zai/glm-5.3-flash:max
   task: minimax-test/MiniMax-M78:auto
