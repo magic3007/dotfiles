@@ -44,7 +44,7 @@ modelRoles:
   kafara-hydrogen: kafara/gemini-4-hydrogen-xhigh:auto
   minimax-pro: minimax-test/MiniMax-M78:auto
   zai-flash: zai/glm-5.3-flash:max
-  task: minimax-test/MiniMax-M78:auto
+  task: deepseek/deepseek-flash:auto
   advisor: mafia/claude-opus-5-5:high
   worker: minimax-test/MiniMax-M78:xhigh
   reviewer: deepseek/deepseek-flash:max
