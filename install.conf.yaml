@@ -198,6 +198,12 @@
     # 仓库定义的键覆盖本地，本地独有键（模型发现结果、TUI 状态）原样保留。
     # ~/.minimax 下只有 config.yaml 是用户配置，auth / sessions / cache / packages /
     # v2 / model-access 等都由运行时自管，不入库。
+    # Antigravity CLI 的 ~/.gemini/antigravity-cli/settings.json 同样不 link：agy 在
+    # /config、换模型、授予 workspace 信任或会话中批准权限时都会原地重写该文件。
+    # 改由 scripts/antigravity-settings-sync.py 把 antigravity/cli-settings.json 合并进去
+    # （scripts/post-install.d/60-antigravity-settings.sh + sync.conf.yaml 的 shell 段）：
+    # 仓库键（toolPermission / artifactReviewPolicy = always-proceed）覆盖，本地独有的
+    # model / trustedWorkspaces 原样保留。~/.gemini 其余全是运行态。
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json

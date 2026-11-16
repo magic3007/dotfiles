@@ -160,4 +160,5 @@
     - [python3 scripts/sync-skills.py, Building skill views from skills/ and <tool>/skills/]
     - [python3 scripts/codex-config-sync.py, Merging shared codex/config.toml into ~/.codex/config.toml]
     - [python3 scripts/mcode-config-sync.py, Merging shared mcode/config.yaml into ~/.minimax/config.yaml]
+    - [python3 scripts/antigravity-settings-sync.py, Merging shared antigravity/cli-settings.json into ~/.gemini/antigravity-cli/settings.json]
     - [bash scripts/xmatrix-daemon-secrets.sh, Refreshing the xmatrix daemon secrets drop-in]

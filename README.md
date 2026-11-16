@@ -225,6 +225,7 @@ dotfiles/
 ├── cursor_config/   → Cursor settings        (macOS)
 ├── vscode_config/   → VS Code user config     (macOS)
 ├── antigravity_config/ → Antigravity settings (macOS)
+├── antigravity/     → Antigravity CLI settings (merged into ~/.gemini/antigravity-cli)
 ├── iterm2/          → iTerm2 plist          (macOS)
 ├── obsidian/        → Obsidian vault settings
 ├── docker/          → Dev Dockerfiles
