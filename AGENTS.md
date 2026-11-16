@@ -63,7 +63,7 @@ Common features across all shells:
 Shell aliases and wrapper functions in `common_shell_setup.sh`:
 - `cc` — Codex (`Codex --dangerously-skip-permissions`)
 - `cx` — OpenAI Codex (`codex --full-auto`)
-- `gm` — Google Gemini CLI (`gemini --yolo`)
+- `gm` — Google Antigravity CLI (`agy --dangerously-skip-permissions`)
 - `oc` — Opencode
 - `dscc()` — Codex with DeepSeek API backend
 - `kmcc()` / `kmcc2()` — Codex with Kimi API (via OpenRouter / direct)
@@ -94,12 +94,11 @@ Privacy: this repo is public. Internal skills stay untracked via the explicit li
 
 Third-party installs: `npx skills add <pkg> -g` puts the skill in `~/.agents/skills/` (tracked in `~/.agents/.skill-lock.json`); lark-* live there. The harness dirs are no longer symlinks into this repo, so `-g` can't write into the repo any more; re-run `scripts/sync-skills.py` afterwards so Claude Code sees the new skill.
 
-### AI Tool Configurations (`Codex/`, `codex/`, `gemini/`, `opencode/`, `pi/`)
+### AI Tool Configurations (`Codex/`, `codex/`, `opencode/`, `pi/`)
 
 Each AI coding tool has its own config directory symlinked to `~/`:
 - `Codex/` → `~/.Codex/` — Codex settings, hooks, skills, rules, commands, agents
 - `codex/` → `~/.codex/` — OpenAI Codex config and env
-- `gemini/` → `~/.gemini/` — Gemini CLI settings
 - `opencode/` → `~/.config/opencode/` — Opencode config
 - `pi/` → `~/.pi/agent/` — Pi agent settings, models, extensions
 - `mcode/` → merged into `~/.minimax/config.yaml` by `scripts/mcode-config-sync.py` (**not** symlinked — see below)

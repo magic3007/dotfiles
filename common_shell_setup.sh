@@ -392,10 +392,10 @@ cxp() {
 cxds()    { cxp dspix deepseek-flash "$@"; }
 cxglm()   { cxp glmpix glm-5.3-flash "$@"; }
 
-# google gemini cli (override oh-my-zsh git plugin's gm='git merge')
+# google antigravity cli (override oh-my-zsh git plugin's gm='git merge')
 unalias gm 2>/dev/null
 gm() {
-  gemini --yolo "$@"
+  agy --dangerously-skip-permissions "$@"
 }
 
 # claude code with deepseek API

@@ -62,7 +62,7 @@ bun 也要链：omp 的 shim 是 `#!/usr/bin/env bun`。
 软链不受影响，也不用重启 daemon。改完 `xmatrix harness refresh`，用
 `xmatrix harness status <harness:id>` 看结果。
 
-同源问题（本机未链）：`claude`、`gemini`（在 `~/.nvm/versions/node/*/bin`）、
+同源问题（本机未链）：`claude`（在 `~/.nvm/versions/node/*/bin`）、
 `kimi`（`~/.kimi-code/bin`）、`opencode`（`~/.opencode/bin`）同样不在 daemon PATH 里，
 Hub 侧也报 missing。
 

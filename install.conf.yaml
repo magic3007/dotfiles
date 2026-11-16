@@ -34,7 +34,6 @@
     - ~/.wastebasket
     - ~/.config/karabiner
     - ~/.codex
-    - ~/.gemini
     - ~/.pi/agent
     - ~/.minimax
 
@@ -183,8 +182,6 @@
     # [marketplaces.*]), which a symlink would push into this repo. The tracked
     # codex/config.toml holds only shared keys; scripts/codex-config-sync.py
     # merges them into the machine-local file (scripts/post-install.d/30-codex-config.sh).
-    ~/.gemini/settings.json: gemini/settings.json
-    ~/.gemini/skills: gemini/skills
     ~/.pi/agent/AGENTS.md: pi/AGENTS.md
     ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
@@ -426,7 +423,7 @@
 # Manual install references:
 #   Claude Code:  npm install -g @anthropic-ai/claude-code
 #   OpenAI Codex: npm install -g @openai/codex
-#   Gemini CLI:   npm install -g @google/gemini-cli
+#   Antigravity CLI: curl -fsSL https://antigravity.google/cli/install.sh | bash  (binary: ~/.local/bin/agy)
 #   Pi:           npm install -g --ignore-scripts @earendil-works/pi-coding-agent  (primary, non-interactive)
 #                 curl -fsSL https://pi.dev/install.sh | sh  (fallback; reads confirmation via /dev/tty, cannot auto-confirm)
 #   Opencode:     curl -fsSL https://opencode.ai/install | bash
@@ -446,8 +443,8 @@
           Installing OpenAI Codex CLI,
       ]
     - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v gemini >/dev/null || npm install -g @google/gemini-cli@latest || true",
-          Installing Google Gemini CLI,
+          "command -v agy >/dev/null || curl -fsSL https://antigravity.google/cli/install.sh | bash || true",
+          Installing Google Antigravity CLI,
       ]
     - [
           "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null || ((npm install -g --ignore-scripts @earendil-works/pi-coding-agent) || (yes | curl --connect-timeout 30 -fsSL https://pi.dev/install.sh | sh)) || true",

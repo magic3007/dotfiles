@@ -12,7 +12,6 @@
     - "~/.config/"
     - "~/.claude/"
     - "~/.codex/"
-    - "~/.gemini/"
     - "~/.local/bin/"
     - "~/.cursor/"
     - "~/.pi/"
@@ -101,8 +100,6 @@
     # ~/.codex/config.toml is NOT linked: Codex edits it in place and writes
     # machine state into it, which a symlink would push into this repo.
     # scripts/codex-config-sync.py merges the tracked codex/config.toml into it.
-    ~/.gemini/settings.json: gemini/settings.json
-    ~/.gemini/skills: gemini/skills
     ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
     ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
