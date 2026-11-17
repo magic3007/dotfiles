@@ -8,10 +8,15 @@ claude/skills/<...>     (Claude)     ~/.claude/skills/<name>        Claude Code 
 codex/skills/<...>      (Codex)      ~/.codex/skills/<name>         Codex
 pi/skills/<...>         (Pi)         ~/.pi/agent/skills/<name>      Pi
 omp/skills/<...>        (omp)        ~/.omp/agent/skills/<name>     omp
+-                       (shared)     ~/.gemini/config/skills/<name> Antigravity CLI (agy)
 
 Claude Code is the only harness that does not read ~/.agents/skills, so its view
 also gets every shared skill and every external skill installed directly into
 ~/.agents/skills (e.g. lark-* from `npx skills add -g`).
+
+agy discovers global skills only in ~/.gemini/config/skills (it skips symlinked
+entries declared in skills.json), so it gets a view of the shared skills plus
+those external ones -- the same set omp sees from ~/.agents/skills.
 
 Rules
 -----
@@ -61,10 +66,11 @@ VIEWS = {
     "codex": HOME / ".codex" / "skills",
     "pi": HOME / ".pi" / "agent" / "skills",
     "omp": HOME / ".omp" / "agent" / "skills",
+    "gemini": HOME / ".gemini" / "config" / "skills",
 }
 # Symlinks resolving under these roots were created by this script or by the
 # old sync-pi-skills.sh / sync-omp-skills.sh mirrors, so they are ours to prune.
-OWNED_ROOTS = [REPO, AGENTS, VIEWS["claude"], VIEWS["codex"]]
+OWNED_ROOTS = [REPO, AGENTS, VIEWS["claude"], VIEWS["codex"], VIEWS["gemini"]]
 SKIP_DIRS = {"examples", "plugins", "templates", "node_modules", "__pycache__"}
 SHIM_MARK = ".sync-skills-shim"
 NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
@@ -234,6 +240,7 @@ def place(view: Path, name: str, entry: tuple[str, Path, dict[str, Path]]) -> No
 
 def ensure_view(scope: str) -> Path | None:
     view = VIEWS[scope]
+    source = SOURCES.get(scope)
     if view.is_symlink():
         # Legacy: whole-dir link into the repo (old ~/.claude/skills, ~/.codex/skills).
         if act(f"replace whole-dir link {view} -> {os.readlink(view)} with a real dir"):
@@ -245,7 +252,10 @@ def ensure_view(scope: str) -> Path | None:
                 view.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(legacy_system), view / ".system")
     if not view.exists():
-        if not SOURCES[scope].is_dir() and scope != "claude":
+        if source is None:
+            if not view.parent.is_dir():
+                return None  # owning tool has not created its config dir yet
+        elif not source.is_dir() and scope != "claude":
             return None
         if act(f"mkdir {view}"):
             view.mkdir(parents=True)
@@ -309,6 +319,12 @@ def main() -> int:
     for scope in ("codex", "pi", "omp"):
         sync_view(scope, plans[scope])
 
+    # agy: shared skills plus the external ones from ~/.agents/skills -- what omp
+    # also sees there. agy must not get omp-only or Claude-only skills.
+    gemini = {n: ("link", d, {}) for n, d in external_skills(shared).items()}
+    gemini.update(plans["shared"])
+    sync_view("gemini", gemini)
+
     # Cursor reads ~/.claude/skills and ~/.agents/skills natively; the old
     # ~/.cursor/skills -> claude/skills link only duplicated them.
     cursor = HOME / ".cursor" / "skills"
@@ -316,7 +332,7 @@ def main() -> int:
         remove(cursor)
 
     counts = ", ".join(f"{s}={len(found[s])}" for s in SOURCES)
-    print(f"skills: {counts}; claude view={len(claude)}; warnings={len(warnings)}")
+    print(f"skills: {counts}; claude view={len(claude)}; gemini view={len(gemini)}; warnings={len(warnings)}")
     return 0
 
 

@@ -203,7 +203,9 @@
     # 改由 scripts/antigravity-settings-sync.py 把 antigravity/cli-settings.json 合并进去
     # （scripts/post-install.d/60-antigravity-settings.sh + sync.conf.yaml 的 shell 段）：
     # 仓库键（toolPermission / artifactReviewPolicy = always-proceed）覆盖，本地独有的
-    # model / trustedWorkspaces 原样保留。~/.gemini 其余全是运行态。
+    # model / trustedWorkspaces 原样保留。~/.gemini 其余全是运行态；唯一例外是
+    # ~/.gemini/config/skills 这一份 skills 视图，由 scripts/sync-skills.py 生成
+    # （agy 只从该目录读全局 skills，且跳过 skills.json 里的符号链接条目）。
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
