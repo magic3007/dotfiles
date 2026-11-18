@@ -36,10 +36,19 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 SHARED = REPO / "antigravity" / "cli-settings.json"
-LIVE = Path(
-    os.environ.get("ANTIGRAVITY_CLI_DIR") or Path.home() / ".gemini" / "antigravity-cli"
-) / "settings.json"
 BACKUP_SUFFIX = ".pre-sync"
+
+
+def resolve_targets() -> list[Path]:
+    override = os.environ.get("ANTIGRAVITY_CLI_DIR")
+    if override:
+        return [Path(override) / "settings.json"]
+    targets = [
+        p / "antigravity-cli" / "settings.json"
+        for p in sorted(Path.home().glob(".gemini*"))
+        if p.is_dir() and (p / "antigravity-cli").is_dir()
+    ]
+    return targets or [Path.home() / ".gemini" / "antigravity-cli" / "settings.json"]
 
 
 def load(path: Path) -> dict:
@@ -96,6 +105,48 @@ def write_atomic(path: Path, text: str) -> None:
         raise
 
 
+def sync_one(live_path: Path, shared: dict, *, dry_run: bool, quiet: bool) -> int:
+    existed = live_path.is_file()
+    current_text = live_path.read_text(encoding="utf-8") if existed else None
+    try:
+        live = load(live_path)
+    except json.JSONDecodeError as exc:
+        print(
+            f"antigravity-settings-sync: {live_path} is not valid JSON ({exc}); "
+            "leaving it untouched",
+            file=sys.stderr,
+        )
+        return 1
+
+    merged = merge(live, shared)
+    text = dump(merged)
+
+    if current_text == text:
+        if not quiet:
+            print(f"antigravity-settings-sync: {live_path} already up to date")
+        return 0
+
+    if existed:
+        keys = changed_keys(live, merged)
+        detail = ", ".join(keys[:8]) + (" ..." if len(keys) > 8 else "")
+        action = "would update" if dry_run else "updated"
+        print(f"antigravity-settings-sync: {action} {live_path} ({len(keys)} key(s): {detail})")
+    else:
+        action = "would seed" if dry_run else "seeded"
+        print(f"antigravity-settings-sync: {action} {live_path} from {SHARED}")
+
+    if dry_run:
+        return 0
+
+    if existed and current_text is not None:
+        backup = live_path.with_name(live_path.name + BACKUP_SUFFIX)
+        backup.write_text(current_text, encoding="utf-8")
+        os.chmod(backup, 0o600)
+
+    write_atomic(live_path, text)
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
@@ -114,45 +165,10 @@ def main() -> int:
         return 1
 
     shared = load(SHARED)
-    existed = LIVE.is_file()
-    current_text = LIVE.read_text(encoding="utf-8") if existed else None
-    try:
-        live = load(LIVE)
-    except json.JSONDecodeError as exc:
-        print(
-            f"antigravity-settings-sync: {LIVE} is not valid JSON ({exc}); "
-            "leaving it untouched",
-            file=sys.stderr,
-        )
-        return 1
-
-    merged = merge(live, shared)
-    text = dump(merged)
-
-    if current_text == text:
-        if not args.quiet:
-            print(f"antigravity-settings-sync: {LIVE} already up to date")
-        return 0
-
-    if existed:
-        keys = changed_keys(live, merged)
-        detail = ", ".join(keys[:8]) + (" ..." if len(keys) > 8 else "")
-        action = "would update" if args.dry_run else "updated"
-        print(f"antigravity-settings-sync: {action} {LIVE} ({len(keys)} key(s): {detail})")
-    else:
-        action = "would seed" if args.dry_run else "seeded"
-        print(f"antigravity-settings-sync: {action} {LIVE} from {SHARED}")
-
-    if args.dry_run:
-        return 0
-
-    if existed and current_text is not None:
-        backup = LIVE.with_name(LIVE.name + BACKUP_SUFFIX)
-        backup.write_text(current_text, encoding="utf-8")
-        os.chmod(backup, 0o600)
-
-    write_atomic(LIVE, text)
-    return 0
+    rc = 0
+    for target in resolve_targets():
+        rc |= sync_one(target, shared, dry_run=args.dry_run, quiet=args.quiet)
+    return rc
 
 
 if __name__ == "__main__":

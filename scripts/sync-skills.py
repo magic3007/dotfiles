@@ -238,8 +238,8 @@ def place(view: Path, name: str, entry: tuple[str, Path, dict[str, Path]]) -> No
 # --------------------------------------------------------------------------- views
 
 
-def ensure_view(scope: str) -> Path | None:
-    view = VIEWS[scope]
+def ensure_view(scope: str, view_override: Path | None = None) -> Path | None:
+    view = view_override or VIEWS[scope]
     source = SOURCES.get(scope)
     if view.is_symlink():
         # Legacy: whole-dir link into the repo (old ~/.claude/skills, ~/.codex/skills).
@@ -262,8 +262,12 @@ def ensure_view(scope: str) -> Path | None:
     return view
 
 
-def sync_view(scope: str, desired: dict[str, tuple[str, Path, dict[str, Path]]]) -> None:
-    view = ensure_view(scope)
+def sync_view(
+    scope: str,
+    desired: dict[str, tuple[str, Path, dict[str, Path]]],
+    view_override: Path | None = None,
+) -> None:
+    view = ensure_view(scope, view_override=view_override)
     if view is None or not view.exists():
         return
     for name in sorted(desired):
@@ -323,7 +327,9 @@ def main() -> int:
     # also sees there. agy must not get omp-only or Claude-only skills.
     gemini = {n: ("link", d, {}) for n, d in external_skills(shared).items()}
     gemini.update(plans["shared"])
-    sync_view("gemini", gemini)
+    gemini_dirs = [p / "config" / "skills" for p in sorted(HOME.glob(".gemini*")) if p.is_dir()]
+    for gdir in gemini_dirs or [VIEWS["gemini"]]:
+        sync_view("gemini", gemini, view_override=gdir)
 
     # Cursor reads ~/.claude/skills and ~/.agents/skills natively; the old
     # ~/.cursor/skills -> claude/skills link only duplicated them.

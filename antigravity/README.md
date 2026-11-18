@@ -11,13 +11,15 @@ are `agyh` (`~/.gemini`, `gemini-4-hydrogen-medium`) and `agyc` (`~/.gemini-2`,
 
 ## Settings are merged, not linked
 
-The settings file is `~/.gemini/antigravity-cli/settings.json` — **not**
-`~/.gemini/config/config.json`, which only holds plugins. `agy` rewrites it in
+The settings file is `<gemini_dir>/antigravity-cli/settings.json` (by default
+`~/.gemini/antigravity-cli/settings.json`) — **not**
+`<gemini_dir>/config/config.json`, which only holds plugins. `agy` rewrites it in
 place on every `/config` change, model switch, workspace-trust grant and
 mid-session permission grant.
 
-`scripts/antigravity-settings-sync.py` re-applies the tracked keys on install
-and on every 15-minute tick, keeping live-only keys (`model`,
+`scripts/antigravity-settings-sync.py` re-applies the tracked keys across every
+existing `~/.gemini*/antigravity-cli/settings.json` on install and on every
+15-minute tick, keeping live-only keys (`model`,
 `trustedWorkspaces`) verbatim. It dumps with sorted keys, because `agy` itself
 writes them alphabetically — otherwise every save would churn the file.
 
@@ -48,8 +50,9 @@ one level deep, and it **skips symlinked entries listed in a `skills.json`**
 manifest — but it does follow a symlink that sits directly in that directory.
 So `scripts/sync-skills.py` builds it as one more generated view: a real
 directory of per-skill symlinks, holding the shared skills plus the external ones
-in `~/.agents/skills` — the same set omp sees. The script does not create the
-directory when `~/.gemini/config` is absent.
+in `~/.agents/skills` — the same set omp sees. It syncs every existing
+`~/.gemini*/config/skills` and does not create the directory when
+`<gemini_dir>/config` is absent.
 
 Project skills need no step: `agy` discovers `<workspace>/.agents/skills`
 natively.

@@ -10,6 +10,6 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
-[[ -d $HOME/.gemini/antigravity-cli ]] || exit 0
+compgen -G "$HOME/.gemini*/antigravity-cli" >/dev/null || exit 0
 
 exec python3 "$REPO/scripts/antigravity-settings-sync.py" "$@"
