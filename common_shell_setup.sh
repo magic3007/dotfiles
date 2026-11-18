@@ -392,11 +392,15 @@ cxp() {
 cxds()    { cxp dspix deepseek-flash "$@"; }
 cxglm()   { cxp glmpix glm-5.3-flash "$@"; }
 
-# google antigravity cli (override oh-my-zsh git plugin's gm='git merge')
-unalias gm 2>/dev/null
-gm() {
-  agy --dangerously-skip-permissions "$@"
+# google antigravity cli (per-account isolated --gemini_dir; default effort medium)
+_agy_run() {
+  local gemini_dir="$1" model="$2"
+  shift 2
+  agy --gemini_dir="$gemini_dir" --dangerously-skip-permissions --model "$model" "$@"
 }
+
+agyh() { _agy_run "$HOME/.gemini"   gemini-4-hydrogen-medium "$@"; }
+agyc() { _agy_run "$HOME/.gemini-2" gemini-4-carbon-medium   "$@"; }
 
 # claude code with deepseek API
 # Reference: https://api-docs.deepseek.com/guides/anthropic_api

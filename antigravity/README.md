@@ -4,7 +4,10 @@ Delivery: **merge**, never link. See `docs/REPO_GUIDE.md` §2 for why.
 
 Binary: `~/.local/bin/agy`, installed by
 `curl -fsSL https://antigravity.google/cli/install.sh | bash` from phase 2 of
-`install.conf.yaml`. The shell wrapper is `gm` in `common_shell_setup.sh`.
+`install.conf.yaml`. The per-account shell wrappers in `common_shell_setup.sh`
+are `agyh` (`~/.gemini`, `gemini-4-hydrogen-medium`) and `agyc` (`~/.gemini-2`,
+`gemini-4-carbon-medium`), using `agy`'s hidden global flag `--gemini_dir`
+(which must precede any subcommand).
 
 ## Settings are merged, not linked
 
@@ -26,7 +29,7 @@ Tracked keys are the permission policy:
 | `artifactReviewPolicy` | `always-proceed` | `always-proceed` |
 
 So plain `agy` starts with full permissions; the `--dangerously-skip-permissions`
-flag the `gm` wrapper passes is redundant with it.
+flag the `agyh`/`agyc` wrappers pass is redundant with it.
 
 `permissions.defaultMode: "bypassPermissions"` is accepted by the validator but
 has no effect — the binary contains no such literal. Do not rely on it.
@@ -56,15 +59,10 @@ natively.
 Model ids carry the effort suffix (`gemini-4-hydrogen-medium`), so switching
 effort means switching id; `agy models` lists the variants.
 
-Visibility depends on how you signed in. A Google account login exposes
-`gemini-4-argon`, `gemini-4-hydrogen`, `gemini-3.8-flash`, `claude-opus-5-5`,
-`claude-sonnet-5-5` and `gpt-oss-120b`. `gemini-4-carbon-{low,medium,high}`
-appears only with a Gemini API key, which also needs
-`--settings '{"modelProvider":"gemini"}'` — that is the only accepted value for
-that key. Without the key, `--model gemini-4-carbon-medium` fails with
-"not recognized as a known model".
-
-Aliases `agh` and `agc` in `common_shell_setup.sh` cover the two models in use.
+Wrappers `agyh` (`~/.gemini`, `gemini-4-hydrogen-medium`) and `agyc`
+(`~/.gemini-2`, `gemini-4-carbon-medium`) in `common_shell_setup.sh` cover the
+two accounts and models in use. Passing `--model <other>` after `agyh`/`agyc`
+overrides the default for that invocation.
 
 ## Installer pollution
 

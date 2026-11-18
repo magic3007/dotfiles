@@ -113,9 +113,9 @@ The names follow a suffix convention, so the file itself is the list:
 | `*pi` | Pi | `dspi`, `glmpi`, `o5pi` |
 | `*omp` | omp | `dsomp`, `glmomp`, `dvomp` |
 | `cx*` | Codex | `cxds`, `cxglm` |
-| `ag*` | Antigravity CLI | `agh`, `agc` |
+| `ag*` | Antigravity CLI | `agyh`, `agyc` |
 
-Plain `cc`, `cx`, `oc`, `gm` start the default backend. Credentials come from
+Plain `cc`, `cx`, `oc` start the default backend (`agyh`/`agyc` select the per-account Antigravity CLI profile). Credentials come from
 `~/.common_shell_setup_local.sh`, which is never committed.
 
 ### macOS Window Management
