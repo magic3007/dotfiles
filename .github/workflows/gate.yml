@@ -1,0 +1,27 @@
+name: gate
+
+# Everything this repository enforces runs through .repo-std/gate.sh — CI calls
+# that one entry point and nothing else, so a check added locally is in CI the
+# same commit.
+#
+# `--prove` is the negative control: it runs every check against its violating
+# fixture and fails when a check passes there, which would mean the check guards
+# nothing.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Checks
+        run: bash .repo-std/gate.sh
+      - name: Negative control
+        run: bash .repo-std/gate.sh --prove

@@ -1,0 +1,93 @@
+# Corrections ledger.
+#
+# One entry per lesson this repository paid for. `check` names the script in
+# .repo-std/checks/ that makes the lesson fail loudly instead of being a line in
+# a document nobody re-reads at the right moment.
+#
+# Adding a lesson: write the check first, give it a violating fixture under
+# .repo-std/checks/fixtures/<check>/, then register it here.
+# .repo-std/checks/corrections_ledger.py rejects an entry without a check, a
+# check without an entry, and a check without a fixture.
+
+- origin: >-
+    2026-11-17: install.conf.yaml and sync.conf.yaml had drifted apart by 19
+    links (all of omp/, codex/AGENTS.md, pi/ extensions and agents, every macOS
+    target). The convention "add it to both" existed in AGENTS.md and was still
+    broken.
+  rule: >-
+    Every link must appear in both dotbot configs with the same source and the
+    same `if` guard; deliberate asymmetries are declared in
+    .repo-std/link-exemptions.yml with a reason.
+  check: link_parity
+
+- origin: >-
+    debug_experience/2026-03-29_dotbot_install_missing_claude_agents_directory.md:
+    `~/.claude/agents: claude/agents` pointed at a directory that did not exist,
+    so dotbot ended the run with "Some tasks were not executed successfully".
+  rule: Every in-repo link source must exist.
+  check: link_sources_exist
+
+- origin: >-
+    Codex, kimi, mcode, the Antigravity CLI and the Herdr app each replaced a
+    symlinked config with a regular file by saving via temp file + rename, which
+    pushed machine state into the repository and broke the next dotbot run.
+  rule: >-
+    A config its owning tool rewrites in place is never symlinked; it is merged
+    by a scripts/*-sync.py or seeded by post-install.d/10-seed-configs.sh.
+  check: no_link_for_self_rewriting_configs
+
+- origin: >-
+    The repository is public; every harness here takes a credential *reference*
+    (env-var name, ${VAR}, !command) precisely so no key is ever committed.
+  rule: No tracked file contains a literal credential.
+  check: no_plaintext_secrets
+
+- origin: >-
+    omp's skill loader silently skips a SKILL.md without `description`, and
+    scripts/sync-skills.py keys views on the frontmatter `name`, so a mismatch
+    produces a view entry under the wrong label. Both failures are silent.
+  rule: >-
+    Every skill source directory holds a SKILL.md whose frontmatter declares a
+    `description` and a `name` equal to the directory name.
+  check: skill_frontmatter
+
+- origin: >-
+    Internal skills stay out of this public repository only because .gitignore
+    lists them; an unlisted one is published by a single `git add -A`.
+  rule: Every untracked skill directory is matched by an explicit .gitignore entry.
+  check: private_skills_ignored
+
+- origin: >-
+    2026-11-16: the Gemini CLI was replaced by the Antigravity CLI and `gemini/`
+    was deleted, but README.md still documented the directory and the alias.
+  rule: Every repository path named by README.md, AGENTS.md or docs/REPO_GUIDE.md exists.
+  check: doc_paths_exist
+
+- origin: >-
+    `omp config set` rewrites omp/config.yml as pure YAML and strips comments,
+    so explanations placed there vanish at the next toggle. omp also takes a
+    native file lock on it, so the file must stay writable.
+  rule: omp/config.yml carries no comments and stays owner-writable.
+  check: omp_config_no_comments
+
+- origin: >-
+    2026-11-16: the Antigravity CLI installer appended PATH lines to ~/.bashrc,
+    ~/.zshrc and ~/.profile, which are symlinks into this repository, so the
+    installer edited tracked files. bun's installer does the same unless it is
+    called with SHELL=/bin/none.
+  rule: The tracked rc files carry no installer-appended lines.
+  check: no_installer_pollution
+
+- origin: >-
+    ./install and sync.sh wrap nearly every step in `|| true`, so a syntax error
+    in a helper script is invisible until the thing it configures is missing.
+  rule: Every shell and python file this repository owns parses.
+  check: source_syntax
+
+- origin: >-
+    A ledger of lessons decays into prose unless something forces each entry to
+    name a check, and each check to have a failing fixture.
+  rule: >-
+    Checks and ledger entries correspond one to one, and every check has a
+    violating fixture.
+  check: corrections_ledger

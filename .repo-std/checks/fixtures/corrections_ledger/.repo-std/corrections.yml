@@ -1,0 +1,3 @@
+- origin: a lesson with no enforcement
+  rule: this entry names a check that does not exist
+  check: vanished_check

@@ -1,0 +1,4 @@
+source ~/.common_shell_setup.sh
+
+# Added by Antigravity CLI installer
+export PATH="$HOME/.local/bin:$PATH"
