@@ -22,9 +22,11 @@ Bootstraps everything: SSH keys → Claude Code → repo clone → `./install` �
 ```bash
 git clone --recursive https://github.com/magic3007/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install          # idempotent — safe to re-run
-./install -n       # dry run
+./install              # idempotent — safe to re-run
+./install --only link  # phase 1 symlinks only; the closest thing to a preview
 ```
+
+The pinned Dotbot has no `--dry-run`.
 </details>
 
 ## What's Configured
@@ -36,6 +38,19 @@ cd ~/dotfiles
 | **bash** | shared aliases, functions, and env vars via `common_shell_setup.sh` |
 | **fish** | archived — frozen config kept at `archive/fish/` for existing logins |
 | **starship** | Cross-shell prompt with custom styling |
+
+Two shells are actively maintained: **zsh** and **bash**. They share
+`common_shell_setup.sh` — aliases, functions, env vars, and the harness
+wrappers below. fish is frozen in `archive/fish/`; do not add to it.
+
+Destructive commands are guarded there:
+
+| Command | Behaviour |
+|---------|-----------|
+| `rm` | prints a warning instead of deleting — use `rem` (reversible, moves to `~/.wastebasket`) or `\rm` for the real thing |
+| `mv`, `cp` | forced interactive (`-i`) |
+
+Docker helpers: `docker-run`, `docker-slave`, `docker-run-gui`.
 
 ### Terminal & Multiplexer
 | Tool | Config |
@@ -72,32 +87,36 @@ cd ~/dotfiles
 | **lsd** | Modern `ls` replacement |
 
 ### AI Coding Tools
-| Tool | Config |
-|------|--------|
-| **Claude Code** | Settings, hooks, skills, agents, commands, rules, API wrappers for 6+ backends |
-| **Codex** | OpenAI Codex config, env, skills |
-| **Gemini CLI** | Settings, skills |
-| **Opencode** | Config, package.json |
-| **Pi** | Models + settings |
-| **Kimi Code** | config.toml |
-| **DeepSeek Harness** | CLI only (`dsh`); config is machine-local in `~/.dsh` (profiles, credentials) and not linked |
-| **ChatGPT** | Shell helper |
+| Tool | Config | Detail |
+|------|--------|--------|
+| **omp** | `omp/` — models, roles, gateways, plugins, rules | `omp/README.md` |
+| **Claude Code** | `claude/` — settings, hooks, skills, agents, commands | — |
+| **Codex** | `codex/` — shared keys merged into the live config | `codex/README.md` |
+| **mcode** (MiniMax Code) | `mcode/config.yaml`, merged | `mcode/README.md` |
+| **Antigravity CLI** (`agy`) | `antigravity/cli-settings.json`, merged | `antigravity/README.md` |
+| **Pi** | `pi/` — models, settings, extensions, agents | — |
+| **Opencode** | `opencode/` | — |
+| **Kimi Code** | `kimi-code/config.toml`, seeded | — |
+| **DeepSeek Harness** | CLI only (`dsh`); config is machine-local in `~/.dsh` | — |
+| **ChatGPT** | `chatgpt/chatgpt.sh` | — |
 
 > **任务完成提醒开关（默认关闭）**：`END_REMINDER_ENABLE` 控制 Claude Code、Codex 和 Pi 任务结束时的 wechat-reminder 飞书/微信通知。设为 `1` 启用（如 `END_REMINDER_ENABLE=1 claude`），未设置 / `0` 时静默。
 
-#### Shell Aliases
-```bash
-cc        # Claude Code — native Anthropic API
-sdcc      # Claude Code — VolcEngine (doubao-seed-2.0-lite)
-dscc      # Claude Code — DeepSeek (v4-flash)
-dsccpro   # Claude Code — DeepSeek (v4-pro)
-kmcc      # Claude Code — Kimi via OpenRouter
-kmcc2     # Claude Code — Kimi direct
-mxcc      # Claude Code — MiniMax via OpenRouter
-mmcc      # Claude Code — MiMo
-gm        # Google Gemini CLI
-oc        # Opencode
-```
+#### Shell wrappers
+
+Each harness has one wrapper per backend, defined in `common_shell_setup.sh`.
+The names follow a suffix convention, so the file itself is the list:
+
+| Suffix | Harness | Example |
+|--------|---------|---------|
+| `*cc` | Claude Code | `dscc`, `kmcc`, `sdcc` |
+| `*pi` | Pi | `dspi`, `glmpi`, `o5pi` |
+| `*omp` | omp | `dsomp`, `glmomp`, `dvomp` |
+| `cx*` | Codex | `cxds`, `cxglm` |
+| `ag*` | Antigravity CLI | `agh`, `agc` |
+
+Plain `cc`, `cx`, `oc`, `gm` start the default backend. Credentials come from
+`~/.common_shell_setup_local.sh`, which is never committed.
 
 ### macOS Window Management
 | Tool | Config |
@@ -201,40 +220,42 @@ and environment variables.
 
 ```
 dotfiles/
-├── skills/          → ~/.agents/skills/  Shared agent skills (all harnesses; scripts/sync-skills.py)
-├── claude/          → ~/.claude/         Claude Code (hooks, Claude-only skills, settings)
-├── codex/           → ~/.codex/          OpenAI Codex
-├── gemini/          → ~/.gemini/         Google Gemini CLI
-├── opencode/        → ~/.config/opencode/ Opencode
+├── install.conf.yaml    ./install            — every symlink, both install phases
+├── sync.conf.yaml       sync.sh              — the subset re-applied every 15 min
+├── docs/REPO_GUIDE.md   the rules, the process, the change paths
+├── .repo-std/           the checks that enforce them (gate.sh)
+│
+├── skills/          → ~/.agents/skills/  Shared agent skills (all harnesses)
+├── claude/          → ~/.claude/         Claude Code
+├── codex/           → merged             OpenAI Codex
+├── mcode/           → merged             MiniMax Code
+├── antigravity/     → merged             Antigravity CLI (agy)
+├── omp/             → ~/.omp/agent/      omp coding agent harness
 ├── pi/              → ~/.pi/agent/       Pi coding agent
-├── kimi-code/       → ~/.kimi-code/      Kimi Code
-├── neovim/          → ~/.config/nvim/    NvChad + basic-ide
-├── vim/             → ~/.vim_runtime/    Vim config + plugins
+├── opencode/        → ~/.config/opencode/
+├── kimi-code/       → seeded             Kimi Code
+│
+├── oh-my-zsh/       → ~/.zshrc + ~/.zshrc.d/
+├── bash/            → ~/.bashrc
+├── common_shell_setup.sh → ~/.common_shell_setup.sh  (shared by bash and zsh)
 ├── git/             → ~/.gitconfig       Git aliases + hooks
-├── starship/        → ~/.config/starship.toml
-├── archive/fish/    → ~/.config/fish/    Fish shell (ARCHIVED, frozen)
-├── ranger/          → ~/.config/ranger/  Ranger file manager
-├── joshuto/         → ~/.config/joshuto/ Joshuto file manager
-├── yazi/            → ~/.config/yazi/    Yazi file manager
-├── lsd/             → ~/.config/lsd/     LSD config
-├── bat/             → ~/.config/bat/     Bat config
-├── gdb/             → ~/.gdbinit + ~/.gdb/
-├── ghostty/         → ~/.config/ghostty/
-├── karabiner/       → ~/.config/karabiner/   (macOS)
-├── skhd/            → ~/.skhdrc + ~/.skhd/   (macOS)
-├── cursor_config/   → Cursor settings        (macOS)
-├── vscode_config/   → VS Code user config     (macOS)
-├── antigravity_config/ → Antigravity settings (macOS)
-├── antigravity/     → Antigravity CLI settings (merged into ~/.gemini/antigravity-cli)
-├── iterm2/          → iTerm2 plist          (macOS)
-├── obsidian/        → Obsidian vault settings
-├── docker/          → Dev Dockerfiles
-├── install-scripts/ → Platform package installers
-├── scripts/         → Install helpers (Tailscale join, config sync, skill views)
-└── wechat-reminder/ → Dual-channel notification tool
+├── tmux.conf, ghostty/, cmux/, starship/
+├── herdr/           → ~/.config/herdr/       agent-aware multiplexer + plugins
+├── herdr-app/       → ~/.config/herdr-app/   desktop app themes
+│
+├── neovim/          → ~/.config/nvim/    NvChad + basic-ide
+├── vim/             → ~/.vim_runtime/
+├── vscode_config/, cursor_config/, antigravity_config/   (macOS IDE settings)
+├── ranger/, joshuto/, yazi/, lsd/, bat/, gdb/
+├── karabiner/, skhd/, iterm2/, yabairc                   (macOS)
+├── obsidian/, docker/, install-scripts/
+├── scripts/         → Install helpers, config merges, skill views
+├── wechat-reminder/ → Dual-channel notification tool
+└── archive/fish/    → ~/.config/fish/    ARCHIVED, frozen
 ```
 
 ## Reference
 
-- [Dotbot](https://github.com/anishathalye/dotbet) — dotfile management
-- [CLAUDE.md](CLAUDE.md) — full development guide and constraints
+- [Dotbot](https://github.com/anishathalye/dotbot) — dotfile management
+- [docs/REPO_GUIDE.md](docs/REPO_GUIDE.md) — how this repository works, and how to change it
+- [AGENTS.md](AGENTS.md) — the index a coding agent starts from
