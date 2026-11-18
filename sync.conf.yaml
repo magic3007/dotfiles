@@ -48,6 +48,7 @@
     ~/.vim_runtime: vim/vimrc
     ~/.ideavimrc: ideavimrc
     ~/.config/nvim: neovim/nvim-basic-ide
+    ~/.vscoderc: vscode/vscoderc
     # VS Code user config (macOS). Same files as install.conf.yaml; the 15-minute
     # tick restores them if VS Code or a sync drops a link.
     ~/Library/Application Support/Code/User/keybindings.json:
@@ -65,6 +66,35 @@
     ~/Library/Application Support/Code/User/prompts:
         if: 'test "$(uname)" = Darwin'
         path: vscode_config/prompts
+    ~/Library/Application Support/Cursor/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: cursor_config/keybindings.json
+    ~/Library/Application Support/Cursor/User/settings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: cursor_config/settings.json
+    ~/Library/Application Support/Antigravity/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: antigravity_config/keybindings.json
+    ~/Library/Application Support/Antigravity/User/settings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: antigravity_config/settings.json
+
+    # ---- macOS window management ----
+    ~/.yabairc:
+        if: 'test "$(uname)" = Darwin'
+        path: yabairc
+    ~/.skhdrc:
+        if: 'test "$(uname)" = Darwin'
+        path: skhdrc
+    ~/.skhd:
+        if: 'test "$(uname)" = Darwin'
+        path: skhd
+    ~/.config/karabiner/karabiner.json:
+        if: 'test "$(uname)" = Darwin'
+        path: karabiner/karabiner.json
+    ~/.config/karabiner/assets:
+        if: 'test "$(uname)" = Darwin'
+        path: karabiner/assets
 
     # ---- File managers ----
     ~/.config/ranger: ranger
@@ -97,14 +127,25 @@
     ~/.claude/hooks: claude/hooks
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    ~/.codex/AGENTS.md: codex/AGENTS.md
     # ~/.codex/config.toml is NOT linked: Codex edits it in place and writes
     # machine state into it, which a symlink would push into this repo.
     # scripts/codex-config-sync.py merges the tracked codex/config.toml into it.
+    ~/.pi/agent/AGENTS.md: pi/AGENTS.md
     ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
     ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
+    ~/.pi/agent/extensions: pi/extensions
+    ~/.pi/agent/agents: pi/agents
     # ~/.minimax/config.yaml 不 link：mcode 用「临时文件 + rename 覆盖配置路径」保存配置，
     # symlink 会被顶成普通文件。改由 scripts/mcode-config-sync.py 合并（见下方 shell 段）。
+    # omp static config. Rationale and hard constraints: docs/REPO_GUIDE.md.
+    ~/.omp/agent/config.yml: omp/config.yml
+    ~/.omp/agent/models.yml: omp/models.yml
+    ~/.omp/agent/gateways-login.json: omp/gateways-login.json
+    ~/.omp/agent/WATCHDOG.yml: omp/WATCHDOG.yml
+    ~/.omp/agent/AGENTS.md: omp/AGENTS.md
+    ~/.omp/agent/RULES.md: omp/RULES.md
     ~/.omp/agent/extensions/deepen.ts: omp/extensions/deepen.ts
     ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
@@ -140,6 +181,14 @@
 
     # ---- cmux ----
     ~/.config/cmux/cmux.json: cmux/cmux.json
+
+    # ---- iTerm2 (macOS only) ----
+    ~/.config/iterm2/com.googlecode.iterm2.plist:
+        if: 'test "$(uname)" = Darwin'
+        path: iterm2/com.googlecode.iterm2.plist
+
+    # ---- Warp ----
+    ~/.warp: warp
 
     # ---- Herdr + Herdr app ----
     # install.conf.yaml 里有的 herdr/config.toml，这里此前整段缺失（15 分钟同步

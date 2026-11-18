@@ -145,29 +145,60 @@
     ~/.Rprofile: Rprofile
 
     # ---- macOS window management ----
-    ~/.yabairc: yabairc
-    ~/.skhdrc: skhdrc
-    ~/.skhd: skhd
-    ~/.config/karabiner/karabiner.json: karabiner/karabiner.json
-    ~/.config/karabiner/assets: karabiner/assets
+    # Guarded: these targets only exist on macOS. Without the guard a Linux run
+    # creates dead links, and sync.conf.yaml could not mirror the entry — the
+    # two files must stay identical (.repo-std/checks/link_parity.py).
+    ~/.yabairc:
+        if: 'test "$(uname)" = Darwin'
+        path: yabairc
+    ~/.skhdrc:
+        if: 'test "$(uname)" = Darwin'
+        path: skhdrc
+    ~/.skhd:
+        if: 'test "$(uname)" = Darwin'
+        path: skhd
+    ~/.config/karabiner/karabiner.json:
+        if: 'test "$(uname)" = Darwin'
+        path: karabiner/karabiner.json
+    ~/.config/karabiner/assets:
+        if: 'test "$(uname)" = Darwin'
+        path: karabiner/assets
 
     # ---- IDE / Editor config ----
     ~/.vscoderc: vscode/vscoderc
-    ~/Library/Application Support/Code/User/keybindings.json: vscode_config/keybindings.json
-    ~/Library/Application Support/Code/User/settings.json: vscode_config/settings.json
+    ~/Library/Application Support/Code/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/keybindings.json
+    ~/Library/Application Support/Code/User/settings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/settings.json
     # chatLanguageModels.json holds BYOK providers; its apiKey is a
     # ${input:chat.lm.secret.*} reference to VS Code Secret Storage, never a
     # literal, so the tracked file carries no secret.
-    ~/Library/Application Support/Code/User/chatLanguageModels.json: vscode_config/chatLanguageModels.json
+    ~/Library/Application Support/Code/User/chatLanguageModels.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/chatLanguageModels.json
     # mcp.json defines MCP servers only (no credentials — keep it that way; use
     # an env-var reference if a server ever needs a token).
-    ~/Library/Application Support/Code/User/mcp.json: vscode_config/mcp.json
+    ~/Library/Application Support/Code/User/mcp.json:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/mcp.json
     # Custom chat modes / prompt files.
-    ~/Library/Application Support/Code/User/prompts: vscode_config/prompts
-    ~/Library/Application Support/Cursor/User/keybindings.json: cursor_config/keybindings.json
-    ~/Library/Application Support/Cursor/User/settings.json: cursor_config/settings.json
-    ~/Library/Application Support/Antigravity/User/keybindings.json: antigravity_config/keybindings.json
-    ~/Library/Application Support/Antigravity/User/settings.json: antigravity_config/settings.json
+    ~/Library/Application Support/Code/User/prompts:
+        if: 'test "$(uname)" = Darwin'
+        path: vscode_config/prompts
+    ~/Library/Application Support/Cursor/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: cursor_config/keybindings.json
+    ~/Library/Application Support/Cursor/User/settings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: cursor_config/settings.json
+    ~/Library/Application Support/Antigravity/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: antigravity_config/keybindings.json
+    ~/Library/Application Support/Antigravity/User/settings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: antigravity_config/settings.json
 
     # ---- AI tools ----
     ~/.claude/settings.json: claude/settings.json
@@ -265,8 +296,10 @@
     # deepen.ts = /deepen：旁路加深提示词并回填输入框（见 omp/README.md）。
     ~/.omp/agent/extensions/deepen.ts: omp/extensions/deepen.ts
 
-    # ---- iTerm2 ----
-    ~/.config/iterm2/com.googlecode.iterm2.plist: iterm2/com.googlecode.iterm2.plist
+    # ---- iTerm2 (macOS only) ----
+    ~/.config/iterm2/com.googlecode.iterm2.plist:
+        if: 'test "$(uname)" = Darwin'
+        path: iterm2/com.googlecode.iterm2.plist
 
     # ---- Ghostty ----
     ~/.config/ghostty/config: ghostty/config
@@ -403,10 +436,6 @@
 
 - shell:
     - [test -d ~/.fzf && ~/.fzf/install --all || true, Installing fzf]
-
-# ---------------------------------------------------------------------------
-# Fish plugins (Fisher) REMOVED - fish is archived, no longer maintained.
-# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # Node.js (prerequisite for AI coding tools)
@@ -615,10 +644,10 @@
       ]
 
 # ---------------------------------------------------------------------------
-# CC Gateway - Claude Code reverse proxy
+# macOS input preferences
 # ---------------------------------------------------------------------------
 - shell:
     - [
-          bash ~/.claude/cc-gateway/install.sh || true,
-          Installing CC Gateway for Claude Code,
+          test "$(uname)" = "Darwin" && bash mac/mac_config.sh || true,
+          Applying macOS key-repeat and press-and-hold preferences,
       ]
