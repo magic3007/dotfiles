@@ -122,3 +122,6 @@ skills/weekly-metrics-query/
 skills/xiaohongshu/
 # Codex runtime skills; scripts/sync-skills.py moves a leftover copy to ~/.codex/skills/.system
 codex/skills/.system/
+
+# Test cache from vendored skill suites; never part of the repo.
+.pytest_cache/
