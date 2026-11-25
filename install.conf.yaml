@@ -388,7 +388,6 @@
 # ---------------------------------------------------------------------------
 - shell:
     - [bash install-scripts/linux/install-packages.sh || true, Installing Linux system packages (apt/conda/mamba)]
-    - [bash install-scripts/mac/install-brew.sh || true, Installing Homebrew on macOS]
     - [bash install-scripts/mac/install-packages.sh || true, Installing macOS packages with Homebrew]
 
 # ---------------------------------------------------------------------------

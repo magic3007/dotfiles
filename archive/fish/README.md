@@ -31,9 +31,8 @@ nothing useful now that the config is frozen, and its pinned plugin list
 re-downloading state the repo no longer pins.
 
 `fish` itself is still installed as a package by
-`install-scripts/{linux,mac}/install-packages.sh`, and
-`install-scripts/change-default-shell.sh` still offers it as a shell choice.
-Neither is fish *config* maintenance, so both were left alone.
+`install-scripts/{linux,mac}/install-packages.sh`. That is not fish *config*
+maintenance, so it was left alone.
 
 ## Rules for this directory
 

@@ -1,13 +1,9 @@
 # neovim
 
-Two configs, both tracked as git submodules and symlinked from `~/.config/nvim`:
-
-| Config | Submodule | Purpose |
-|---|---|---|
-| `nvim-basic-ide/` | [magic3007/nvim-basic-ide](https://github.com/magic3007/nvim-basic-ide) (`custom` branch) | the active config — lightweight IDE: LSP, cmp, treesitter |
-| `NvChad/` | NvChad | full IDE setup, not currently linked |
-
-`install.conf.yaml` links `~/.config/nvim` → `neovim/nvim-basic-ide`.
+The config is the `nvim-basic-ide/` submodule
+([magic3007/nvim-basic-ide](https://github.com/magic3007/nvim-basic-ide), `custom`
+branch): a lightweight IDE with LSP, cmp and treesitter. `install.conf.yaml`
+links `~/.config/nvim` → `neovim/nvim-basic-ide`.
 
 ## Plugin revisions are pinned on purpose
 

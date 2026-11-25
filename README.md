@@ -65,7 +65,7 @@ Docker helpers: `docker-run`, `docker-slave`, `docker-run-gui`.
 ### Editor & IDE
 | Tool | Config |
 |------|--------|
-| **neovim** | NvChad (full IDE) + nvim-basic-ide (lightweight), LSP, treesitter |
+| **neovim** | nvim-basic-ide (lightweight IDE), LSP, treesitter |
 | **vim** | vimrc with plugin management, undo history, extensive settings |
 | **VSCode** | macOS — key repeat, keybindings, settings, chat model providers (BYOK), MCP servers, prompt files |
 | **ideavim** | JetBrains Vim emulation |
@@ -137,7 +137,7 @@ Plain `cc`, `cx`, `oc` start the default backend (`agyh`/`agyc` select the per-a
 ### Debugging & Profiling
 | Tool | Config |
 |------|--------|
-| **gdb** | Dashboard, reverse engineering helpers, STL pretty-printers |
+| **gdb** | Dashboard, STL pretty-printers |
 
 ### Containers
 | Tool | Config |
@@ -243,7 +243,7 @@ dotfiles/
 ├── herdr/           → ~/.config/herdr/       agent-aware multiplexer + plugins
 ├── herdr-app/       → ~/.config/herdr-app/   desktop app themes
 │
-├── neovim/          → ~/.config/nvim/    NvChad + basic-ide
+├── neovim/          → ~/.config/nvim/    nvim-basic-ide
 ├── vim/             → ~/.vim_runtime/
 ├── vscode_config/, cursor_config/, antigravity_config/   (macOS IDE settings)
 ├── ranger/, joshuto/, yazi/, lsd/, bat/, gdb/

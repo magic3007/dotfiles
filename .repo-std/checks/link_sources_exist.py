@@ -2,8 +2,7 @@
 """Every link source must exist in the repository.
 
 A missing source makes dotbot print `Nonexistent source ~/.x -> y` and end the
-whole run with "Some tasks were not executed successfully" — the failure mode
-recorded in debug_experience/2026-03-29_dotbot_install_missing_claude_agents_directory.md.
+whole run with "Some tasks were not executed successfully".
 Sources outside the repository (paths starting with ~ or /) are installed by
 other steps and are checked for their shape only.
 """
