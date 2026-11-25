@@ -52,7 +52,7 @@ def annotate(body: list[str]) -> list[tuple[str, int | None]]:
     index = 0
     while index < len(body):
         line = body[index]
-        if line.startswith("-"):
+        if line.startswith(("-", "+")):
             group += 1
             while index < len(body) and body[index].startswith("-"):
                 tags.append(("minus", group))
@@ -68,11 +68,12 @@ def annotate(body: list[str]) -> list[tuple[str, int | None]]:
 
 def change_groups(body: list[str]) -> list[list[str]]:
     groups: list[list[str]] = []
-    for line, (kind, group) in zip(body, annotate(body)):
-        if kind == "minus":
+    for line, (_, group) in zip(body, annotate(body)):
+        if group is None:
+            continue
+        if group == len(groups):
             groups.append([])
-        if kind in ("minus", "plus"):
-            groups[group].append(line)
+        groups[group].append(line)
     return groups
 
 
