@@ -1,6 +1,5 @@
 # fzf
-# Prepend ~/.fzf/bin to PATH so user-installed fzf takes priority over system fzf
-[[ -d ~/.fzf/bin ]] && PATH="$HOME/.fzf/bin${PATH:+:${PATH}}"
+# ~/.fzf/bin is on PATH through ~/.common_shell_setup.sh.
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND="fd --type file --follow --hidden --no-ignore-vcs --exclude '.git' --exclude '[Mm]iniconda3' --exclude '[Aa]naconda3' --color=always"
 export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"

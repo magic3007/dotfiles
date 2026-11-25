@@ -150,8 +150,8 @@ A lesson no repository state can assert (a platform behaviour, a runtime race)
 stays prose — and must say *why* no check is possible. Current example: a
 machine-local `~/.zshrc_local` that is a copy of the main zshrc sends zsh
 startup into infinite recursion; the file is untracked, so nothing here can see
-it. The defence is that `oh-my-zsh/zshrc` sources `~/.zshrc_local` last and
-expects overrides only.
+it. The defence is that `oh-my-zsh/zshrc.d/99-local.zsh` sources `~/.zshrc_local`
+last and expects overrides only.
 
 ## 6. Verification
 

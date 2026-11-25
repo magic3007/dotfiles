@@ -1,15 +1,6 @@
-# profile zsh:
-# https://cloud.tencent.com/developer/article/1678315
-# zmodload zsh/zprof
-# zmodload zsh/datetime
-# setopt PROMPT_SUBST
-# PS4='+$EPOCHREALTIME %N:%i> '
-#
-# logfile=$(mktemp zsh_profile.7Pw1Ny0G)
-# echo "Logging to $logfile"
-# exec 3>&2 2>$logfile
-#
-# setopt XTRACE
+# ~/.zshrc — zsh entry point: oh-my-zsh, then ~/.zshrc.d/*.zsh in file-name
+# order. Shared bash/zsh settings live in ~/.common_shell_setup.sh;
+# ~/.zshrc_local is sourced last by zshrc.d/99-local.zsh.
 
 # Prevent recursive startup loops (e.g. when ~/.zshrc_local accidentally sources ~/.zshrc).
 typeset -gi DOTFILES_ZSHRC_LOAD_DEPTH=${DOTFILES_ZSHRC_LOAD_DEPTH:-0}
@@ -113,38 +104,15 @@ plugins=(git
 )
 
 source $ZSH/oh-my-zsh.sh
-# Load modular zsh config files from ~/.zshrc.d.
+
+# This file is a symlink into the dotfiles repository; this is its root.
+DOTFILES_ROOT="${${(%):-%x}:A:h:h}"
+
+# Load modular config from ~/.zshrc.d in file-name order; 99-local.zsh runs last.
 ZSHRC_MODULE_DIR="${ZDOTDIR:-$HOME}/.zshrc.d"
 for zshrc_module in "$ZSHRC_MODULE_DIR"/*.zsh(N); do
   source "$zshrc_module"
 done
-unset ZSHRC_MODULE_DIR zshrc_module
+unset ZSHRC_MODULE_DIR zshrc_module DOTFILES_ROOT
 
 (( DOTFILES_ZSHRC_LOAD_DEPTH-- ))
-# 在多个 shell 会话之间共享历史记录
-setopt SHARE_HISTORY
-
-# common shell setup for bash and zsh
-[ -f ~/.common_shell_setup.sh ] && source ~/.common_shell_setup.sh
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-export CLASHCTL_HOME=$HOME/clashctl
-[ -f $CLASHCTL_HOME/scripts/cmd/clashctl.sh ] && source $CLASHCTL_HOME/scripts/cmd/clashctl.sh
-
-# kimi-code
-export PATH="$HOME/.kimi-code/bin:$PATH"
-
-# bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-# Codex proxy wrapper (must stay last: it has to outrank ~/.local/bin).
-# No-op when the wrapper is not installed, e.g. on machines without the proxy.
-[ -f ~/dotfiles/oh-my-zsh/codex-proxy.zsh ] && source ~/dotfiles/oh-my-zsh/codex-proxy.zsh
-
-# MiniMax Code CLI
-export PATH="$HOME/.minimax-code/bin:$PATH"

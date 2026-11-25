@@ -10,15 +10,6 @@ if command -v lsd &> /dev/null; then
   alias lt='lsd --tree'
 fi
 
-# proxy
-# function pc() {
-# 	https_proxy=http://127.0.0.1:7890 \
-# 	http_proxy=http://127.0.0.1:7890  \
-#   all_proxy=socks5://127.0.0.1:7891 \
-# 	"$@"
-# }
-# alias pc="https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7891"
-
 # The fuck
 # command -v thefuck >/dev/null 2>&1 && eval $(thefuck --alias)
 
@@ -300,8 +291,31 @@ alias .....='cd ../../../..'
 # vscode
 [ -f ~/.vscoderc ] && source ~/.vscoderc
 
-# setup path
-export PATH=$HOME/.local/bin:$PATH
+# ============================================================
+# PATH shared by bash and zsh — each tool directory appears once
+# ============================================================
+export PATH="$HOME/.local/bin:$PATH"            # uv and hand-installed tools
+[[ -d "$HOME/.fzf/bin" ]] && PATH="$HOME/.fzf/bin:$PATH"
+export PATH="$HOME/.opencode/bin:$PATH"         # opencode
+export PATH="$HOME/.kimi-code/bin:$PATH"        # Kimi Code CLI
+export PATH="$HOME/.minimax-code/bin:$PATH"     # MiniMax Code CLI (mcode)
+export PATH="$HOME/.minimax/bin:$PATH"          # MiniMax CLI
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[[ -f "$HOME/.antigravity/antigravity/bin/antigravity" ]] &&
+  PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+# google-cloud-sdk (brew cask gcloud-cli): binaries installed via
+# `gcloud components install` land here, not /opt/homebrew/bin
+[[ -d /opt/homebrew/share/google-cloud-sdk/bin ]] &&
+  PATH="/opt/homebrew/share/google-cloud-sdk/bin:$PATH"
+
+# uv's env file adds ~/.local/bin when uv created one
+[[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
+
+# clashctl proxy helpers; no-op when the checkout is not installed
+export CLASHCTL_HOME="$HOME/clashctl"
+[[ -f "$CLASHCTL_HOME/scripts/cmd/clashctl.sh" ]] && source "$CLASHCTL_HOME/scripts/cmd/clashctl.sh"
 
 # add all private keys to ssh agent
 if find "${HOME}/.ssh" -name "id_*" -print -quit | grep -q .; then
@@ -311,16 +325,6 @@ if find "${HOME}/.ssh" -name "id_*" -print -quit | grep -q .; then
         fi
     done
 fi
-
-
-export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
-
-# google-cloud-sdk (brew cask gcloud-cli): binaries installed via
-# `gcloud components install` land here, not in /opt/homebrew/bin
-[ -d /opt/homebrew/share/google-cloud-sdk/bin ] && export PATH="/opt/homebrew/share/google-cloud-sdk/bin:$PATH"
-
-# chatgpt.sh
-export PATH="$PATH:$HOME/.chatgpt"
 
 # lazygit
 alias lg='lazygit'
@@ -368,7 +372,6 @@ ccg() {
 oc() {
   opencode "$@"
 }
-export PATH="$PATH:$HOME/.opencode/bin"
 
 # Codex with full-auto mode. Disable cmux's per-invocation hooks: older cmux
 # wrappers run lifecycle hooks synchronously, delaying both startup and exit.
@@ -534,14 +537,11 @@ if command -v tailscale >/dev/null 2>&1; then
 fi
 
 
-# uv - Python package manager
-# uv installs to ~/.local/bin by default
-export PATH="$HOME/.local/bin:$PATH"
-
+# uv - Python package manager; it installs to ~/.local/bin, already on PATH
 # No UV_INDEX_URL here, deliberately. It becomes uv's *default index*, and uv writes the index it resolved from into
 # every lockfile it touches (`source = { registry = ... }` plus each wheel URL), so any project's uv.lock would carry
-# this machine's mirror — thousands of lines of diff with no version change, unreproducible elsewhere. The proxies
-# exported above already reach pypi.org; pass `--index-url` to the one command that needs a mirror instead.
+# this machine's mirror — thousands of lines of diff with no version change, unreproducible elsewhere. Pass
+# `--index-url` to the one command that needs a mirror instead.
 # Check a checkout with: env -u UV_INDEX_URL uv lock --check
 # Local-only override (untracked): ~/.common_shell_setup_local.sh
 
@@ -631,9 +631,8 @@ _npm_check_global_packages() {
 
 _npm_check_global_packages
 
-[ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh
-
-# Added by Antigravity
-[ -f ~/.antigravity/antigravity/bin/antigravity ] && export PATH="$PATH:$HOME/.antigravity/antigravity/bin"
-
 alias hd=herdr
+
+# Machine-local overrides, untracked by design. Sourced last so they win over
+# every setting above.
+[ -f ~/.common_shell_setup_local.sh ] && source ~/.common_shell_setup_local.sh

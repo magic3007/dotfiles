@@ -197,8 +197,8 @@ Machine-specific overrides — gitignored:
 | File | Purpose |
 |------|---------|
 | `~/.gitconfig_local` | Git user name/email |
-| `~/.zsh_local` | Zsh overrides |
-| `~/.bash_local` | Bash overrides |
+| `~/.zshrc_local` | Zsh overrides, loaded last |
+| `~/.bashrc_local` | Bash overrides, loaded last |
 | `~/.common_shell_setup_local.sh` | API keys, webhook URLs, env vars |
 | `~/.config/fish/conf.d/local.fish` | Fish overrides (fish archived) |
 

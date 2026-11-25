@@ -1,11 +1,9 @@
 # Codex proxy wrapper.
 #
-# This must be sourced at the very end of ~/.zshrc. ~/.zshrc sources
-# ~/.common_shell_setup.sh twice — once from 40-runtime.zsh inside the
-# zshrc.d loop, once after it — and ~/.local/bin/env re-prepends ~/.local/bin
-# each time. Anything inside zshrc.d therefore ends up behind ~/.local/bin, so
-# an interactive shell would resolve `codex` to the real binary and skip the
-# wrapper (and with it the proxy variables).
+# Sourced by zshrc.d/40-runtime.zsh after ~/.common_shell_setup.sh. The shared
+# setup prepends ~/.local/bin, so the wrapper must be prepended again afterwards
+# to outrank it; otherwise an interactive shell resolves `codex` to the real
+# binary and skips the wrapper (and with it the proxy variables).
 #
 # Only the wrapper goes on PATH. The shell environment itself stays free of
 # proxy variables, keeping the "proxy only for Codex" property.
