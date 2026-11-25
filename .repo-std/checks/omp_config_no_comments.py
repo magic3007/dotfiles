@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _dotbot import report, repo_root  # noqa: E402
+from _lib import report, repo_root  # noqa: E402
 
 CONFIG = "omp/config.yml"
 

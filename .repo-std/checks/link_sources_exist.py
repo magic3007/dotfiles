@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _dotbot import CONFIGS, load_links, report, repo_root  # noqa: E402
+from _lib import CONFIG, load_links, report, repo_root  # noqa: E402
 
 
 def main() -> int:
@@ -22,20 +22,19 @@ def main() -> int:
     violations = []
     checked = 0
 
-    for config in CONFIGS:
-        for target, spec in load_links(root / config).items():
-            source = spec.get("path")
-            if not source:
-                violations.append(f"{config}: {target} has no path")
-                continue
-            if source.startswith(("~", "/")):
-                continue
-            checked += 1
-            if not (root / source).exists():
-                violations.append(
-                    f"{config}: {target} -> {source} does not exist; "
-                    f"dotbot aborts the link section with 'Nonexistent source'"
-                )
+    for target, spec in load_links(root).items():
+        source = spec.get("path")
+        if not source:
+            violations.append(f"{CONFIG}: {target} has no path")
+            continue
+        if source.startswith(("~", "/")):
+            continue
+        checked += 1
+        if not (root / source).exists():
+            violations.append(
+                f"{CONFIG}: {target} -> {source} does not exist; "
+                f"dotbot aborts the link section with 'Nonexistent source'"
+            )
 
     return report(violations, f"{checked} in-repo link sources exist")
 

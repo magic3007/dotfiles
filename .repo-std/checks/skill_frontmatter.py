@@ -22,13 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import yaml  # noqa: E402
 
-from _dotbot import report, repo_root  # noqa: E402
-
-# Skill source trees, in the layout scripts/sync-skills.py reads.
-SOURCES = ("skills", "claude/skills", "codex/skills", "pi/skills", "omp/skills")
-
-# Upstream bundles: they ship their own quality bar and we only consume them.
-VENDORED = {"skills/scientific-agent-skills"}
+from _lib import SKILL_SOURCES, is_vendored, report, repo_root  # noqa: E402
 
 MAX_DEPTH = 3
 
@@ -52,15 +46,13 @@ def main() -> int:
     violations = []
     checked = 0
 
-    for source in SOURCES:
+    for source in SKILL_SOURCES:
         base = root / source
         if not base.is_dir():
             continue
         for skill_md in sorted(base.rglob("SKILL.md")):
             rel = skill_md.relative_to(root)
-            if len(rel.relative_to(source).parts) > MAX_DEPTH:
-                continue
-            if any(str(rel).startswith(v + "/") for v in VENDORED):
+            if len(rel.relative_to(source).parts) > MAX_DEPTH or is_vendored(rel.as_posix()):
                 continue
             checked += 1
             meta = frontmatter(skill_md)

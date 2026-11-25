@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _dotbot import CONFIGS, load_links, report, repo_root  # noqa: E402
+from _lib import CONFIG, load_links, report, repo_root  # noqa: E402
 
 # Written out here rather than derived from the configs: a guard that reads the
 # source it guards only proves the source agrees with itself.
@@ -37,14 +37,13 @@ def main() -> int:
     root = repo_root(sys.argv[1:])
     violations = []
 
-    for config in CONFIGS:
-        links = load_links(root / config)
-        for target, reason in SELF_REWRITING.items():
-            if target in links:
-                violations.append(
-                    f"{config}: {target} is linked, but {reason}. "
-                    f"Merge or seed it instead — see docs/REPO_GUIDE.md."
-                )
+    links = load_links(root)
+    for target, reason in SELF_REWRITING.items():
+        if target in links:
+            violations.append(
+                f"{CONFIG}: {target} is linked, but {reason}. "
+                f"Merge or seed it instead — see docs/REPO_GUIDE.md."
+            )
 
     return report(violations, f"{len(SELF_REWRITING)} self-rewriting configs stay unlinked")
 

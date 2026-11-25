@@ -14,13 +14,12 @@ nothing and a prefix is hard to write by accident.
 from __future__ import annotations
 
 import re
-import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _dotbot import report, repo_root  # noqa: E402
+from _lib import owned_files, report, repo_root  # noqa: E402
 
 # Literal provider prefixes. Each is a published format, so a match is a real key.
 PREFIXES = re.compile(
@@ -63,20 +62,7 @@ REFERENCE = re.compile(
     """
 )
 
-SKIP_DIRS = {"skills", "archive", "dotbot", "dotbot-git", "oh-my-zsh", "vim", ".repo-std"}
 SKIP_SUFFIXES = {".png", ".jpg", ".plist", ".lock", ".xsd"}
-
-
-def tracked_files(root: Path) -> list[Path]:
-    out = subprocess.run(
-        ["git", "ls-files", "-z"], cwd=root, capture_output=True, text=True, check=False
-    )
-    names = [name for name in out.stdout.split("\0") if name] if out.returncode == 0 else []
-    if not names:
-        # Not a checkout, or a subtree with nothing tracked (a fixture): scan the
-        # tree directly rather than silently scanning nothing.
-        return [p for p in root.rglob("*") if p.is_file()]
-    return [root / name for name in names]
 
 
 def main() -> int:
@@ -84,11 +70,10 @@ def main() -> int:
     violations = []
     scanned = 0
 
-    for path in tracked_files(root):
-        rel = path.relative_to(root)
-        if rel.parts and rel.parts[0] in SKIP_DIRS:
-            continue
-        if path.suffix in SKIP_SUFFIXES or not path.is_file():
+    for name in owned_files(root):
+        path = root / name
+        rel = Path(name)
+        if path.suffix in SKIP_SUFFIXES:
             continue
         try:
             text = path.read_text(encoding="utf-8")

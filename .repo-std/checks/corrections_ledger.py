@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import yaml  # noqa: E402
 
-from _dotbot import report, repo_root  # noqa: E402
+from _lib import report, repo_root  # noqa: E402
 
 REQUIRED_FIELDS = ("origin", "rule", "check")
 

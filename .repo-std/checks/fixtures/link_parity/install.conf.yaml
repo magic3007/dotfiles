@@ -1,3 +1,0 @@
-- link:
-    ~/.only-in-install: common_shell_setup.sh
-    ~/.both: tmux.conf

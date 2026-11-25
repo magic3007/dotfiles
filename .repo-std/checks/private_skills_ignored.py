@@ -20,9 +20,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _dotbot import report, repo_root  # noqa: E402
+from _lib import SKILL_SOURCES, report, repo_root  # noqa: E402
 
-SOURCES = ("skills", "claude/skills", "codex/skills", "pi/skills", "omp/skills")
 PROBE = "SKILL.md"
 
 
@@ -37,10 +36,10 @@ def main() -> int:
         print("SKIP  not a git checkout")
         return 0
 
-    tracked_dirs = {name.rsplit("/", 1)[0] for name in git(root, "ls-files", *SOURCES)}
+    tracked_dirs = {name.rsplit("/", 1)[0] for name in git(root, "ls-files", *SKILL_SOURCES)}
     entries = [
         entry.relative_to(root).as_posix()
-        for source in SOURCES
+        for source in SKILL_SOURCES
         if (root / source).is_dir()
         for entry in sorted((root / source).iterdir())
         if entry.is_dir()

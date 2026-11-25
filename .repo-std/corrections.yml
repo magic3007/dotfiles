@@ -10,17 +10,6 @@
 # check without an entry, and a check without a fixture.
 
 - origin: >-
-    2026-11-17: install.conf.yaml and sync.conf.yaml had drifted apart by 19
-    links (all of omp/, codex/AGENTS.md, pi/ extensions and agents, every macOS
-    target). The convention "add it to both" existed in AGENTS.md and was still
-    broken.
-  rule: >-
-    Every link must appear in both dotbot configs with the same source and the
-    same `if` guard; deliberate asymmetries are declared in
-    .repo-std/link-exemptions.yml with a reason.
-  check: link_parity
-
-- origin: >-
     2026-03-29: `~/.claude/agents: claude/agents` pointed at a directory that
     did not exist, so dotbot ended the run with "Some tasks were not executed
     successfully".
@@ -85,9 +74,7 @@
 - origin: >-
     ./install and sync.sh wrap nearly every step in `|| true`, so a syntax error
     in a helper script is invisible until the thing it configures is missing.
-  rule: >-
-    Every shell and python file of the install and sync machinery, and every
-    script a linked config runs, parses.
+  rule: Every shell and python file outside the vendored trees parses.
   check: source_syntax
 
 - origin: >-
