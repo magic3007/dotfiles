@@ -62,4 +62,5 @@ python3 scripts/sync-skills.py --dry-run
 - `./install` and `sync.sh` read different config files.
 - Harness config under `~/` is often generated or merged — editing the live file
   is reverted within 15 minutes. Edit the tracked source.
-- The repository is public; credentials are always a reference, never a literal.
+- The repository is public; credentials are always a reference, never a literal,
+  and a skill directory is private until `.gitignore` allowlists it.

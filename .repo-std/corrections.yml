@@ -52,9 +52,13 @@
   check: skill_frontmatter
 
 - origin: >-
-    Internal skills stay out of this public repository only because .gitignore
-    lists them; an unlisted one is published by a single `git add -A`.
-  rule: Every untracked skill directory is matched by an explicit .gitignore entry.
+    Internal skills were kept out of this public repository by listing each one
+    in .gitignore: an unlisted one was published by a single `git add -A`, and
+    the list itself published every internal skill name.
+  rule: >-
+    Skill directories are ignored by default and published only by a `!<dir>/`
+    allowlist entry; every tracked skill directory is allowlisted and every
+    untracked one is ignored.
   check: private_skills_ignored
 
 - origin: >-

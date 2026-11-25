@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Untracked skills must be ignored on purpose, not by accident.
+"""Skills are private by default and published only by an allowlist.
 
-This repository is public, and internal skills are kept local by listing them in
-.gitignore. A new internal skill is untracked either way, so "it does not show up
-in git status" proves nothing: one `git add -A` publishes it. The check demands
-an explicit .gitignore entry for every untracked skill directory, which turns
-"remember not to commit it" into a state git itself enforces.
+This repository is public. .gitignore ignores every skill source directory and
+re-includes the published ones with `!<dir>/`, so a new internal skill stays out
+of `git add -A` without anyone remembering to list it, and no internal skill
+name appears in the public tree.
+
+Two states break that contract:
+- an untracked skill directory that is not ignored: `git add -A` publishes it;
+- a tracked skill directory that is ignored: files added to it later are
+  silently left out of the next commit.
 """
 
 from __future__ import annotations
@@ -19,10 +23,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _dotbot import report, repo_root  # noqa: E402
 
 SOURCES = ("skills", "claude/skills", "codex/skills", "pi/skills", "omp/skills")
+PROBE = "SKILL.md"
 
 
-def git(root: Path, *args: str) -> list[str]:
-    out = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=False)
+def git(root: Path, *args: str, stdin: str | None = None) -> list[str]:
+    out = subprocess.run(["git", *args], cwd=root, input=stdin, capture_output=True, text=True, check=False)
     return [line for line in out.stdout.splitlines() if line]
 
 
@@ -32,28 +37,29 @@ def main() -> int:
         print("SKIP  not a git checkout")
         return 0
 
-    tracked = set(git(root, "ls-files"))
-    ignored = set(git(root, "ls-files", "--others", "--ignored", "--exclude-standard", "--directory"))
-    ignored_dirs = {entry.rstrip("/") for entry in ignored}
+    tracked_dirs = {name.rsplit("/", 1)[0] for name in git(root, "ls-files", *SOURCES)}
+    entries = [
+        entry.relative_to(root).as_posix()
+        for source in SOURCES
+        if (root / source).is_dir()
+        for entry in sorted((root / source).iterdir())
+        if entry.is_dir()
+    ]
+    probes = "\n".join(f"{rel}/{PROBE}" for rel in entries)
+    ignored = {p.rsplit("/", 1)[0] for p in git(root, "check-ignore", "--no-index", "--stdin", stdin=probes)}
 
     violations = []
-    checked = 0
-    for source in SOURCES:
-        base = root / source
-        if not base.is_dir():
-            continue
-        for skill_dir in sorted(p for p in base.iterdir() if p.is_dir()):
-            rel = skill_dir.relative_to(root).as_posix()
-            if any(name.startswith(rel + "/") for name in tracked):
-                continue
-            checked += 1
-            if rel not in ignored_dirs:
-                violations.append(
-                    f"{rel}: untracked and not ignored — `git add -A` would publish it. "
-                    f"Add it to .gitignore, or commit it on purpose."
-                )
+    for rel in entries:
+        tracked = any(d == rel or d.startswith(rel + "/") for d in tracked_dirs)
+        if tracked and rel in ignored:
+            violations.append(f"{rel}: tracked but ignored — add `!{rel}/` to .gitignore")
+        elif not tracked and rel not in ignored:
+            violations.append(
+                f"{rel}: untracked and not ignored — `git add -A` would publish it. "
+                f"Commit it on purpose, or drop its `!{rel}/` line from .gitignore."
+            )
 
-    return report(violations, f"{checked} untracked skill dirs are explicitly ignored")
+    return report(violations, f"{len(entries)} skill dirs: published ones allowlisted, the rest ignored")
 
 
 if __name__ == "__main__":

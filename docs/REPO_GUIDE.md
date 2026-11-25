@@ -99,9 +99,10 @@ Three properties of the views that are easy to break:
   and are tracked in `~/.agents/.skill-lock.json`, outside this repository.
   Re-run the sync afterwards so Claude Code and the Antigravity CLI see them.
 
-This repository is public. An internal skill stays out of it by being listed in
-`.gitignore`; `.repo-std/checks/private_skills_ignored.py` fails when an
-untracked skill directory is not.
+This repository is public. Every skill directory is ignored by default and is
+published only by a `!<dir>/` allowlist line in `.gitignore`, so an internal
+skill stays out without being named; `.repo-std/checks/private_skills_ignored.py`
+fails on an untracked skill that is not ignored and on a tracked one that is.
 
 
 ## 4. Change paths
@@ -113,7 +114,7 @@ Each row is a whole task: where to start, what to touch, how to know it worked.
 | add a config file | the table in §2 | add the entry to **both** dotbot configs, or write the merge/seed step | `bash .repo-std/gate.sh` then `./install --only link` |
 | add a shell alias | `common_shell_setup.sh` | one function or alias, next to its siblings | `bash -n common_shell_setup.sh`, then open a new shell |
 | add a skill | `skills/<name>/SKILL.md` | frontmatter needs `name` and `description`; put a harness-specific one under that harness's directory | `python3 scripts/sync-skills.py --dry-run` |
-| keep a skill private | `.gitignore` | add the directory path; this repository is public | `bash .repo-std/gate.sh` |
+| publish a skill | `.gitignore` | add `!<dir>/` next to its siblings; without it the skill stays private | `bash .repo-std/gate.sh` |
 | change an omp model or role | `omp/models.yml`, `omp/config.yml` | `config.yml` takes **no comments** — explanations go in `omp/README.md` | `omp models`, then start a session |
 | change a Codex/mcode/Antigravity setting | the tracked file named in §2 | never the live file under `~/` | re-run the matching `scripts/*-sync.py` |
 | make a GUI app start at login | `grok-bot/README.md` | XDG autostart entry linked from **both** dotbot configs, `if:`-guarded on the absolute launcher path | `bash .repo-std/gate.sh`, then log in again |

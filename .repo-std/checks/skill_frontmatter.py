@@ -6,8 +6,8 @@ scripts/sync-skills.py keys the generated views on `name`. Both failures are
 silent: the skill simply never appears.
 
 Directory name and frontmatter name may differ on purpose — sync-skills.py names
-each view entry after the frontmatter, which is how `skills/canvo` is exported as
-`canvo-op`. What must never happen is a missing or empty field.
+each view entry after the frontmatter, so a bundle directory can export a skill
+under another name. What must never happen is a missing or empty field.
 
 Bundles (a directory of skills, with or without a SKILL.md of its own) are walked
 too, so a nested skill cannot hide a missing description.
