@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
-# Negative control for private_skills_ignored.
+# Fixture for private_skills_ignored.
 #
-# The check needs real git state (tracked vs ignored), which a static fixture
-# inside this repository cannot express: every file committed here is tracked.
-# So build a throwaway checkout holding one untracked, unignored skill and
-# assert the check rejects it.
-#
-# Exit 0 means the check failed as it should.
+# The check needs real git state (tracked vs ignored), which a static tree inside
+# this repository cannot express: every file committed here is tracked. So build
+# a throwaway checkout holding both broken states and run the check on it:
+# an untracked skill that is not ignored, and a tracked skill that is ignored.
 set -uo pipefail
 
-CHECK="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/checks/private_skills_ignored.py"
+CHECK="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/private_skills_ignored.py"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 git -C "$tmp" init -q
-mkdir -p "$tmp/skills/leaked-internal-skill"
-printf -- '---\nname: leaked-internal-skill\ndescription: internal\n---\n' \
-    > "$tmp/skills/leaked-internal-skill/SKILL.md"
+for name in leaked-internal-skill published-but-ignored; do
+    mkdir -p "$tmp/skills/$name"
+    printf -- '---\nname: %s\ndescription: x\n---\n' "$name" > "$tmp/skills/$name/SKILL.md"
+done
+git -C "$tmp" add skills/published-but-ignored
+printf 'skills/published-but-ignored/\n' > "$tmp/.gitignore"
 
-! python3 "$CHECK" --root "$tmp"
+python3 "$CHECK" --root "$tmp"

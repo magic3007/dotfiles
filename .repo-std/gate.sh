@@ -5,7 +5,10 @@
 #   .repo-std/gate.sh --prove    run every check against its violating fixture
 #
 # --prove is the negative control: a guard that has never failed is a guard
-# nobody tested. It passes only when every check *fails* on its fixture.
+# nobody tested. It passes only when every check *reports a violation* (a
+# `FAIL  ` line) on its fixture; a crash or a bare non-zero exit proves nothing.
+# A fixture that needs real git state is an executable fixtures/<name>/prove.sh
+# that builds it and runs the check, under the same contract.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -23,7 +26,11 @@ for check in "$CHECKS"/*.py; do
 
     if [[ "$mode" == "run" ]]; then
         if out="$(python3 "$check" --root "$ROOT" 2>&1)"; then
-            printf 'PASS  %s\n' "$name"
+            if [[ "$out" == SKIP* ]]; then
+                printf 'SKIP  %s: %s\n' "$name" "${out#SKIP  }"
+            else
+                printf 'PASS  %s\n' "$name"
+            fi
         else
             printf 'FAIL  %s\n%s\n' "$name" "$out"
             fail=1
@@ -33,21 +40,18 @@ for check in "$CHECKS"/*.py; do
 
     fixture="$FIXTURES/$name"
     if [[ -x "$fixture/prove.sh" ]]; then
-        if "$fixture/prove.sh" >/dev/null 2>&1; then
-            printf 'PROVE %s (fixture rejected, via prove.sh)\n' "$name"
-        else
-            printf 'BROKEN %s: prove.sh did not observe a failure\n' "$name"
-            fail=1
-        fi
+        out="$("$fixture/prove.sh" 2>&1)"
     elif [[ -d "$fixture" ]]; then
-        if python3 "$check" --root "$fixture" >/dev/null 2>&1; then
-            printf 'BROKEN %s: passes on its violating fixture — it guards nothing\n' "$name"
-            fail=1
-        else
-            printf 'PROVE %s (fixture rejected)\n' "$name"
-        fi
+        out="$(python3 "$check" --root "$fixture" 2>&1)"
     else
         printf 'BROKEN %s: no fixture at %s\n' "$name" "${fixture#$ROOT/}"
+        fail=1
+        continue
+    fi
+    if grep -q '^FAIL  ' <<<"$out"; then
+        printf 'PROVE %s (fixture rejected)\n' "$name"
+    else
+        printf 'BROKEN %s: no violation reported on its fixture\n%s\n' "$name" "$out"
         fail=1
     fi
 done

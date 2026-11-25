@@ -7,7 +7,7 @@ regular file; machine-local state then sits in the repository, and the next
 dotbot run aborts the whole link section with "already exists but is a regular
 file or directory".
 
-The repository handles each of these by merging (scripts/*-config-sync.py) or by
+The repository handles each of these by merging (scripts/*-sync.py) or by
 seeding (scripts/post-install.d/10-seed-configs.sh) instead. Observed for Codex,
 kimi, mcode, the Antigravity CLI and the Herdr app.
 """

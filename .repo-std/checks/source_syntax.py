@@ -21,8 +21,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _dotbot import report, repo_root  # noqa: E402
 
-# Directories this repository authors and runs during install/sync.
-OWNED = ("scripts", "install-scripts", "wechat-reminder", "herdr", "self-reflection", "mac", "claude/hooks")
+# Paths this repository authors and runs during install/sync or from a linked config.
+OWNED = (
+    "scripts",
+    "install-scripts",
+    "wechat-reminder",
+    "herdr",
+    "self-reflection",
+    "mac",
+    "claude/hooks",
+    "claude/scripts",
+    "claude/statusline-command.sh",
+    "codex/mihomo",
+)
 
 
 def owned_files(root: Path, suffix: str) -> list[Path]:
@@ -36,7 +47,7 @@ def owned_files(root: Path, suffix: str) -> list[Path]:
     paths = []
     for name in names:
         rel = Path(name)
-        in_scope = len(rel.parts) == 1 or any(name.startswith(d + "/") for d in OWNED)
+        in_scope = len(rel.parts) == 1 or any(name == d or name.startswith(d + "/") for d in OWNED)
         if in_scope and (root / rel).is_file():
             paths.append(root / rel)
     return paths

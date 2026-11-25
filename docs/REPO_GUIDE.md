@@ -93,8 +93,8 @@ Three properties of the views that are easy to break:
   view back into the repository: harnesses that recurse would list the same
   skill twice, and a tool writing into the view would write into the repository.
 - A bundle (several skills under one directory) is flattened to one entry per
-  frontmatter `name`, which is why `skills/canvo` is exported as `canvo-op`.
-  Directory name and frontmatter name may legitimately differ.
+  frontmatter `name`, so the exported skill name may differ from its directory
+  name. Directory name and frontmatter name may legitimately differ.
 - Third-party installs (`npx skills add <pkg> -g`) land in `~/.agents/skills`
   and are tracked in `~/.agents/.skill-lock.json`, outside this repository.
   Re-run the sync afterwards so Claude Code and the Antigravity CLI see them.
@@ -133,13 +133,14 @@ why.
 So: **a lesson is not recorded until a check fails on it.**
 
 1. Write the check as `.repo-std/checks/<name>.py`. It takes `--root`, prints one
-   line per violation, exits non-zero when there is any.
+   `FAIL  ` line per violation, exits non-zero when there is any.
 2. Write a violating sample under `.repo-std/checks/fixtures/<name>/` — a minimal
    tree the check must reject. When real git state is needed, write an executable
-   `prove.sh` there instead, exiting 0 when it observed the failure.
+   `prove.sh` there instead that builds that state and runs the check on it.
 3. Register it in `.repo-std/corrections.yml` with the `origin` (what went wrong,
    when) and the `rule` (one judgeable sentence).
-4. `bash .repo-std/gate.sh --prove` must show your check rejecting its fixture.
+4. `bash .repo-std/gate.sh --prove` must show your check reporting a `FAIL  `
+   line on its fixture; a crash does not count.
 
 `.repo-std/checks/corrections_ledger.py` is the guard over the guards: it fails
 when a check has no ledger entry, when an entry names a check that no longer
@@ -162,8 +163,8 @@ python3 scripts/sync-skills.py --dry-run
 ./install --only link             # idempotent; relinks without touching phase 2
 ```
 
-CI (`.github/workflows/gate.yml`) runs the first two and nothing else, so a check
-added locally is in CI in the same commit.
+The checks need Python 3 with PyYAML. CI (`.github/workflows/gate.yml`) runs the
+first two and nothing else, so a check added locally is in CI in the same commit.
 
 ## 7. Boundaries
 

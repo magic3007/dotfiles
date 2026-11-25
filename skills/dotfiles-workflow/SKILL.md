@@ -43,8 +43,9 @@ Then prove the check actually guards something:
 bash .repo-std/gate.sh --prove
 ```
 
-That runs every check against its violating fixture and fails when a check
-passes there. A guard that has never failed is a guard nobody tested.
+That runs every check against its violating fixture and fails unless each check
+reports a `FAIL  ` line there. A guard that has never failed is a guard nobody
+tested.
 
 ## Commands
 

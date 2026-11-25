@@ -48,7 +48,7 @@
     produces a view entry under the wrong label. Both failures are silent.
   rule: >-
     Every skill source directory holds a SKILL.md whose frontmatter declares a
-    `description` and a `name` equal to the directory name.
+    non-empty `name` and `description`.
   check: skill_frontmatter
 
 - origin: >-
@@ -81,7 +81,9 @@
 - origin: >-
     ./install and sync.sh wrap nearly every step in `|| true`, so a syntax error
     in a helper script is invisible until the thing it configures is missing.
-  rule: Every shell and python file this repository owns parses.
+  rule: >-
+    Every shell and python file of the install and sync machinery, and every
+    script a linked config runs, parses.
   check: source_syntax
 
 - origin: >-

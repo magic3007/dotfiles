@@ -26,9 +26,9 @@ from _dotbot import report, repo_root  # noqa: E402
 RC_FILES = ("bash/bashrc", "oh-my-zsh/zshrc", "oh-my-zsh/zshenv", "common_shell_setup.sh")
 
 MARKERS = (
-    re.compile(r"#\s*Added by Antigravity CLI installer", re.I),
-    re.compile(r"#\s*Added by Windsurf", re.I),
+    re.compile(r"#\s*Added by ", re.I),
     re.compile(r"#\s*Generated for envman", re.I),
+    re.compile(r"^#\s*bun(\s+completions)?\s*$"),
 )
 
 def main() -> int:
