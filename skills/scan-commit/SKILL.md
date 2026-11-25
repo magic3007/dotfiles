@@ -127,21 +127,21 @@ git add <file1> <file2> ...
 
 **For files that are split across groups (hunk-level staging):**
 
-Use the patch-based approach to stage only the hunks belonging to this group:
+Use the hunk stager that ships with `smart-commit`, instead of assembling
+patches by hand:
 
-1. Get the diff for the file:
-   ```bash
-   git diff --no-color <file> > /tmp/scan-commit-full.patch
-   ```
-2. Extract only the hunks belonging to this group into a patch file.
-3. Apply the filtered patch to the index:
-   ```bash
-   git apply --cached /tmp/scan-commit-group.patch
-   ```
-4. Clean up:
-   ```bash
-   rm -f /tmp/scan-commit-full.patch /tmp/scan-commit-group.patch
-   ```
+```bash
+# The path's index entry must equal HEAD: run `git reset` once before the first commit.
+python3 ~/.agents/skills/smart-commit/scripts/stage_hunks.py --list <file>
+python3 ~/.agents/skills/smart-commit/scripts/stage_hunks.py --take 0,2,3 <file>
+python3 ~/.agents/skills/smart-commit/scripts/stage_hunks.py --take 1 --split 3:1 <file>
+```
+
+`--take` stages whole hunks by index, `--split HUNK:GROUP[,GROUP]` keeps only the
+named change groups inside one mixed hunk, and `--check` validates the patch
+without staging it. The helper refuses a path that already has staged changes,
+so hand each file to it once per commit and let later commits start with
+`git reset`.
 
 **For untracked files:**
 
@@ -195,56 +195,13 @@ Done! Created N commits:
   ghi9012 docs(api): Document batch processing endpoint
 ```
 
-## Conventional Commits Specification
+## Commit Message Rules
 
-Every commit message MUST follow this format:
-
-```
-<type>[optional scope][optional !]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Types
-
-| Type       | When to Use                                          |
-| ---------- | ---------------------------------------------------- |
-| `feat`     | A new feature (correlates with MINOR in SemVer)      |
-| `fix`      | A bug fix (correlates with PATCH in SemVer)          |
-| `docs`     | Documentation only changes                           |
-| `style`    | Formatting, missing semi-colons, etc. (not CSS)      |
-| `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `perf`     | Performance improvement                              |
-| `test`     | Adding or correcting tests                           |
-| `build`    | Changes to build system or external dependencies     |
-| `ci`       | Changes to CI configuration files and scripts        |
-| `chore`    | Other changes that don't modify src or test files    |
-| `revert`   | Reverts a previous commit                            |
-
-### The 50/72 Rule & Formatting Rules
-
-**Subject line (first line):**
-
-1. Separate subject from body with a **blank line**
-2. Limit the **entire** subject line to **~50 characters** (type + scope + description combined). Hard limit: 72 chars.
-3. **Capitalize** the description after `<type>(scope):`
-4. **No period** at the end of the subject line
-5. Use **imperative mood**
-6. All commit messages in **English**
-
-**Body:**
-
-7. **Wrap at 72 characters**
-8. Explain **what and why**, not how
-
-**Scope & Breaking Changes:**
-
-- `scope`: noun describing the section of the codebase
-- `!` after type/scope: indicates a BREAKING CHANGE
-- `BREAKING CHANGE:` footer for breaking change details
-- `Closes #123` / `Refs #456` in footer to reference issues
+Every commit message follows
+`~/.agents/skills/smart-commit/references/conventional-commits.md`: the
+`<type>(scope): <Capitalized description>` format, the type table, the 50/72
+subject and body limits, the imperative mood, and the breaking-change footers.
+Read it once before planning; every message in the plan must satisfy it.
 
 ## Edge Cases
 
@@ -259,7 +216,7 @@ If all changes belong to ONE logical concern, create a single commit. Don't spli
 
 ### File-Level Split vs. Hunk-Level Split
 - **File-level**: Entire file belongs to one group — simple `git add`
-- **Hunk-level**: File has changes for multiple groups — use the patch-based approach in Step 7
+- **Hunk-level**: File has changes for multiple groups — use the hunk stager in Step 7
 
 ### Untracked Binary Files
 Binary files cannot be diffed. Stage them as whole files.

@@ -93,7 +93,8 @@ git reset --soft origin/main
 # Generate commit message using gen-commit-msg logic
 ```
 
-**Generate Commit Message** (following gen-commit-msg format):
+**Generate Commit Message** following the shared Conventional Commits rules in
+`~/.agents/skills/smart-commit/references/conventional-commits.md`:
 
 1. Analyze staged changes:
 
@@ -102,24 +103,8 @@ git reset --soft origin/main
    git diff --cached
    ```
 
-1. Categorize changes (feat/fix/docs/refactor/test/chore/perf)
-
-1. Determine scope from changed files (workflow/engine/reward/dataset/api/docs/etc.)
-
-1. Generate message in format:
-
-   ```
-   <type>(<scope>): <subject>
-
-   <body>
-
-   [Optional sections:]
-   Key changes:
-   - change 1
-   - change 2
-
-   Refs: #123, #456
-   ```
+1. Pick the type and scope from the changed files, then write the message in the
+   reference's format (imperative capitalized subject, body explaining why).
 
 1. Commit with generated message:
 
@@ -147,30 +132,11 @@ git log --oneline origin/main..HEAD
 
 **Categorize Changes:**
 
-| Type       | When to Use                     |
-| ---------- | ------------------------------- |
-| `feat`     | New feature or capability       |
-| `fix`      | Bug fix                         |
-| `docs`     | Documentation only              |
-| `refactor` | Code change without feature/fix |
-| `test`     | Adding or fixing tests          |
-| `chore`    | Build, deps, config changes     |
-| `perf`     | Performance improvement         |
-
-**Determine Scope:**
-
-Infer from changed files:
-
-- `src/workflow/` → `workflow`
-- `src/engine/` → `engine`
-- `src/reward/` → `reward`
-- `src/dataset/` → `dataset`
-- `src/api/` → `api`
-- `src/utils/` → `utils`
-- `src/infra/` → `infra`
-- `docs/` → `docs`
-- `examples/` → `examples`
-- Multiple areas → omit scope or use broader term
+Pick the type from the reference's table (`feat`, `fix`, `docs`, `refactor`,
+`test`, `chore`, `perf`, ...). Infer the scope from the changed paths: the
+common top-level directory, or its subdirectory when every change sits under
+one (e.g. `src/auth/` → `auth`). Omit the scope when the changes span unrelated
+areas.
 
 ### Step 6: Generate PR Title and Description
 
@@ -188,8 +154,6 @@ Infer from changed files:
 - Mirror commit message style
 
 **PR Description Format:**
-
-MUST strictly follow the [GitHub PR template](../../.github/PULL_REQUEST_TEMPLATE.md):
 
 ```markdown
 ## Description
@@ -217,14 +181,14 @@ Fixes #(issue)
 
 <!-- Mark with 'x' what you've done -->
 
-- [ ] I have read the [Contributing Guide](../CONTRIBUTING.md)
+- [ ] I have read the repository's contributing guide
 - [ ] I have run formatting tools (pre-commit or manual)
 - [ ] I have run relevant unit tests and they pass
 - [ ] I have added tests for new functionality
 - [ ] I have updated documentation if needed
 - [ ] My branch is up to date with main
 - [ ] This PR introduces breaking changes (if yes, fill out details below)
-- [ ] If this PR changes documentation, I have built and previewed it locally with `jb build docs`
+- [ ] If this PR changes documentation, I have built and previewed it locally
 - [ ] No critical issues raised by AI reviewers
 
 **Breaking Change Details (if applicable):**
@@ -236,7 +200,7 @@ Fixes #(issue)
 <!-- Add any other context, screenshots, logs, or explanations here -->
 ```
 
-**How to Fill the Template:**
+**How to Fill the Description:**
 
 1. **Description**: 2-4 sentences explaining what this PR does and why
 1. **Related Issue**: Link to issue (search for related issues if exists)

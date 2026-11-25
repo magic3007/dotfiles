@@ -18,6 +18,7 @@ Invoke with `/pr-review` or when the task matches.
 - No arguments: Review PR for current branch
 - PR number: Review specific PR (e.g., `pr-review 123`)
 - `--quick`: Quick mode, only run Phase 1 analysis
+- `--economy`: Economy model mix (see Model Configuration)
 
 ## Quick Start
 
@@ -68,24 +69,24 @@ Get basic PR info: title, description, modified files, change summary.
 
 Analyze each file change, detecting change types by risk level.
 
-**CRITICAL level types:** FrameworkA, FrameworkB, FrameworkC, FrameworkD
-**HIGH level types:** distributed comm, DTensor, MoE, TP/EP/CP
-**MEDIUM level types:** tensor ops, workflow, API, compile
+**CRITICAL level types:** framework core, public API, security boundary
+**HIGH level types:** concurrency, distributed coordination, data layout
+**MEDIUM level types:** business logic, error handling, observability
 **LOW level types:** tests, docs, config
 
-### 1.3 Framework-Specific Risk Identification
+### 1.3 Risk Identification
 
-Based on detected types, identify corresponding risks.
+Based on detected types, identify the corresponding risks.
 
 ### 1.4 Output Change Analysis Report
 
 ```
 CHANGE_ANALYSIS_REPORT:
-- detected_types: [FRAMEWORK_PARALLEL, COMPONENT_A, FRAMEWORK_CORE, ...]
+- detected_types: [PUBLIC_API, CONCURRENCY, CORE_LOGIC, ...]
 - risk_level: CRITICAL | HIGH | MEDIUM | LOW
 - affected_files: [file1.py, file2.py, ...]
 - identified_risks: [risk1, risk2, ...]
-- related_frameworks: [frameworkA, frameworkB, frameworkC, ...]
+- related_areas: [core, api, concurrency, ...]
 ```
 
 ---
@@ -103,7 +104,7 @@ CHANGE_ANALYSIS_REPORT:
 
 Based on detected change types, select appropriate review task templates.
 
-- Framework-specific tasks (FrameworkA, FrameworkB, FrameworkC, FrameworkD, Core)
+- Area-specific tasks (core, public API, concurrency, data layout)
 - General tasks (Logic, Concurrency, Data Structures, Numerical, Performance, etc.)
 
 ### 2.3 Output Review Task List
@@ -151,7 +152,7 @@ findings:
 
 | Model      | Requirements                                                               |
 | ---------- | -------------------------------------------------------------------------- |
-| **Opus**   | Complete context, cross-file traces, verify parallel strategy interactions |
+| **Opus**   | Complete context, cross-file traces, verify cross-module interactions      |
 | **Sonnet** | Changed code + direct callers/callees, type signature consistency          |
 | **Haiku**  | Format and basic correctness only                                          |
 
@@ -209,9 +210,9 @@ findings:
 | -------------- | ------------------------------------- | --------------- |
 | Docs only      | [DOCS]                                | 1 Haiku         |
 | Config only    | [CONFIG_ONLY]                         | 1-2 Haiku       |
-| Single bug fix | [TENSOR_OPS]                          | 2-4 Sonnet      |
-| FrameworkA core| [FRAMEWORKA_*, COMPONENT_A, DATA_TENSOR] | 4-8 Opus        |
-| Cross-domain   | [WORKFLOW_ENGINE, FRAMEWORK_CORE, TESTS] | 5-10 mixed      |
+| Single bug fix | [LOGIC]                               | 2-4 Sonnet      |
+| Core change    | [CORE_*, PUBLIC_API, DATA_LAYOUT]     | 4-8 Opus        |
+| Cross-domain   | [BUSINESS_LOGIC, CORE, TESTS]         | 5-10 mixed      |
 
 ---
 

@@ -32,8 +32,9 @@ never by editing the live file — the next sync would revert it.
 
 `codex/config.toml` registers the Responses API providers and a flat native team
 capped at 50 concurrent threads. Role files are `codex/agents/dspix.toml` and
-`codex/agents/glmpix.toml`; the orchestration policy is
-`codex/skills/toil-offloading/`.
+`codex/agents/glmpix.toml`; the orchestration policy is the shared
+`skills/toil-offloading/` (`SKILL.md` + `references/assignment-brief.md`), with
+the Codex runtime wrapper in `codex/skills/toil-offloading-codex/`.
 
 Credentials stay in `DEEPSEEK_API_KEY` and `ZAI_API_KEY`, never in tracked TOML.
 
@@ -48,7 +49,7 @@ assignments directly, without role-availability or model/provider probes.
 |---|---|---|
 | `check_dangerous_ops.sh` | PreToolUse | blocks `reset --hard`, `push --force`, `clean -f`; blocks writes to `/tmp/`; intercepts deletions outside the safe directories |
 | `check-expert-update.sh` | PostToolUse | reminds to update docs after config/script edits |
-| `claudeception-activator.sh` | UserPromptSubmit | triggers knowledge extraction |
+| `metaception-activator.sh` | UserPromptSubmit | triggers knowledge extraction |
 | `claude-end-reminder.sh` | Stop | Feishu notification, gated by `END_REMINDER_ENABLE` |
 
 Safe directories whitelisted in `check_dangerous_ops.sh`: `output/`,

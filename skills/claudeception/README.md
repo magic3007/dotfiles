@@ -4,94 +4,20 @@ Every time you use an AI coding agent, it starts from zero. You spend an hour de
 
 This skill fixes that. When Claude Code discovers something non-obvious (a debugging technique, a workaround, some project-specific pattern), it saves that knowledge as a new skill. Next time a similar problem comes up, the skill gets loaded automatically.
 
-## Installation
+## Role in this repository
 
-### Step 1: Clone the skill
+This directory is the **A/B control arm** (`old_skill`) of `metaception`: the
+unmodified upstream v3.1.0 body, kept so the two-arm evaluation under
+`skills/metaception/tests/` has a fixed baseline. Its frontmatter description
+carries no trigger phrases, so prompt phrasing selects `metaception` instead.
 
-**Project-level (default)**
+The active `UserPromptSubmit` hook in this repository is
+`claude/hooks/metaception-activator.sh` (linked to `~/.claude/hooks/`), and it
+activates `metaception`, not this skill.
 
-```bash
-git clone https://github.com/blader/Claudeception.git .claude/skills/claudeception
-```
+## Upstream usage (control arm)
 
-**User-level (only for intentional cross-project use)**
-
-```bash
-git clone https://github.com/blader/Claudeception.git ~/.claude/skills/claudeception
-```
-
-The skill's learned outputs are project-local by default: save them under
-`.claude/skills/[skill-name]/`. Use `~/.claude/skills/[skill-name]/` only when
-the user explicitly requests a global/user-wide skill or confirms that it should
-be shared across projects. Do not silently fall back to the user directory.
-
-### Step 2: Set up the activation hook (recommended)
-
-The skill can activate via semantic matching, but a hook ensures it evaluates every session for extractable knowledge.
-
-#### User-level setup (optional)
-
-1. Create the hooks directory and copy the script:
-
-```bash
-mkdir -p ~/.claude/hooks
-cp ~/.claude/skills/claudeception/scripts/claudeception-activator.sh ~/.claude/hooks/
-chmod +x ~/.claude/hooks/claudeception-activator.sh
-```
-
-2. Add the hook to your global Claude settings (`~/.claude/settings.json`):
-
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/claudeception-activator.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-#### Project-level setup (default)
-
-1. Create the hooks directory inside your project and copy the script:
-
-```bash
-mkdir -p .claude/hooks
-cp .claude/skills/claudeception/scripts/claudeception-activator.sh .claude/hooks/
-chmod +x .claude/hooks/claudeception-activator.sh
-```
-
-2. Add the hook to your project settings (`.claude/settings.json` in the repo):
-
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/claudeception-activator.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-If you already have a `settings.json`, merge the `hooks` configuration into it.
-
-The hook injects a reminder on every prompt that tells Claude to evaluate whether the current task produced extractable knowledge. This achieves higher activation rates than relying on semantic description matching alone.
-
-## Usage
+The rest of this README describes the upstream skill this directory pins.
 
 ### Automatic Mode
 
@@ -177,7 +103,8 @@ The skill is picky about what it extracts. If something is just a documentation 
 
 ## Examples
 
-See `examples/` for sample skills:
+See `examples/` for sample skills, each written as `EXAMPLE.md` so a recursive
+skill scanner does not pick them up as real skills:
 
 - `nextjs-server-side-error-debugging/`: errors that don't show in browser console
 - `prisma-connection-pool-exhaustion/`: the "too many connections" serverless problem

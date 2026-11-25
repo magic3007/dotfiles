@@ -281,8 +281,10 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 - 并发/嵌套上限由 `task.maxConcurrency` / `task.maxRecursionDepth` 决定（默认 32 / 2，准确值用
   `omp config get task`）；`task.batch` 默认开，所以独立 slice 要在**一次** `task` 调用的
   `tasks[]` 里并发抛。
-- 编排规则（合同写法、分区、验收、收尾）在 `omp/skills/toil-offloading-omp/SKILL.md`，对应
-  Codex 侧 `codex/skills/toil-offloading/` + `codex/agents/{dspix,glmpix}.toml` 那套原生 team。
+- 编排规则（合同写法、分区、验收、收尾）的正文在共享 skill `skills/toil-offloading/`
+  （`SKILL.md` + `references/assignment-brief.md`）；omp 侧的运行入口是
+  `omp/skills/toil-offloading-omp/`，Codex 侧是 `codex/skills/toil-offloading-codex/`
+  + `codex/agents/{dspix,glmpix}.toml` 那套原生 team。
 
 ## herdr worker 档位（`modelRoles.worker` / `modelRoles.reviewer`）
 

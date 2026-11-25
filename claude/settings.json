@@ -90,7 +90,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/claudeception-activator.sh"
+            "command": "~/.claude/hooks/metaception-activator.sh"
           }
         ]
       }

@@ -31,7 +31,7 @@
 - `SKILL.md` — 技能本体：形态阶梯 + 四类知识契约 + 九步流程 + 质量门
 - `resources/skill-template.md` — 抽取产出的模板
 - `scripts/validate_skill.py` — 结构校验器（退出码 0=通过，1=有 FAIL，2=结构问题）
-- `examples/esm-circular-import-tdz/SKILL.md` — 五块齐备的最小完整样例（校验 32/32）
+- `examples/esm-circular-import-tdz/EXAMPLE.md` — 五块齐备的最小完整样例（校验 32/32；校验器也接受文件路径）
 
 ## 校验器覆盖的门
 

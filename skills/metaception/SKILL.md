@@ -7,7 +7,7 @@ description: |
   `Procedure`（决策表与停止条件）、`Calibration`（置信度、证伪条件、复审日期）。
   Use when: (1) 用户纠正了 agent 的做法，或同一个错误第二次出现，
   (2) 刚完成一次非显然的调试/排障（误导性报错、workaround、试错才成功），
-  (3) 用户说 "save this as a skill" / "what did we learn?" / "记录一下这次调试",
+  (3) 用户说 "save this as a skill" / "extract a skill from this" / "what did we learn?" / "记录一下这次调试",
   (4) 运行 /metaception 做会话回顾，
   (5) **准备往 AGENTS.md / CLAUDE.md / 规则文件 / 文档里再加一行约束时**——先用本技能判定这行字能不能改成一条检查。
   产出物必须通过 `scripts/validate_skill.py`（含可执行化门与负控门）。
@@ -383,8 +383,9 @@ python3 <skill-dir>/scripts/validate_skill.py <new-skill-dir>
 
 ## 7. 示例与来源
 
-- 完整样例：`examples/esm-circular-import-tdz/SKILL.md`（五块齐备）。
+- 完整样例：`examples/esm-circular-import-tdz/EXAMPLE.md`（五块齐备；校验器可直接吃文件路径）。
 - 产出模板：`resources/skill-template.md`。
 - 前身：`claudeception` v3.1.0（blader），提供了抽取时机、检索去重、description 写法与落盘位置。
   本技能的增量是：**纠正优先可执行化**（§0 形态阶梯 + 负控门）、四类知识分层落位、机器校验。
-  A/B 对照臂用 `skills/claudeception` 本体（未改动）。
+  A/B 对照臂用 `skills/claudeception` 本体（正文未改动）；它的 description 只声明自己是
+  `old_skill` 基线，不含任何触发短语，因此同样的触发语只会命中 `metaception`。

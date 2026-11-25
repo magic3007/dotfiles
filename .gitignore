@@ -34,7 +34,6 @@ skills/*
 !skills/mcp-notion-usage-guide/
 !skills/metaception/
 !skills/mihomo-tun-user-systemd/
-!skills/pr-review/
 !skills/ralph-loop/
 !skills/repo-industrialize/
 !skills/save-debug-experience/
@@ -42,15 +41,16 @@ skills/*
 !skills/scan-commit/
 !skills/scientific-agent-skills/
 !skills/smart-commit/
+!skills/toil-offloading/
 claude/skills/*
 !claude/skills/browser-skill/
 !claude/skills/claude-cron-automation/
+!claude/skills/pr-review/
 !claude/skills/web-access/
 codex/skills/*
-!codex/skills/AGENTS.md
 !codex/skills/README.md
 !codex/skills/insights/
-!codex/skills/toil-offloading/
+!codex/skills/toil-offloading-codex/
 pi/skills/*
 !pi/skills/toil-offloading-pi/
 omp/skills/*

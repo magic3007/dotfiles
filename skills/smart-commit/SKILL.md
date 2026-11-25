@@ -15,56 +15,13 @@ Invoke with `/smart-commit` or when the task matches.
 
 - `--dry-run`: Only show the proposed commit plan without executing
 
-## Conventional Commits Specification
+## Commit Message Rules
 
-Every commit message MUST follow this format:
-
-```
-<type>[optional scope][optional !]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Types
-
-| Type       | When to Use                                          |
-| ---------- | ---------------------------------------------------- |
-| `feat`     | A new feature (correlates with MINOR in SemVer)      |
-| `fix`      | A bug fix (correlates with PATCH in SemVer)          |
-| `docs`     | Documentation only changes                           |
-| `style`    | Formatting, missing semi-colons, etc. (not CSS)      |
-| `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `perf`     | Performance improvement                              |
-| `test`     | Adding or correcting tests                           |
-| `build`    | Changes to build system or external dependencies     |
-| `ci`       | Changes to CI configuration files and scripts        |
-| `chore`    | Other changes that don't modify src or test files    |
-| `revert`   | Reverts a previous commit                            |
-
-### The 50/72 Rule & Formatting Rules
-
-**Subject line (first line):**
-
-1. Separate subject from body with a **blank line**
-2. Limit the **entire** subject line to **~50 characters** (type + scope + description combined). Hard limit: 72 chars.
-3. **Capitalize** the description after `<type>(scope):`
-4. **No period** at the end of the subject line
-5. Use **imperative mood**
-6. All commit messages in **English**
-
-**Body:**
-
-7. **Wrap at 72 characters**
-8. Explain **what and why**, not how
-
-**Scope & Breaking Changes:**
-
-- `scope`: noun describing the section of the codebase
-- `!` after type/scope: indicates a BREAKING CHANGE
-- `BREAKING CHANGE:` footer for breaking change details
-- `Closes #123` / `Refs #456` in footer to reference issues
+Every commit message follows
+[`~/.agents/skills/smart-commit/references/conventional-commits.md`](references/conventional-commits.md):
+the `<type>(scope): <Capitalized description>` format, the type table, the 50/72
+subject and body limits, the imperative mood, and the breaking-change footers.
+Read it once before planning; every message in the plan must satisfy it.
 
 ## Workflow
 
@@ -240,15 +197,12 @@ unavailable, or when one hunk mixes two concerns, drive the index directly with
 `scripts/stage_hunks.py` (bundled with this skill):
 
 ```bash
-# 1. The diff must still be staged (or already reset) — inspect hunks and change groups
-python3 <skill>/scripts/stage_hunks.py --list <path>
+# 1. The index must equal HEAD for the path — run `git reset` once before the first commit
+python3 ~/.agents/skills/smart-commit/scripts/stage_hunks.py --list <path>
 
-# 2. Index must equal HEAD for that path, so reset once before the first commit
-git reset
-
-# 3. Stage whole hunks, and within a mixed hunk only its 2nd change group
-python3 <skill>/scripts/stage_hunks.py --take 0,1,2,4,5 <path>
-python3 <skill>/scripts/stage_hunks.py --take 1,2,3 --split 5:1 <path>
+# 2. Stage whole hunks, and within a mixed hunk only its 2nd change group
+python3 ~/.agents/skills/smart-commit/scripts/stage_hunks.py --take 0,1,2,4,5 <path>
+python3 ~/.agents/skills/smart-commit/scripts/stage_hunks.py --take 1,2,3 --split 5:1 <path>
 ```
 
 The helper reads the file's full diff (working tree vs HEAD), rewrites the chosen

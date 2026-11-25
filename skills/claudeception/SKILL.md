@@ -1,12 +1,9 @@
 ---
 name: claudeception
 description: |
-  Claudeception is a continuous learning system that extracts reusable knowledge from work sessions.
-  Triggers: (1) /claudeception command to review session learnings, (2) "save this as a skill"
-  or "extract a skill from this", (3) "what did we learn?", (4) After any task involving
-  non-obvious debugging, workarounds, or trial-and-error discovery. Creates new Claude Code
-  skills when valuable, reusable knowledge is identified, saving them in the current
-  project's .claude/skills/ directory by default.
+  Archived Claudeception v3.1.0 continuous-learning flow, kept only as the `old_skill` baseline
+  of metaception's two-arm test suite (`skills/metaception/tests/`). It is not the active
+  extraction skill; `metaception` is.
 author: Claude Code
 version: 3.1.0
 allowed-tools:
