@@ -129,8 +129,8 @@ Plain `cc`, `cx`, `oc` start the default backend (`agyh`/`agyc` select the per-a
 | Tool | Config |
 |------|--------|
 | **cargo** | rsproxy.cn mirror |
-| **pip** | TUNA mirror (tsinghua) |
-| **conda / mamba** | TUNA mirror |
+| **pip** | PKU mirror |
+| **conda / mamba** | PKU mirror |
 | **npm** | npmmirror.com |
 | **R** | `.Rprofile` |
 
@@ -154,7 +154,7 @@ Plain `cc`, `cx`, `oc` start the default backend (`agyh`/`agyc` select the per-a
 ### Productivity & Knowledge
 | Tool | Config |
 |------|--------|
-| **Obsidian** | Plugins, appearance, core plugin settings |
+| **Obsidian** | `obsidian/` — plugins, appearance, core plugin settings; copied by hand, not linked |
 | **wechat-reminder** | Dual-channel (WeChat PushDeer + Feishu webhook), Claude Code hook integration |
 
 ### Networking (Tailscale mesh)

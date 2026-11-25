@@ -169,14 +169,18 @@ first two and nothing else, so a check added locally is in CI in the same commit
 
 ## 7. Boundaries
 
-- **Vendored trees** — `skills/scientific-agent-skills/`, `dotbot/`, `vim/vimrc/`,
-  `neovim/`, `oh-my-zsh/` plugins. Upstream owns their contents; the checks skip
-  them and only the integration edges are our business.
+- **Vendored trees** — `skills/scientific-agent-skills/`, `dotbot/`, `dotbot-git/`,
+  `vim/vimrc/`, `neovim/nvim-basic-ide/`, `ranger/plugins/ranger_devicons/`,
+  `tmux.conf` (gpakosz/.tmux), `gdb/gdbinit_dashboard`, `gdb/gdbinit_dbinit_stl_views`,
+  `ranger/commands_full.py`, `obsidian/plugins/claudian/`,
+  `claude/skills/web-access/`, `omp/skills/skill-creator/`. Upstream owns their
+  contents; only the integration edges are our business.
 - **Archived** — `archive/fish/`. Frozen so an existing fish login keeps working.
   Do not add to it.
 - **Runtime state** — anything under `~/` that a tool writes: sessions, caches,
   lockfiles, `~/.omp/plugins`, `~/.minimax/` except `config.yaml`. It never comes
   back into the repository.
 - **Standalone tools** — `scripts/backup_to_NAS.sh`, `scripts/mount_sshfs.sh`,
-  `scripts/tailscale-setup.sh`, `scripts/yolo-generic.sh`. Run by hand or by one
+  `scripts/tailscale-setup.sh`, `scripts/yolo-generic.sh`, `codex/mihomo/`,
+  `self-reflection/`, `docker/`, `obsidian/`. Run or installed by hand or by one
   install step; they are not part of the link/merge/seed model.

@@ -218,8 +218,7 @@
     ~/.pi/agent/models.json: pi/models.json
     ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
     ~/.pi/agent/extensions: pi/extensions
-    # pi/agents 是 pi 专属 subagent 定义（dspix / glmpix）。
-    # ~/.pi/agent/agents 不存在，故整目录链接，与 extensions 一致。
+    # pi/agents 是 pi 专属 subagent 定义；~/.pi/agent/agents 不存在，故整目录链接，与 extensions 一致。
     ~/.pi/agent/agents: pi/agents
     # mcode（minimax Code）的 ~/.minimax/config.yaml 不 link：mcode 保存配置是「写
     # .config-tmp-<hex> 临时文件 + rename 覆盖配置路径本身」，主写入路径不解析 realpath，

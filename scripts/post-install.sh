@@ -9,8 +9,8 @@
 # must not stop the others, so failures are reported and the exit status is
 # non-zero at the end (install.conf.yaml ignores it on purpose).
 #
-# A hook can also be run directly — e.g. sync.sh runs only the seed hook,
-# because the 15-minute sync must stay cheap.
+# A hook can also be run directly. The 15-minute sync (sync.conf.yaml `shell:`)
+# runs the seed hook and calls the merge scripts itself, skipping the rest.
 set -uo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
