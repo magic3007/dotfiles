@@ -42,7 +42,6 @@
     "deny": [],
     "defaultMode": "default"
   },
-  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
