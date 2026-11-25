@@ -1,0 +1,24 @@
+# Gateways this repository reaches from more than one harness: the one place
+# that states each gateway's host and the variable its key is read from. A
+# vendor used by a single file has nothing to drift against and stays there.
+#
+# `host` is the base URL an anthropic-messages client takes: those clients
+# append `/v1/messages` themselves, so the base carries no `/v1`. A harness
+# whose client appends only its own path (mcode's AI SDK posts to
+# `<base>/messages`, codex posts to `<base>/responses`) needs the `/v1` in the
+# base; `urls` gives its file that form. omp strips a trailing `/v1` before
+# joining, so it would hide a wrong form — Pi does not.
+#
+# Credential reference styles are fixed per file by the tool that expands them;
+# provider_consistency.py knows them and compares this entry's `credential`
+# against them.
+providers:
+  kafara:
+    host: https://ai.kafara.men
+    credential: KAFARA_API_KEY
+  mafia:
+    host: https://api.appintheloop.com
+    credential: MAFIA_API_KEY
+    urls:
+      mcode/config.yaml: https://api.appintheloop.com/v1
+      codex/config.toml: https://api.appintheloop.com/v1

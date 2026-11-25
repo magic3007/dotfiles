@@ -155,7 +155,6 @@ provider:
     whitelist:
       - MiniMax-M3
     options:
-      apiKey: sk-xxx
       baseURL: https://agent.minimaxi.com/mavis/api/v1/llm/v1
 defaultModelContextWindow: 400000
 defaultModelThinking:

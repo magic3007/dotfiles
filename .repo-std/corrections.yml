@@ -84,3 +84,14 @@
     Checks and ledger entries correspond one to one, and every check has a
     violating fixture.
   check: corrections_ledger
+
+- origin: >-
+    2026-11-25: the mafia gateway was written six ways (omp models.yml, omp
+    gateways-login.json, Pi, mcode twice, Codex): with and without /v1, once with
+    a trailing slash, and named appintheloop in Pi; kafara's context window was
+    1,000,000 in omp and 200,000 in Pi. omp strips a trailing /v1, so a wrong
+    form worked in omp and broke in Pi.
+  rule: >-
+    Every gateway's base URL and credential reference come from
+    .repo-std/providers.yml, in the form it declares for each harness file.
+  check: provider_consistency

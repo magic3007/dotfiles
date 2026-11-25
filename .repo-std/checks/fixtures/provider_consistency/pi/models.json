@@ -1,0 +1,10 @@
+{
+    "providers": {
+        "kafara": {
+            "baseUrl": "https://ai.kafara.men/v1/",
+            "api": "anthropic-messages",
+            "apiKey": "$WRONG_KEY",
+            "models": []
+        }
+    }
+}

@@ -158,8 +158,8 @@
                 }
             ]
         },
-        "appintheloop": {
-            "baseUrl": "https://api.appintheloop.com/",
+        "mafia": {
+            "baseUrl": "https://api.appintheloop.com",
             "api": "anthropic-messages",
             "apiKey": "$MAFIA_API_KEY",
             "headers": {
@@ -168,7 +168,7 @@
             "models": [
                 {
                     "id": "claude-fable-5",
-                    "name": "Fable 5 (appintheloop)",
+                    "name": "Fable 5 (mafia)",
                     "reasoning": true,
                     "thinkingLevelMap": {
                         "off": null,
@@ -187,14 +187,14 @@
                 },
                 {
                     "id": "claude-opus-5-5",
-                    "name": "Opus 5.5 (appintheloop)",
+                    "name": "Opus 5.5 (mafia)",
                     "reasoning": true,
                     "input": ["text", "image"],
                     "contextWindow": 1000000
                 },
                 {
                     "id": "MiniMax-M3.1-Flash",
-                    "name": "MiniMax-M3.1-Flash (appintheloop)",
+                    "name": "MiniMax-M3.1-Flash (mafia)",
                     "reasoning": true,
                     "thinkingLevelMap": {
                         "off": null,
@@ -223,28 +223,28 @@
                     "name": "Opus 4.7 (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 200000
+                    "contextWindow": 1000000
                 },
                 {
                     "id": "devin/claude-opus-5-5",
                     "name": "Opus 5.5 (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 200000
+                    "contextWindow": 1000000
                 },
                 {
                     "id": "devin/claude-haiku-5-5",
                     "name": "Haiku 5.5 (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 200000
+                    "contextWindow": 1000000
                 },
                 {
                     "id": "grok-4.7",
                     "name": "Grok 4.7 (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 200000
+                    "contextWindow": 500000
                 },
                 {
                     "id": "gpt-6-luna",
@@ -279,21 +279,21 @@
                     "name": "GPT-5.6 Sol (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 272000
+                    "contextWindow": 372000
                 },
                 {
                     "id": "gpt-5.6-luna",
                     "name": "GPT-5.6 Luna (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 272000
+                    "contextWindow": 372000
                 },
                 {
                     "id": "gpt-5.6-terra",
                     "name": "GPT-5.6 Terra (Kafara AI)",
                     "reasoning": true,
                     "input": ["text", "image"],
-                    "contextWindow": 272000
+                    "contextWindow": 372000
                 },
                 {
                     "id": "gpt-5.5",

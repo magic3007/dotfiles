@@ -59,7 +59,7 @@ providers:
         defaultLevel: max
         requiresEffort: true
   mafia:
-    baseUrl: https://api.appintheloop.com/v1
+    baseUrl: https://api.appintheloop.com
     api: anthropic-messages
     auth: apiKey
     # 不写真实 key。值先走 omp 的 resolveConfigValue()：
@@ -148,12 +148,13 @@ providers:
       name: gemini-4-carbon
       contextWindow: 1048576
       maxTokens: 943718
-  # kafara（ai.kafara.men）：/v1/models 只回 id/object/created/owned_by，不声明 token_limits，
-  # 发现值一律落到插件兜底 200000/64000。窗口照 mafia 块同款模型补成 1M（内置目录 anthropic
-  # 的 claude-opus-5-5 / claude-fable-5-1）；kafara 侧 id 是 devin/ 前缀或 -high 后缀，按原样写。
-  # 不需要 mafia 的 X-Sub-Module 头：默认编码系统提示 + 无头直连实测 200（stopReason=stop）。
+  # kafara（ai.kafara.men）：窗口/输出上限按网关 GET /v1/models 报的
+  # max_input_tokens / max_tokens 写（2026-11-25 实测 Claude 家族 1,000,000 / 64,000，
+  # gpt-6.1-sol 272,000 / 128,000）；没声明的项才由 omp 的兜底 200000/64000 补。
+  # kafara 侧 id 是 devin/ 前缀或 -high 后缀，按原样写。不需要 mafia 的
+  # X-Sub-Module 头：默认编码系统提示 + 无头直连实测 200（stopReason=stop）。
   kafara:
-    baseUrl: https://ai.kafara.men/v1
+    baseUrl: https://ai.kafara.men
     api: anthropic-messages
     auth: apiKey
     # apiKey 同 mafia 块：用 `!命令` 从 ~/.common_shell_setup_local.sh 取，不靠环境
@@ -190,18 +191,15 @@ providers:
       thinking:
         mode: anthropic-adaptive
         efforts: ["low","medium","high","xhigh","max"]
-    # gpt-6.1-sol 是 OpenAI 家族，不是 Claude：窗口/输出上限照 openrouter 目录里
-    # 同一个底层模型 openai/gpt-6.1-sol 的 1,050,000 / 128,000，不照 anthropic 的 1M/64K。
-    # 两个数字的来源分强弱：128,000 有网关实测（2026-11-12 直连 /v1/messages，
-    # max_tokens=128000 与 200000 都回 200，说明中继不设上限、也不报错，128000 只是
-    # 上游真实生成上限）；1,050,000 只是目录值，没做百万 token 实测（一次探针就是
-    # 几十万输入 token 的真金白银），当成声明值而不当已验证事实。
+    # gpt-6.1-sol 是 OpenAI 家族，不是 Claude：窗口/输出上限按网关 GET /v1/models
+    # 报的 272,000 / 128,000 写。不抄 openrouter 目录里同底层模型的 1,050,000：
+    # 网关自己只接 272,000 输入，声明成 1M 只会发出网关拒收的请求。
     # thinking 不写：发现值已是 low…max（OpenAI 家族不认 anthropic-adaptive 的
     # budget 语义），写了反而要用错的 mode 覆盖对的档位。
     - id: gpt-6.1-sol
       name: gpt-6.1-sol
       reasoning: true
-      contextWindow: 1050000
+      contextWindow: 272000
       maxTokens: 128000
     # Gemini 4 家族的 kafara 侧两个 id：carbon 带 devin/ 前缀（同 mafia 的
     # gemini-4-carbon，走 google 上游），hydrogen 只有 -xhigh 变体。窗口/输出上限

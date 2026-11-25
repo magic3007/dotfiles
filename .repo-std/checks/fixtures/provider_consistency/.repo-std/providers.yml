@@ -1,0 +1,6 @@
+# Minimal manifest for the fixture: one gateway with no per-file form, so the
+# fixture's drift is a plain mismatch.
+providers:
+  kafara:
+    host: https://ai.kafara.men
+    credential: KAFARA_API_KEY
