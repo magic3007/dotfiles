@@ -70,11 +70,11 @@ max_depth = 1
 
 [agents.dspix]
 description = "Low-cost worker for simple, mechanical, independent toil."
-config_file = "../dotfiles/codex/agents/dspix.toml"
+config_file = "agents/dspix.toml"
 
 [agents.glmpix]
 description = "Stronger worker for tasks needing non-trivial reasoning, diagnosis, or review."
-config_file = "../dotfiles/codex/agents/glmpix.toml"
+config_file = "agents/glmpix.toml"
 
 [features]
 js_repl = false

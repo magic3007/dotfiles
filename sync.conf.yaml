@@ -127,6 +127,7 @@
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.codex/AGENTS.md: codex/AGENTS.md
+    ~/.codex/agents: codex/agents
     # ~/.codex/config.toml is NOT linked: Codex edits it in place and writes
     # machine state into it, which a symlink would push into this repo.
     # scripts/codex-config-sync.py merges the tracked codex/config.toml into it.

@@ -468,9 +468,9 @@ okpi()   { pi --provider kafara --model 'devin/claude-opus-5-5' "$@"; }
 fkpi()   { pi --provider kafara --model 'devin/claude-fable-5-1' "$@"; }
 
 # omp (oh-my-pi / @oh-my-pi/pi-coding-agent) model shortcuts, mirroring the *pi group above.
-# Named after the *roles* in ~/dotfiles/omp/config.yml (modelRoles), so provider, model id,
+# Named after the *roles* in omp/config.yml (modelRoles), so provider, model id,
 # base URL and thinking level stay in one place; omp's built-in providers (deepseek, devin,
-# …) need no entry in ~/dotfiles/omp/models.yml, only DEEPSEEK_API_KEY etc. in the environment.
+# …) need no entry in omp/models.yml, only DEEPSEEK_API_KEY etc. in the environment.
 # Tool calls are already pre-approved (tools.approvalMode = yolo), so no extra flags here.
 # Anything else: `omp --model <role>` or `omp --model <provider>/<model-id>`.
 dvomp()   { omp --model devin-opus       "$@"; }  # claude-opus-5-5 via devin

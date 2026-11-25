@@ -7,7 +7,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
-        <string>__HOME__/dotfiles/sync.sh</string>
+        <string>__DOTFILES__/sync.sh</string>
     </array>
     <key>StartInterval</key>
     <integer>900</integer>

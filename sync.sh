@@ -53,7 +53,7 @@ install_launchagent() {
     local plist_dest="$HOME/Library/LaunchAgents/com.dotfiles.sync.plist"
 
     mkdir -p "$HOME/Library/LaunchAgents"
-    sed "s|__HOME__|$HOME|g" "$plist_src" > "$plist_dest"
+    sed "s|__DOTFILES__|$DOTFILES_DIR|g" "$plist_src" > "$plist_dest"
 
     # Unload first if already loaded, then reload
     launchctl unload "$plist_dest" 2>/dev/null || true
@@ -65,10 +65,10 @@ install_systemd_timer() {
     local unit_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
     mkdir -p "$unit_dir"
 
-    cp "$DOTFILES_DIR/systemd/dotfiles-sync.service" "$unit_dir/"
+    sed "s|__DOTFILES__|$DOTFILES_DIR|g" "$DOTFILES_DIR/systemd/dotfiles-sync.service" \
+        > "$unit_dir/dotfiles-sync.service"
     cp "$DOTFILES_DIR/systemd/dotfiles-sync.timer" "$unit_dir/"
 
-    # %h expands to $HOME automatically in systemd user units
     systemctl --user daemon-reload
     systemctl --user enable --now dotfiles-sync.timer
     echo "✅ Installed systemd timer (enabled and started)"

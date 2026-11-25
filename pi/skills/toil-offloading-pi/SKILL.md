@@ -39,7 +39,7 @@ context on the plan and the acceptance decision, not on typing out the changes.
 ### Where the tier is declared
 
 `~/.pi/agent/herdr-agents/config.json` holds the durable defaults, and the
-checked-in source of that file is `~/dotfiles/pi/herdr-agents/config.json`
+checked-in source of that file is `pi/herdr-agents/config.json` in the dotfiles repository
 (the seed hook copies it only when the target is missing). The relevant key is
 `models.default`; per-role pins live in role frontmatter and per-task overrides
 in the tool call.

@@ -207,6 +207,7 @@
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.codex/AGENTS.md: codex/AGENTS.md
+    ~/.codex/agents: codex/agents
     # ~/.codex/config.toml is NOT linked on any platform: Codex edits it in
     # place and writes machine state into it ([projects.*] trust, [hooks.state],
     # [marketplaces.*]), which a symlink would push into this repo. The tracked
