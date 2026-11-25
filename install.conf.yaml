@@ -335,6 +335,14 @@
         if: '[ -x /home/magic/.local/bin/grok-bot ]'
         path: grok-bot/grok-bot.desktop
 
+    # ---- Local proxy environment (both platforms) ----
+    # 端口不写死：proxy-env 探测 127.0.0.1 上在监听的候选端口，shell 与
+    # systemd 用户环境都从它派生。设计与限制见 proxy/README.md。
+    ~/.local/bin/proxy-env: proxy/proxy-env.sh
+    ~/.config/systemd/user/proxy-env.service:
+        if: 'test "$(uname)" = Linux'
+        path: proxy/proxy-env.service
+
 # ---------------------------------------------------------------------------
 # Sync vim plugins to local disk for faster startup on network filesystems
 # ---------------------------------------------------------------------------

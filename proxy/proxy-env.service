@@ -1,0 +1,10 @@
+[Unit]
+Description=Publish the live local proxy port to the systemd user environment
+After=clash-for-linux.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/proxy-env --systemd
+
+[Install]
+WantedBy=clash-for-linux.service

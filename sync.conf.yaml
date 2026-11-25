@@ -206,6 +206,13 @@
         if: '[ -x /home/magic/.local/bin/grok-bot ]'
         path: grok-bot/grok-bot.desktop
 
+    # ---- Local proxy environment (both platforms) ----
+    # 说明见 install.conf.yaml 同名条目与 proxy/README.md。
+    ~/.local/bin/proxy-env: proxy/proxy-env.sh
+    ~/.config/systemd/user/proxy-env.service:
+        if: 'test "$(uname)" = Linux'
+        path: proxy/proxy-env.service
+
 # Skill views are generated (per-skill links), not whole-dir links: see
 # scripts/sync-skills.py. Never exits non-zero on conflicts (prints warnings).
 - shell:
