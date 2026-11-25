@@ -94,6 +94,8 @@ install_from_release() {
     return 0
 }
 
+[ "$(uname)" = Darwin ] || exit 0
+
 # Check if already installed
 if command -v gh >/dev/null 2>&1; then
     info "GitHub CLI already installed: $(gh --version 2>&1 | head -1)"

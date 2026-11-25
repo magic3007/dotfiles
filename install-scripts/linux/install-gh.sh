@@ -14,6 +14,8 @@ NC='\033[0m'
 info()  { printf "${GREEN}[✓]${NC} %s\n" "$1"; }
 warn()  { printf "${YELLOW}[!]${NC} %s\n" "$1"; }
 
+[ "$(uname)" = Linux ] || exit 0
+
 # Check if already installed
 if command -v gh >/dev/null 2>&1; then
     info "GitHub CLI already installed: $(gh --version 2>&1 | head -1)"
