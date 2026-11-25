@@ -2,24 +2,8 @@ providers:
   minimax-test:
     baseUrl: https://openplatform-sh-pre.xaminim.com/anthropic/v1
     api: anthropic-messages
-    # key 不写环境变量名，写 `!命令`：真值只在未跟踪的 ~/.common_shell_setup_local.sh
-    # 里 export，命令直接去那个唯一来源取，跟 gateways-login.json 里 kafara/mafia
-    # 的写法一致。为什么不能退回环境变量名（2026-11-02 实测的故障）：
-    #   1. herdr 起的 pane 拿不到这些 export。herdr-core 是 systemd --user 的
-    #      transient unit（hc-serve-<hash>.service），它的环境来自 systemd --user
-    #      manager，不 source ~/.common_shell_setup.sh，manager 自己也没有这些 key。
-    #   2. 环境变量缺失时 omp 的 resolveConfigValue() 走第 3 条分支，把整串
-    #      "MINIMAX_MY_API_KEY" 当字面量发出去，网关回 401
-    #      "login fail: Please carry the API secret key in the 'X-Api-Key' field"。
-    #   3. session 01a19bfc（herdr worktree frontcs2-wt/review）就是这么死的：主模型
-    #      kafara 撞 429 usage_limit_reached，降级到 minimax-test 后 M78 与
-    #      MiniMax-M3.1-Flash 连撞两次 401，整条 fallback 链断掉。
-    # `!命令` 由 omp 用 /bin/sh -c 跑（10s 超时，成功缓存，失败 30s 退避），所以
-    # 任何启动路径（herdr pane、systemd unit、xmatrix daemon）都取得到 key。
-    # 改这行当心 YAML 引号：双引号标量里的 `tr -d '"'` 必须写成 `tr -d '\""'"`；少末尾
-    # 那个 `'` 时 YAML 照样解析，但 shell 串引号不闭合，omp 只报 No API key found。
-    # 上游 xaminim openplatform 两种头都收（2026-11-02 实测：只发
-    # Authorization: Bearer 回 200，只发 X-Api-Key 也回 200），不必再手写 headers。
+    # apiKey 写 `!命令` 引用，不写环境变量名；规则、YAML 引号与验证见
+    # omp/README.md「硬性约束」第 3 条。
     auth: apiKey
     apiKey: "!grep -m1 '^export MINIMAX_MY_API_KEY=' $HOME/.common_shell_setup_local.sh | cut -d= -f2- | tr -d '\"'"
     disableStrictTools: true
