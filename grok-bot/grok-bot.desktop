@@ -1,0 +1,29 @@
+# XDG 自动启动项（autostart）。桌面环境在用户登录图形会话后执行它：
+# GNOME / KDE / Xfce 都读 ~/.config/autostart/*.desktop。
+#
+# 为什么不用 systemd user 单元：Grok Bot 是 Electron 图形程序，需要会话里的
+# DISPLAY/WAYLAND_DISPLAY 和 session D-Bus。systemd user 服务死在登录前，
+# 拿不到这些变量，会直接 abort。类比 Python：这不是常驻 daemon，是 GUI 客户端，
+# 生命周期挂在「桌面会话」这个父进程上。
+[Desktop Entry]
+Type=Application
+Name=Grok Bot
+GenericName=AI Bot Desktop
+Comment=Grok Bot desktop agent
+# Exec 不经过 shell，也不展开 `~`，所以必须写绝对路径。也不能写 `grok-bot`
+# 让 PATH 找：GNOME 会话的 PATH 通常不含 ~/.local/bin（systemd user manager
+# 的环境里就没有），autostart 会静默失败。
+# 这个启动器由 grok-bot-linux-install 技能创建，里面已带
+# --disable-gpu --in-process-gpu --no-sandbox（本机必需，见该技能）。
+Exec=/home/magic/.local/bin/grok-bot
+# 图标只用于桌面环境的展示；AppImage 升级后旧版本目录被删也无妨（会退化
+# 成通用图标），不影响启动。
+Icon=/home/magic/Applications/grok-bot-0.78.1/grok-bot.png
+Terminal=false
+Categories=Development;
+# 与启动器注册的 .desktop 一致，让 GNOME 把窗口归到 Grok Bot 这个应用下。
+StartupWMClass=grok-bot
+# GNOME 专用键（写 false 就等于禁用；这里显式写 true 表明意图，其它桌面环境
+# 忽略这两行）。延迟 5 秒避开登录瞬间的 D-Bus / GPU 初始化竞争。
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=5

@@ -323,6 +323,19 @@
     # ---- Warp ----
     ~/.warp: warp
 
+    # ---- Desktop autostart (Linux/GNOME, KDE, Xfce) ----
+    # Grok Bot 由 grok-bot-linux-install 技能做用户级安装（无 root）：
+    #   ~/.local/bin/grok-bot → ~/Applications/grok-bot-<ver>/AppRun，启动器里
+    #   写死本机必需的 Chromium 开关（--disable-gpu --in-process-gpu --no-sandbox）。
+    # 仓库只拥有「登录即启动」这一条 XDG autostart；~/.local/share/applications/
+    # 下的启动器是安装产物（含版本号），由技能生成，不在这里链接。
+    # `if` 用绝对路径而非 $HOME：.desktop 的 Exec 不展开 `~`，两边必须指向同一处。
+    # 没装 grok-bot 的机器（含 macOS）条件为假，不会留下一条注定失败的启动项；
+    # grok-bot 装好后只需再跑一次 ./install（或等 15 分钟的 sync 补上）。
+    ~/.config/autostart/grok-bot.desktop:
+        if: '[ -x /home/magic/.local/bin/grok-bot ]'
+        path: grok-bot/grok-bot.desktop
+
 # ---------------------------------------------------------------------------
 # Sync vim plugins to local disk for faster startup on network filesystems
 # ---------------------------------------------------------------------------

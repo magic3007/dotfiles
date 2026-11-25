@@ -199,6 +199,14 @@
     ~/.config/herdr-app/themes/noir.json: herdr-app/themes/noir.json
     ~/.config/herdr-app/themes/dracula.json: herdr-app/themes/dracula.json
 
+    # ---- Desktop autostart (Linux/GNOME) ----
+    # Grok Bot 登录即启动。链接本体在 grok-bot/grok-bot.desktop；说明见
+    # install.conf.yaml 同名条目。这里也要写：15 分钟的 sync 只读本文件，
+    # 缺了这条，链接被删/丢一次就永远补不回来（仓库约定：两边都写）。
+    ~/.config/autostart/grok-bot.desktop:
+        if: '[ -x /home/magic/.local/bin/grok-bot ]'
+        path: grok-bot/grok-bot.desktop
+
 # Skill views are generated (per-skill links), not whole-dir links: see
 # scripts/sync-skills.py. Never exits non-zero on conflicts (prints warnings).
 - shell:

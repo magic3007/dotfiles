@@ -116,6 +116,7 @@ Each row is a whole task: where to start, what to touch, how to know it worked.
 | keep a skill private | `.gitignore` | add the directory path; this repository is public | `bash .repo-std/gate.sh` |
 | change an omp model or role | `omp/models.yml`, `omp/config.yml` | `config.yml` takes **no comments** — explanations go in `omp/README.md` | `omp models`, then start a session |
 | change a Codex/mcode/Antigravity setting | the tracked file named in §2 | never the live file under `~/` | re-run the matching `scripts/*-sync.py` |
+| make a GUI app start at login | `grok-bot/README.md` | XDG autostart entry linked from **both** dotbot configs, `if:`-guarded on the absolute launcher path | `bash .repo-std/gate.sh`, then log in again |
 | record a correction | `.repo-std/` | §5 | `bash .repo-std/gate.sh --prove` |
 
 Harness-specific depth that does not fit a table: `omp/README.md` (models,
