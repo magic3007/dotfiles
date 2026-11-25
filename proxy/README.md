@@ -12,11 +12,11 @@ ports (`PROXY_PORTS` overrides the list) and prints the eight proxy variables;
 
 |Consumer|How it gets the port|Platform|
 |---|---|---|
-|new shells|`proxy_on` in `common_shell_setup.sh` runs at startup; no live port clears inherited values|Linux, macOS|
+|new shells|`proxy_on` in `shell/common.d/90-proxy.sh` runs at startup; no live port clears inherited values|Linux, macOS|
 |one command|`pc <cmd>`|Linux, macOS|
 |systemd user services|`proxy/proxy-env.service` runs `proxy-env --systemd` each time `clash-for-linux.service` starts and writes the user manager environment|Linux|
 
-`scripts/post-install.d/80-proxy-env.sh` enables the unit when
+`scripts/proxy-env-unit.sh` (a provision step) enables the unit when
 `clash-for-linux.service` exists. Do not add `HTTP_PROXY` and similar keys to
 `~/.config/environment.d/`: that file is read only at login and pins a port.
 

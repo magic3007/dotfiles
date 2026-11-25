@@ -18,10 +18,10 @@ and on macOS Codex replaces the symlink with a regular file anyway.
 | `~/.codex/config.toml` | no | the live file Codex owns, mode 0600, with its own state |
 
 Precedence mirrors git config: `config_local.toml` > `codex/config.toml` >
-the live file. `scripts/codex-config-sync.py` merges them and rewrites the live
-file when the result differs; it also replaces a leftover symlink with a real
-file. It runs from `scripts/post-install.d/30-codex-config.sh` and from the
-`shell:` section of `sync.conf.yaml`.
+the live file. `scripts/config-merge.py` merges them and rewrites the live file
+when the result differs; it also replaces a leftover symlink with a real file
+and keeps the previous content as `config.toml.pre-sync`. `scripts/apply.sh`
+runs it on every install and every 15-minute tick.
 
 Add shared keys only to `codex/config.toml`. Never add keys Codex writes itself.
 

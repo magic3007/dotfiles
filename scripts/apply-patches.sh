@@ -3,8 +3,8 @@
 #
 # Usage: apply-patches.sh <target-dir> <patch> [<patch> ...]
 #
-# Used by the post-install hooks for vendored dependencies that are pinned to a
-# revision too old to work on the local runtime (see post-install.d/). The
+# Used by scripts/neovim-runtime.sh for vendored dependencies that are pinned to
+# a revision too old to work on the local runtime. The
 # target must be a git checkout, which is what makes idempotency cheap: a patch
 # that is already applied passes the reverse check and is skipped.
 set -uo pipefail

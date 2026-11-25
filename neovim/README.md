@@ -15,7 +15,7 @@ the newest `nvim-treesitter` dropped the `nvim-treesitter.configs` /
 `nvim-treesitter.query` modules that `nvim-ts-context-commentstring`,
 `vim-illuminate` and `indent-blankline` load).
 
-Two of those pins had drifted; `scripts/post-install.d/20-neovim-runtime.sh` puts
+Two of those pins had drifted; `scripts/neovim-runtime.sh` puts
 them back, and also applies the local patches in `patches/` — see the 0.12
 compatibility list below.
 
@@ -24,7 +24,7 @@ compatibility list below.
 The local Neovim is 0.12, which is newer than everything the config assumes.
 These fixes keep startup and per-buffer rendering clean:
 
-1. **Plugin revisions restored** — `scripts/post-install.d/20-neovim-runtime.sh`
+1. **Plugin revisions restored** — `scripts/neovim-runtime.sh`
    checks out
    `nvim-treesitter` and `nvim-lspconfig` at the pinned commits. `bash`,
    `python` and `cpp` also had never been compiled; `lua`, `markdown` and
@@ -98,19 +98,18 @@ shell via `zsh-wakatime`; only the Neovim plugin was dropped.
 ## Usage
 
 ```bash
-./install                      # links the config and runs the post-install hooks
+./install                      # links the config and runs the provision steps
 nvim --headless -c q           # should print nothing
 ```
 
-The hooks live in `scripts/post-install.d/` and are idempotent; `./install` runs
-all of them via `scripts/post-install.sh`. The Neovim hook needs the plugins to
-be installed already, so start nvim at least once first (packer bootstraps
-itself on first launch). After a `:PackerUpdate`, run
-`scripts/post-install.d/20-neovim-runtime.sh` directly — packer honours the
-pins on install, not on update.
+The Neovim step is `scripts/neovim-runtime.sh`, run by `scripts/provision.sh` on
+every `./install`; it is idempotent. It needs the plugins to be installed
+already, so start nvim at least once first (packer bootstraps itself on first
+launch). After a `:PackerUpdate`, run `bash scripts/neovim-runtime.sh` directly —
+packer honours the pins on install, not on update.
 
 ## When something breaks on upgrade
 
 `git -C neovim/nvim-basic-ide log` shows the customizations on top of upstream.
 A plugin that drifted from its pin is the usual suspect — compare with
-`lua/user/plugins.lua`, then re-run `scripts/post-install.d/20-neovim-runtime.sh`.
+`lua/user/plugins.lua`, then re-run `bash scripts/neovim-runtime.sh`.

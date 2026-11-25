@@ -34,11 +34,11 @@ do_sync() {
     # Pull latest code (fast-forward only to prevent accidental merges)
     git pull --ff-only origin master >> "$LOG_FILE" 2>&1
 
-    # Initialize submodule (dotbot)
     git submodule update --init >> "$LOG_FILE" 2>&1
 
-    # Apply cross-platform symlinks
-    "$DOTFILES_DIR/dotbot/bin/dotbot" -c "$DOTFILES_DIR/sync.conf.yaml" >> "$LOG_FILE" 2>&1
+    "$DOTFILES_DIR/dotbot/bin/dotbot" -d "$DOTFILES_DIR" -c "$DOTFILES_DIR/install.conf.yaml" \
+        --only clean create link >> "$LOG_FILE" 2>&1
+    bash "$DOTFILES_DIR/scripts/apply.sh" >> "$LOG_FILE" 2>&1
 
     echo "✅ dotfiles synced successfully at $(date '+%Y-%m-%d %H:%M:%S')" | tee -a "$LOG_FILE"
 }
@@ -49,7 +49,7 @@ install_launchagent() {
         exit 1
     fi
 
-    local plist_src="$DOTFILES_DIR/com.dotfiles.sync.plist"
+    local plist_src="$DOTFILES_DIR/sync/com.dotfiles.sync.plist"
     local plist_dest="$HOME/Library/LaunchAgents/com.dotfiles.sync.plist"
 
     mkdir -p "$HOME/Library/LaunchAgents"
@@ -65,9 +65,9 @@ install_systemd_timer() {
     local unit_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
     mkdir -p "$unit_dir"
 
-    sed "s|__DOTFILES__|$DOTFILES_DIR|g" "$DOTFILES_DIR/systemd/dotfiles-sync.service" \
+    sed "s|__DOTFILES__|$DOTFILES_DIR|g" "$DOTFILES_DIR/sync/dotfiles-sync.service" \
         > "$unit_dir/dotfiles-sync.service"
-    cp "$DOTFILES_DIR/systemd/dotfiles-sync.timer" "$unit_dir/"
+    cp "$DOTFILES_DIR/sync/dotfiles-sync.timer" "$unit_dir/"
 
     systemctl --user daemon-reload
     systemctl --user enable --now dotfiles-sync.timer

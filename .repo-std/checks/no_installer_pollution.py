@@ -6,11 +6,10 @@ installer that appends to them edits the repository itself. Observed with the
 Antigravity CLI installer (2026-11-16): four rc files gained a PATH line, three
 of them tracked here.
 
-Only exact installer signatures are matched. A hand-maintained block that looks
-similar (the conda block in bash/bashrc, the bun block in oh-my-zsh/zshrc) is
-deliberately not flagged: those are maintained here and read $CONDA_PATH and
-$BUN_INSTALL from this repository's own runtime files. A rule that cannot tell
-the two apart produces noise, and a noisy gate gets ignored.
+Only installer signatures are matched. A hand-maintained block that looks
+similar (the conda block in shell/bash/bashrc) is deliberately not flagged: a
+rule that cannot tell the two apart produces noise, and a noisy gate gets
+ignored.
 """
 
 from __future__ import annotations
@@ -23,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _lib import report, repo_root  # noqa: E402
 
-RC_FILES = ("bash/bashrc", "oh-my-zsh/zshrc", "oh-my-zsh/zshenv", "common_shell_setup.sh")
+RC_FILES = ("shell/bash/bashrc", "shell/zsh/zshrc", "shell/zsh/zshenv", "shell/common.sh")
 
 MARKERS = (
     re.compile(r"#\s*Added by ", re.I),

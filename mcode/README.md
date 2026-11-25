@@ -21,11 +21,11 @@ section.
 Triggers include the shift+tab permission picker, `mcode provider add/remove`,
 default-model changes, and the legacy BYOK provider migration.
 
-`scripts/mcode-config-sync.py` merges `mcode/config.yaml` into the live file:
+`scripts/config-merge.py` merges `mcode/config.yaml` into the live file:
 repo-defined keys win, local-only keys (model-discovery results, `tui.*`) survive
 verbatim, a leftover symlink is healed into a regular file, and the previous live
-file is kept as `config.yaml.pre-sync`. It runs from
-`scripts/post-install.d/40-mcode-config.sh` and on every 15-minute tick.
+file is kept as `config.yaml.pre-sync`. `scripts/apply.sh` runs it on every
+install and every 15-minute tick.
 
 **Consequence**: a setting toggled in the TUI is reverted at the next sync.
 Change `mcode/config.yaml` instead.

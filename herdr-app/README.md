@@ -2,13 +2,13 @@
 
 The Herdr **desktop app** (https://herdr.dev/download): a native window that shows
 terminals and coding agents. It is a separate program from `herdr` (the
-agent-aware terminal multiplexer, config in `../herdr/`), and a third one from
+agent-aware terminal multiplexer, config in `../herdr-tui/`), and a third one from
 `herdr-core` (`hc`), the runtime that actually owns the terminals.
 
 ## Install
 
-`../scripts/install-herdr-app.sh`, wired into `install.conf.yaml` (network phase,
-macOS only). It:
+`../scripts/install-herdr-app.sh`, run by `scripts/provision.sh` (macOS only).
+It:
 
 - reuses an existing `Herdr.app` — `/Applications/Herdr.app` (dragged from the
   dmg) or `~/Applications/Herdr.app` — and only downloads when there is none;
@@ -26,9 +26,9 @@ Launchpad / `herdr-app` across both.
 
 | File | How it reaches `~/.config/herdr-app/` | Why |
 |---|---|---|
-| `themes/noir.json` | symlink (`link:` in `install.conf.yaml` and `sync.conf.yaml`) | the app never writes theme files back |
+| `themes/noir.json` | symlink (`link:` in `install.conf.yaml`) | the app never writes theme files back |
 | `themes/dracula.json` | symlink, same as above | same |
-| `settings.json` | seed (`scripts/post-install.d/10-seed-configs.sh`) | the app rewrites it via temp-file + rename, which replaces a symlink with a regular file |
+| `settings.json` | seed (`scripts/seed-configs.sh`) | the app rewrites it via temp-file + rename, which replaces a symlink with a regular file |
 | `keys.json` | seed, same as above | same |
 
 ## Themes

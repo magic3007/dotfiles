@@ -1,4 +1,4 @@
-# omp plugins, installed by scripts/omp-plugins.sh (from install.conf Phase 2,
+# omp plugins, installed by scripts/omp-plugins.sh (run by scripts/provision.sh,
 # after bun and omp are installed — omp shells out to `bun install`).
 #
 # One `omp plugin install` spec per line; blank lines and # comments are

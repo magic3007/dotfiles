@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # 安装 omp/plugins.txt 里声明、但本机还没装的 omp 插件。
 #
-# 为什么是 scripts/ 里的脚本，而不是 post-install.d/ 的钩子：
-# post-install.d/ 的钩子由 install.conf 的 Phase 1 触发（纯本地、断网也必须成功），
-# 而这一步要联网、还要有 bun。放在 Phase 1 会踩两个坑：
-#   1. 新机器上 omp 还没装（omp 在网络阶段才装），钩子只打印 "omp not on PATH" 就跳过；
+# 为什么是 scripts/ 里的脚本，而不是 scripts/apply.sh（每次 ./install 和 15 分钟
+# 同步都跑的那批本地步骤）：
+# apply.sh 不联网，而这一步要联网、还要有 bun。放进 apply.sh 会踩两个坑：
+#   1. 新机器上 omp 还没装（omp 在 scripts/provision.sh 里才装），脚本只打印
+#      "omp not on PATH" 就跳过；
 #   2. omp 已存在（比如发行版二进制装在 ~/.local/bin）但 bun 缺失时，omp 内部的
 #      安装器 spawn `bun install` 失败，整次 ./install 报
 #      `✘ Failed to install npm:...: Executable not found in $PATH: "bun"`。
-# 所以改由 install.conf 的 Phase 2 在「装完 bun 和 omp」之后调用。
+# 所以由 scripts/provision.sh 在「装完 bun 和 omp」之后调用，只在 ./install 出现。
 #
 # 为什么只装缺失项：`omp plugin install` 对已装插件不是空操作 —— 它会重新解析包，
 # 并把 feature 选择重置回 manifest 默认值（pi-fff 的 autocomplete 就靠种子文件关掉，

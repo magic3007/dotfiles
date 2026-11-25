@@ -1,206 +1,133 @@
-# =============================================================================
-# Dotbot Configuration - Dotfiles Installation
-# =============================================================================
-# Usage: ./install
-# Dotbot docs: https://github.com/anishathalye/dotbot
-#
-# Structure:
-#   Phase 1 — Local operations (no network required, always succeeds)
-#   Phase 2 — Network-dependent operations (with timeouts, non-blocking)
-# =============================================================================
+# The one dotbot config. ./install runs all of it; sync.sh runs only
+# `clean create link` every 15 minutes, then scripts/apply.sh. Delivery rules
+# (link, merge, seed): docs/REPO_GUIDE.md §2.
 
-# ===========================================================================
-# Phase 1: Local Operations (no network required)
-# ===========================================================================
-
-# ---------------------------------------------------------------------------
-# Defaults
-# ---------------------------------------------------------------------------
 - defaults:
     link:
         create: true
         relink: true
 
-# ---------------------------------------------------------------------------
-# Clean broken symlinks
-# ---------------------------------------------------------------------------
-- clean: ["~"]
+- clean:
+    - "~"
+    - "~/.config/"
+    - "~/.claude/"
+    - "~/.codex/"
+    - "~/.local/bin/"
+    - "~/.cursor/"
+    - "~/.pi/"
 
-# ---------------------------------------------------------------------------
-# Create directories
-# ---------------------------------------------------------------------------
 - create:
     - ~/.vim/undo-history
     - ~/.wastebasket
-    - ~/.config/karabiner
-    - ~/.codex
-    - ~/.pi/agent
+    - ~/.vim_plugins
     - ~/.minimax
 
-# ---------------------------------------------------------------------------
-# Git submodules (local if already initialized)
-# ---------------------------------------------------------------------------
-- shell:
-    - [git submodule update --init --recursive, Installing submodules]
-
-# ---------------------------------------------------------------------------
-# Platform-specific directory setup
-# ---------------------------------------------------------------------------
 - shell:
     - [
-          test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Cursor/User || true,
-          Creating Cursor config directory on macOS,
-      ]
-    - [
-          test "$(uname)" = "Darwin" && mkdir -p ~/Library/Application\ Support/Code/User || true,
-          Creating VS Code config directory on macOS,
-      ]
-    - [
-          test "$(uname)" = "Darwin" && mkdir -p ~/.config/iterm2 || true,
-          Creating iTerm2 config directory,
-      ]
-    - [
-          mkdir -p ~/.config/ghostty || true,
-          Creating Ghostty config directory,
-      ]
-    - [
-          mkdir -p ~/.config/cmux || true,
-          Creating cmux config directory,
+          "for f in .bashrc .zshrc .zshenv; do [ -f ~/$f ] && [ ! -L ~/$f ] && [ ! -e ~/${f}_bk ] && mv ~/$f ~/${f}_bk && echo \"Moved ~/$f to ~/${f}_bk\"; done; true",
+          Backing up pre-existing shell rc files,
       ]
 
-# ---------------------------------------------------------------------------
-# Backup existing configs before symlinking
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "test -f ~/.bashrc && ! test -L ~/.bashrc && ! test -f ~/.bashrc_bk && mv ~/.bashrc ~/.bashrc_bk && echo 'Moved existing ~/.bashrc to ~/.bashrc_bk' || true",
-          Backing up existing ~/.bashrc to ~/.bashrc_bk,
-      ]
-    - [
-          "test -f ~/.zshrc && ! test -L ~/.zshrc && ! test -f ~/.zshrc_bk && mv ~/.zshrc ~/.zshrc_bk && echo 'Moved existing ~/.zshrc to ~/.zshrc_bk' || true",
-          Backing up existing ~/.zshrc to ~/.zshrc_bk,
-      ]
-    - [
-          "test -f ~/.zshenv && ! test -L ~/.zshenv && ! test -f ~/.zshenv_bk && mv ~/.zshenv ~/.zshenv_bk && echo 'Moved existing ~/.zshenv to ~/.zshenv_bk' || true",
-          Backing up existing ~/.zshenv to ~/.zshenv_bk,
-      ]
-
-# ---------------------------------------------------------------------------
-# Symlinks
-# ---------------------------------------------------------------------------
 - link:
     # ---- Shell ----
-    ~/.zshenv: oh-my-zsh/zshenv
-    # The endpoint-security agent appends its own git() push wrapper to ~/.zshrc
-    # as root, which turns the symlink into a regular file; dotbot then refuses to
-    # overwrite it and fails the whole run every 15 minutes. Link only when the
-    # target is absent or already a symlink, so the live file stays untouched on a
-    # hijacked machine while fresh machines still get the symlink.
+    ~/.zshenv: shell/zsh/zshenv
+    # An endpoint-security agent rewrites ~/.zshrc as root on some machines,
+    # turning the link into a regular file; link only when absent or a link, so
+    # dotbot does not abort the whole link section there.
     ~/.zshrc:
         if: '[ ! -e ~/.zshrc ] || [ -L ~/.zshrc ]'
-        path: oh-my-zsh/zshrc
-    ~/.zshrc.d: oh-my-zsh/zshrc.d
-    ~/.bashrc: bash/bashrc
-    ~/.common_shell_setup.sh: common_shell_setup.sh
+        path: shell/zsh/zshrc
+    ~/.zshrc.d: shell/zsh/zshrc.d
+    ~/.bashrc: shell/bash/bashrc
+    ~/.common_shell_setup.sh: shell/common.sh
+    # archive/fish is frozen; it is linked only where fish is installed.
+    ~/.config/fish:
+        if: 'command -v fish >/dev/null'
+        path: archive/fish
 
     # ---- Git ----
     ~/.gitconfig: git/gitconfig
 
-    # ---- Terminal multiplexer ----
-    ~/.tmux.conf: tmux.conf
+    # ---- Terminals ----
+    ~/.tmux.conf: terminals/tmux.conf
+    ~/.config/ghostty/config: terminals/ghostty/config
+    ~/.config/cmux/cmux.json: terminals/cmux/cmux.json
+    ~/.warp: terminals/warp
+    ~/.config/herdr/config.toml: herdr-tui/config.toml
+    # herdr-app rewrites settings.json and keys.json via temp file + rename, so
+    # those are seeded (scripts/seed-configs.sh); it never writes themes back.
+    ~/.config/herdr-app/themes/noir.json: herdr-app/themes/noir.json
+    ~/.config/herdr-app/themes/dracula.json: herdr-app/themes/dracula.json
 
     # ---- Editors ----
     ~/.vimrc: vim/vimrc/vimrc
     ~/.vim_runtime: vim/vimrc
     ~/.ideavimrc: ideavimrc
     ~/.config/nvim: neovim/nvim-basic-ide
+    # settings.json of VS Code, Cursor and Antigravity is merged from editors/
+    # by scripts/config-merge.py; the rest is linked. chatLanguageModels.json
+    # references VS Code Secret Storage and mcp.json holds no credentials.
+    ~/Library/Application Support/Code/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: editors/vscode/keybindings.json
+    ~/Library/Application Support/Code/User/chatLanguageModels.json:
+        if: 'test "$(uname)" = Darwin'
+        path: editors/vscode/chatLanguageModels.json
+    ~/Library/Application Support/Code/User/mcp.json:
+        if: 'test "$(uname)" = Darwin'
+        path: editors/vscode/mcp.json
+    ~/Library/Application Support/Code/User/prompts:
+        if: 'test "$(uname)" = Darwin'
+        path: editors/vscode/prompts
+    ~/Library/Application Support/Cursor/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: editors/cursor/keybindings.json
+    ~/Library/Application Support/Antigravity/User/keybindings.json:
+        if: 'test "$(uname)" = Darwin'
+        path: editors/antigravity/keybindings.json
 
-    # ---- File manager ----
+    # ---- File managers and CLI tools ----
     ~/.config/ranger: ranger
     ~/.config/joshuto: joshuto
     ~/.config/yazi: yazi
-
-    # ---- CLI tools ----
     ~/.config/lsd: lsd
     ~/.config/starship.toml: starship/starship.toml
     ~/.config/bat/config: bat/config
-
-    # ---- Fish shell (ARCHIVED - frozen, not maintained) ----
-    # Kept only so an existing fish login still works. Do not add new fish
-    # config here; see archive/fish/README.md.
-    ~/.config/fish: archive/fish
-
-    # ---- Debugger ----
     ~/.gdb: gdb
     ~/.gdbinit: gdb/gdbinit
-
-    # ---- Package managers (with CN mirrors) ----
-    ~/.condarc: condarc
-    ~/.mambarc: mambarc
-    ~/.npmrc: npmrc
-    ~/.config/pip/pip.conf: pip.conf
-    ~/.cargo/config.toml: cargo/config.toml
-
-    # ---- Language config ----
     ~/.Rprofile: Rprofile
+    ~/.local/bin/yolo: scripts/tools/yolo-generic.sh
+    ~/.chatgpt.sh: chatgpt/chatgpt.sh
 
-    # ---- macOS window management ----
-    # Guarded: these targets only exist on macOS. Without the guard a Linux run
-    # creates dead links, and sync.conf.yaml could not mirror the entry — the
-    # two files must stay identical (.repo-std/checks/link_parity.py).
+    # ---- Package-manager mirrors ----
+    ~/.condarc: mirrors/condarc
+    ~/.npmrc: mirrors/npmrc
+    ~/.config/pip/pip.conf: mirrors/pip.conf
+    ~/.cargo/config.toml: mirrors/cargo.toml
+
+    # ---- macOS ----
     ~/.yabairc:
         if: 'test "$(uname)" = Darwin'
-        path: yabairc
+        path: macos/yabairc
     ~/.skhdrc:
         if: 'test "$(uname)" = Darwin'
-        path: skhdrc
+        path: macos/skhdrc
     ~/.skhd:
         if: 'test "$(uname)" = Darwin'
-        path: skhd
+        path: macos/skhd
     ~/.config/karabiner/karabiner.json:
         if: 'test "$(uname)" = Darwin'
-        path: karabiner/karabiner.json
+        path: macos/karabiner/karabiner.json
     ~/.config/karabiner/assets:
         if: 'test "$(uname)" = Darwin'
-        path: karabiner/assets
+        path: macos/karabiner/assets
+    ~/.config/iterm2/com.googlecode.iterm2.plist:
+        if: 'test "$(uname)" = Darwin'
+        path: macos/iterm2/com.googlecode.iterm2.plist
 
-    # ---- IDE / Editor config ----
-    ~/.vscoderc: vscode/vscoderc
-    ~/Library/Application Support/Code/User/keybindings.json:
-        if: 'test "$(uname)" = Darwin'
-        path: vscode_config/keybindings.json
-    ~/Library/Application Support/Code/User/settings.json:
-        if: 'test "$(uname)" = Darwin'
-        path: vscode_config/settings.json
-    # chatLanguageModels.json holds BYOK providers; its apiKey is a
-    # ${input:chat.lm.secret.*} reference to VS Code Secret Storage, never a
-    # literal, so the tracked file carries no secret.
-    ~/Library/Application Support/Code/User/chatLanguageModels.json:
-        if: 'test "$(uname)" = Darwin'
-        path: vscode_config/chatLanguageModels.json
-    # mcp.json defines MCP servers only (no credentials — keep it that way; use
-    # an env-var reference if a server ever needs a token).
-    ~/Library/Application Support/Code/User/mcp.json:
-        if: 'test "$(uname)" = Darwin'
-        path: vscode_config/mcp.json
-    # Custom chat modes / prompt files.
-    ~/Library/Application Support/Code/User/prompts:
-        if: 'test "$(uname)" = Darwin'
-        path: vscode_config/prompts
-    ~/Library/Application Support/Cursor/User/keybindings.json:
-        if: 'test "$(uname)" = Darwin'
-        path: cursor_config/keybindings.json
-    ~/Library/Application Support/Cursor/User/settings.json:
-        if: 'test "$(uname)" = Darwin'
-        path: cursor_config/settings.json
-    ~/Library/Application Support/Antigravity/User/keybindings.json:
-        if: 'test "$(uname)" = Darwin'
-        path: antigravity_config/keybindings.json
-    ~/Library/Application Support/Antigravity/User/settings.json:
-        if: 'test "$(uname)" = Darwin'
-        path: antigravity_config/settings.json
-
-    # ---- AI tools ----
+    # ---- AI harnesses ----
+    # Codex, mcode, the Antigravity CLI and Pi's settings.json rewrite themselves,
+    # so they are merged by scripts/config-merge.py; kimi's config is seeded.
     ~/.claude/settings.json: claude/settings.json
     ~/.claude/config.json: claude/config.json
     ~/.claude/hooks: claude/hooks
@@ -208,55 +135,26 @@
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.codex/AGENTS.md: codex/AGENTS.md
     ~/.codex/agents: codex/agents
-    # ~/.codex/config.toml is NOT linked on any platform: Codex edits it in
-    # place and writes machine state into it ([projects.*] trust, [hooks.state],
-    # [marketplaces.*]), which a symlink would push into this repo. The tracked
-    # codex/config.toml holds only shared keys; scripts/codex-config-sync.py
-    # merges them into the machine-local file (scripts/post-install.d/30-codex-config.sh).
     ~/.pi/agent/AGENTS.md: pi/AGENTS.md
-    ~/.pi/agent/settings.json: pi/settings.json
     ~/.pi/agent/models.json: pi/models.json
     ~/.pi/agent/my-pi-plugins: pi/my-pi-plugins
     ~/.pi/agent/extensions: pi/extensions
-    # pi/agents 是 pi 专属 subagent 定义；~/.pi/agent/agents 不存在，故整目录链接，与 extensions 一致。
     ~/.pi/agent/agents: pi/agents
-    # mcode（minimax Code）的 ~/.minimax/config.yaml 不 link：mcode 保存配置是「写
-    # .config-tmp-<hex> 临时文件 + rename 覆盖配置路径本身」，主写入路径不解析 realpath，
-    # 所以 symlink 会被顶成普通文件（kimi / codex 的 config 同款问题），下次 dotbot 会
-    # 直接报错。改由 scripts/mcode-config-sync.py 把 mcode/config.yaml 合并进本地文件
-    # （scripts/post-install.d/40-mcode-config.sh + sync.conf.yaml 的 shell 段）：
-    # 仓库定义的键覆盖本地，本地独有键（模型发现结果、TUI 状态）原样保留。
-    # ~/.minimax 下只有 config.yaml 是用户配置，auth / sessions / cache / packages /
-    # v2 / model-access 等都由运行时自管，不入库。
-    # Antigravity CLI 的 ~/.gemini/antigravity-cli/settings.json 同样不 link：agy 在
-    # /config、换模型、授予 workspace 信任或会话中批准权限时都会原地重写该文件。
-    # 改由 scripts/antigravity-settings-sync.py 把 antigravity/cli-settings.json 合并进去
-    # （scripts/post-install.d/60-antigravity-settings.sh + sync.conf.yaml 的 shell 段）：
-    # 仓库键（toolPermission / artifactReviewPolicy = always-proceed）覆盖，本地独有的
-    # model / trustedWorkspaces 原样保留。~/.gemini 其余全是运行态；唯一例外是
-    # ~/.gemini/config/skills 这一份 skills 视图，由 scripts/sync-skills.py 生成
-    # （agy 只从该目录读全局 skills，且跳过 skills.json 里的符号链接条目）。
-    ~/.chatgpt.sh: chatgpt/chatgpt.sh
     ~/.config/opencode/opencode.json: opencode/opencode.json
     ~/.config/opencode/package.json: opencode/package.json
-    # kimi 的 config.toml 由 CLI 自己用「写临时文件 + rename」重写，symlink 会被
-    # 顶成普通文件；所以不 link，改由 scripts/post-install.d/10-seed-configs.sh
-    # 在文件缺失时从 kimi-code/config.toml 复制一份。
-    ~/.local/bin/yolo: scripts/yolo-generic.sh
-    # xmatrix 的 harness 探测只看 daemon 进程的 PATH。daemon 由 systemd 单元
-    # ~/.config/systemd/user/xmatrix-daemon.service 启动，里面写死的 PATH 不含
-    # ~/.bun/bin，所以 omp 在 Hub 侧一直显示 missing（`xmatrix harness list --local`
-    # 用的是 shell 环境，看不出问题）。软链进该 PATH 已有的 ~/.local/bin。
-    # bun 也要链：omp 的 shim 是 `#!/usr/bin/env bun`。
-    # 不要改用改单元 PATH 的办法：`xmatrix setup daemon` 会用固定列表重写单元、覆盖手改。
-    #
-    # `force: true` 是必需的，不是保险：omp.sh 安装器按情况二选一 ——
-    #   有 bun 时走 `bun install -g`，产物是 ~/.bun/bin/omp（软链到 dist/cli.js）；
-    #   没有 bun 时退化为下载预编译 ELF，直接写 ~/.local/bin/omp（`PI_INSTALL_DIR` 默认值）。
-    # 后一种情况留下一个普通文件当目标，dotbot 会以
-    # 「already exists but is a regular file」中止整个 link 段（不是只跳过这一条）。
-    # force 只在 `if` 成立（~/.bun/bin/<name> 可执行）时才生效，所以不会凭空删掉
-    # 唯一的 omp；目标位置被 ELF 占用时先归档到 ~/.wastebasket 更稳妥，见 omp/README.md。
+    # omp keeps config.yml writable and strips its comments; see omp/README.md.
+    # ~/.omp/agent/extensions is a real directory, so its files link one by one.
+    ~/.omp/agent/config.yml: omp/config.yml
+    ~/.omp/agent/models.yml: omp/models.yml
+    ~/.omp/agent/gateways-login.json: omp/gateways-login.json
+    ~/.omp/agent/WATCHDOG.yml: omp/WATCHDOG.yml
+    ~/.omp/agent/AGENTS.md: omp/AGENTS.md
+    ~/.omp/agent/RULES.md: omp/RULES.md
+    ~/.omp/agent/extensions/deepen.ts: omp/extensions/deepen.ts
+    # The xmatrix daemon finds harnesses only on its unit's fixed PATH, which
+    # has ~/.local/bin but not ~/.bun/bin; omp's shim needs bun too. force: the
+    # omp installer writes a regular ELF to ~/.local/bin/omp when bun is absent,
+    # and force applies only once the `if` holds, so it never removes the only omp.
     ~/.local/bin/bun:
         if: '[ -x ~/.bun/bin/bun ]'
         path: ~/.bun/bin/bun
@@ -265,408 +163,24 @@
         if: '[ -x ~/.bun/bin/omp ]'
         path: ~/.bun/bin/omp
         force: true
-    # agent run 的凭据不由这里解决：daemon 的环境靠 systemd drop-in 注入，
-    # 见 scripts/xmatrix-daemon-secrets.sh 与 scripts/post-install.d/50-xmatrix-daemon-secrets.sh。
 
-    # ---- omp (Stencil coding agent harness) ----
-    # 静态配置：config.yml / models.yml / gateways-login.json / WATCHDOG.yml / AGENTS.md / RULES.md。
-    # 其余 ~/.omp/agent 内容（agent.db、history.db、models.db、sessions/、
-    # cache/、terminal-sessions/、last-changelog-version）以及 ~/.omp/{logs,run,gpu_cache.json}
-    # 都是运行时状态，各机器不同，留在本机、不进 git。
-    # 插件同理：仓库只跟踪 omp/plugins.txt 里的 spec 清单，
-    # 缺失的插件由 scripts/omp-plugins.sh 在 ./install 的 Phase 2 安装
-    # （要联网、要有 bun，所以不进 15 分钟的 sync，也不能放 Phase 1 的 post-install.d）。
-    #
-    # 硬约束（见 omp/README.md）：
-    #   1) config.yml 必须可写 —— omp 对它上 native file lock，repo 里保持普通可写文件。
-    #   2) omp config set/reset 会重写 config.yml 并剥离注释 —— 说明文字放 README，别写进 YAML。
-    #   3) models.yml 的 apiKey 写环境变量名（MAFIA_API_KEY），真实 key 只在
-    #      ~/.common_shell_setup_local.sh 里 export，密钥不入库。
-    #   4) gateways-login.json 同理：apiKey 写环境变量名 / !命令 / 字面量三种「key 引用」，
-    #      omp-model-gateway 插件存引用、omp 解析，所以文件里不含密钥。
-    ~/.omp/agent/config.yml: omp/config.yml
-    ~/.omp/agent/models.yml: omp/models.yml
-    ~/.omp/agent/gateways-login.json: omp/gateways-login.json
-    ~/.omp/agent/WATCHDOG.yml: omp/WATCHDOG.yml
-    # AGENTS.md = 用户级上下文文件；RULES.md = always-apply 常驻规则（长会话压缩后仍生效）。
-    ~/.omp/agent/AGENTS.md: omp/AGENTS.md
-    ~/.omp/agent/RULES.md: omp/RULES.md
-    # extensions/ 是本机真目录（herdr 集成、pi-fff.json 也在里面），所以逐个文件链接。
-    # deepen.ts = /deepen：旁路加深提示词并回填输入框（见 omp/README.md）。
-    ~/.omp/agent/extensions/deepen.ts: omp/extensions/deepen.ts
-
-    # ---- iTerm2 (macOS only) ----
-    ~/.config/iterm2/com.googlecode.iterm2.plist:
-        if: 'test "$(uname)" = Darwin'
-        path: iterm2/com.googlecode.iterm2.plist
-
-    # ---- Ghostty ----
-    ~/.config/ghostty/config: ghostty/config
-
-    # ---- cmux ----
-    ~/.config/cmux/cmux.json: cmux/cmux.json
-
-    # ---- Herdr (agent-aware terminal multiplexer) ----
-    ~/.config/herdr/config.toml: herdr/config.toml
-
-    # ---- Herdr app (desktop window) ----
-    # 只链接 themes/。settings.json 与 keys.json 归 app 所有：它用「临时文件 +
-    # rename」写回，会把符号链接换成普通文件（实测：dotbot 链接成功后一次
-    # app.zoom_in 就把两个链接替换成了普通文件），而且写回时会丢掉 theme、
-    # appearance 这类它自己不持久化的键。所以这两个走 seed，不走 link：
-    # 见 scripts/post-install.d/10-seed-configs.sh。
-    # 主题文件 app 从不写回，符号链接可以稳定存活（实测保持为 lrwxr-xr-x）。
-    ~/.config/herdr-app/themes/noir.json: herdr-app/themes/noir.json
-    ~/.config/herdr-app/themes/dracula.json: herdr-app/themes/dracula.json
-
-    # ---- Warp ----
-    ~/.warp: warp
-
-    # ---- Desktop autostart (Linux/GNOME, KDE, Xfce) ----
-    # Grok Bot 由 grok-bot-linux-install 技能做用户级安装（无 root）：
-    #   ~/.local/bin/grok-bot → ~/Applications/grok-bot-<ver>/AppRun，启动器里
-    #   写死本机必需的 Chromium 开关（--disable-gpu --in-process-gpu --no-sandbox）。
-    # 仓库只拥有「登录即启动」这一条 XDG autostart；~/.local/share/applications/
-    # 下的启动器是安装产物（含版本号），由技能生成，不在这里链接。
-    # `if` 用绝对路径而非 $HOME：.desktop 的 Exec 不展开 `~`，两边必须指向同一处。
-    # 没装 grok-bot 的机器（含 macOS）条件为假，不会留下一条注定失败的启动项；
-    # grok-bot 装好后只需再跑一次 ./install（或等 15 分钟的 sync 补上）。
+    # ---- Desktop and services ----
+    # .desktop Exec does not expand ~, so the guard uses the same absolute path
+    # as grok-bot/grok-bot.desktop; see grok-bot/README.md.
     ~/.config/autostart/grok-bot.desktop:
         if: '[ -x /home/magic/.local/bin/grok-bot ]'
         path: grok-bot/grok-bot.desktop
-
-    # ---- Local proxy environment (both platforms) ----
-    # 端口不写死：proxy-env 探测 127.0.0.1 上在监听的候选端口，shell 与
-    # systemd 用户环境都从它派生。设计与限制见 proxy/README.md。
     ~/.local/bin/proxy-env: proxy/proxy-env.sh
     ~/.config/systemd/user/proxy-env.service:
         if: 'test "$(uname)" = Linux'
         path: proxy/proxy-env.service
 
-# ---------------------------------------------------------------------------
-# Sync vim plugins to local disk for faster startup on network filesystems
-# ---------------------------------------------------------------------------
-- create:
-    - ~/.vim_plugins
-
 - shell:
-    - [
-          "rsync -a --delete vim/vimrc/sources_non_forked/ ~/.vim_plugins/sources_non_forked/ && rsync -a --delete vim/vimrc/sources_forked/ ~/.vim_plugins/sources_forked/",
-          Syncing vim plugins to local disk,
-      ]
-
-# ---------------------------------------------------------------------------
-# Local post-link setup
-# ---------------------------------------------------------------------------
-- shell:
-    - command: "bash scripts/post-install.sh || true"
-      description: "Running post-install fixups (config seeds, vendored dependency pins and patches)"
+    - command: bash scripts/apply.sh
+      description: Applying local state (seeds, merges, skill views, vim plugins, xmatrix)
       stdout: true
       stderr: true
-    - [
-          "python3 scripts/sync-skills.py || true",
-          "Building skill views (~/.agents, ~/.claude, ~/.codex, ~/.pi/agent, ~/.omp/agent skills) from skills/ and <tool>/skills/",
-      ]
-    - [
-          chmod +x ~/.claude/hooks/check-expert-update.sh 2>/dev/null || true,
-          Setting execute permission for Claude hooks,
-      ]
-    - [
-          chmod +x ~/.claude/hooks/rtk-rewrite.sh 2>/dev/null || true,
-          Setting execute permission for RTK hook,
-      ]
-
-# ---------------------------------------------------------------------------
-# Enable auto-sync (every 15 minutes)
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          bash sync.sh --install || true,
-          Enabling automatic dotfiles sync (every 15 minutes),
-      ]
-
-# ===========================================================================
-# Phase 2: Network-Dependent Operations
-# ===========================================================================
-# All commands below use --connect-timeout / || true to avoid blocking
-# when network is unavailable.
-
-# ---------------------------------------------------------------------------
-# Platform-specific packages
-# ---------------------------------------------------------------------------
-- shell:
-    - [bash install-scripts/linux/install-packages.sh || true, Installing Linux system packages (apt/conda/mamba)]
-    - [bash install-scripts/mac/install-packages.sh || true, Installing macOS packages with Homebrew]
-
-# ---------------------------------------------------------------------------
-# Tailscale mesh (tailnet join)
-# ---------------------------------------------------------------------------
-# Packages install the client (macOS cask tailscale-app / the official Linux
-# installer). This step only joins the tailnet and is idempotent: a Running
-# node is left alone. Set TAILSCALE_AUTHKEY in ~/.common_shell_setup_local.sh
-# for an unattended join; without it the script prints the manual command.
-# All tunables (hostname, exit node / subnet routes, Tailscale SSH) are
-# documented in scripts/tailscale-setup.sh.
-- shell:
-    - [bash scripts/tailscale-setup.sh || true, Joining the Tailscale tailnet (skipped without TAILSCALE_AUTHKEY)]
-
-# ---------------------------------------------------------------------------
-# oh-my-zsh
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "test ! -d ~/.oh-my-zsh && CHSH=no RUNZSH=no KEEP_ZSHRC=yes sh -c \"$(curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\" || true",
-          Installing oh-my-zsh (without changing default shell),
-      ]
-
-# ---------------------------------------------------------------------------
-# oh-my-zsh plugins
-# ---------------------------------------------------------------------------
-- git:
-    "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting":
-        url: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
-        description: "zsh plugin: zsh-syntax-highlighting"
-    "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions":
-        url: "https://github.com/zsh-users/zsh-autosuggestions"
-        description: "zsh plugin: zsh-autosuggestions"
-    "~/.oh-my-zsh/custom/plugins/zsh-wakatime":
-        url: "https://github.com/wbinglee/zsh-wakatime.git"
-        description: "zsh plugin: zsh-wakatime"
-    "~/.oh-my-zsh/custom/plugins/autojump":
-        url: "https://github.com/wting/autojump.git"
-        description: "zsh plugin: autojump"
-    "~/.oh-my-zsh/custom/plugins/zsh-vi-mode":
-        url: "https://github.com/jeffreytse/zsh-vi-mode.git"
-        description: "zsh plugin: zsh-vi-mode"
-
-- shell:
-    - [
-          "test -d ~/.oh-my-zsh/custom/plugins/autojump && cd ~/.oh-my-zsh/custom/plugins/autojump && ./install.py || true",
-          Installing autojump,
-      ]
-
-# ---------------------------------------------------------------------------
-# fzf
-# ---------------------------------------------------------------------------
-- git:
-    "~/.fzf":
-        url: "https://github.com/junegunn/fzf.git"
-        description: "fzf - fuzzy finder"
-
-- shell:
-    - [test -d ~/.fzf && ~/.fzf/install --all || true, Installing fzf]
-
-# ---------------------------------------------------------------------------
-# Node.js (prerequisite for AI coding tools)
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "(export NVM_DIR=\"$HOME/.nvm\" && (test -d \"$NVM_DIR\" || curl --connect-timeout 10 -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash) && . \"$NVM_DIR/nvm.sh\" && nvm install --lts) || true",
-          Installing nvm and Node.js LTS,
-      ]
-
-# ---------------------------------------------------------------------------
-# GitHub CLI
-# ---------------------------------------------------------------------------
-- shell:
-    - [bash install-scripts/linux/install-gh.sh || true, Installing GitHub CLI on Linux]
-    - [bash install-scripts/mac/install-gh.sh || true, Installing GitHub CLI on macOS]
-
-# ---------------------------------------------------------------------------
-# AI Coding Tools
-# ---------------------------------------------------------------------------
-# Note: Claude Code now uses npm (was official install script)
-# Manual install references:
-#   Claude Code:  npm install -g @anthropic-ai/claude-code
-#   OpenAI Codex: npm install -g @openai/codex
-#   Antigravity CLI: curl -fsSL https://antigravity.google/cli/install.sh | bash  (binary: ~/.local/bin/agy)
-#   Pi:           npm install -g --ignore-scripts @earendil-works/pi-coding-agent  (primary, non-interactive)
-#                 curl -fsSL https://pi.dev/install.sh | sh  (fallback; reads confirmation via /dev/tty, cannot auto-confirm)
-#   Opencode:     curl -fsSL https://opencode.ai/install | bash
-#   DeepSeek Harness (dsh): npm install -g @deepseek-ai/dsh
-#                 Config lives in ~/.dsh (DSH_HOME). It is NOT linked here:
-#                 profiles/<name>/ holds pnpm node_modules and is initialized
-#                 on first run; .credentials.yaml holds API keys; the settings
-#                 UI rewrites profiles/*/cordis.patch.yml atomically (temp file
-#                 + rename), which would replace a symlink with a regular file.
-- shell:
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v claude >/dev/null || npm install -g @anthropic-ai/claude-code@latest || true",
-          Installing Claude Code CLI via npm,
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codex >/dev/null || npm install -g @openai/codex@latest || true",
-          Installing OpenAI Codex CLI,
-      ]
-    - [
-          "command -v agy >/dev/null || curl -fsSL https://antigravity.google/cli/install.sh | bash || true",
-          Installing Google Antigravity CLI,
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null || ((npm install -g --ignore-scripts @earendil-works/pi-coding-agent) || (yes | curl --connect-timeout 30 -fsSL https://pi.dev/install.sh | sh)) || true",
-          Installing Pi coding agent via npm (non-interactive, fallback pi.dev script),
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-powerline-footer@0.12.2 || true",
-          Installing pi-powerline-footer (companion for my-pi-plugins gruvbox theme),
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-web-access || true",
-          Installing pi-web-access (companion for my-pi-plugins),
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v pi >/dev/null && pi install npm:pi-herdr-agents || true",
-          Installing pi-herdr-agents (provides the subagent tool),
-      ]
-    - [
-          "command -v opencode >/dev/null || curl --connect-timeout 10 -fsSL https://opencode.ai/install | bash || true",
-          Installing Opencode CLI,
-      ]
-    - [
-          "command -v kimi >/dev/null || curl --connect-timeout 10 -fsSL https://code.kimi.com/kimi-code/install.sh | bash || true",
-          Installing Kimi Code CLI,
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v dsh >/dev/null || npm install -g @deepseek-ai/dsh@latest || true",
-          Installing DeepSeek Harness CLI (dsh),
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v mgrep >/dev/null || npm install -g @mixedbread/mgrep@latest || true",
-          Installing mgrep (semantic grep tool),
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v happy >/dev/null || npm install -g happy@latest || true",
-          Installing happy git workflow helper,
-      ]
-    - [
-          "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v codexapp >/dev/null || npm install -g codexapp@latest firebase@latest || true",
-          Installing CodexApp UI,
-      ]
-
-# ---------------------------------------------------------------------------
-# Lark/Feishu CLI (official CLI for Lark/Feishu platform)
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-        "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"; command -v lark-cli >/dev/null || npx @larksuite/cli@latest install || true",
-        Installing Lark/Feishu CLI (lark-cli),
-      ]
-
-# ---------------------------------------------------------------------------
-# WeChat Reminder (inlined, no longer fetched from gitee)
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "mkdir -p $HOME/.wechat-reminder && cp wechat-reminder/wechat-reminder wechat-reminder/wechat-reminder_main.py wechat-reminder/requirements.txt wechat-reminder/LICENSE $HOME/.wechat-reminder/ && chmod +x $HOME/.wechat-reminder/wechat-reminder $HOME/.wechat-reminder/wechat-reminder_main.py",
-          Installing wechat-reminder,
-      ]
-    - [
-          "test -f $HOME/.wechat-reminder/requirements.txt && python3 -m venv $HOME/.wechat-reminder/.venv && $HOME/.wechat-reminder/.venv/bin/pip install -q -r $HOME/.wechat-reminder/requirements.txt || true",
-          Setting up wechat-reminder venv,
-      ]
-
-# ---------------------------------------------------------------------------
-# uv - Python package manager
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "command -v uv >/dev/null || curl --connect-timeout 30 -LsSf https://astral.sh/uv/install.sh | sh || true",
-          Installing uv Python package manager,
-      ]
-    - [
-          "command -v uv >/dev/null && uv python install 3.12 3.11 3.10 || true",
-          Installing Python versions via uv,
-      ]
-    - [
-          "command -v uv >/dev/null && uv venv --python 3.12 --prompt base --seed ~/.venv || true",
-          Creating global Python venv at ~/.venv with pip,
-      ]
-
-# ---------------------------------------------------------------------------
-# omp - coding agent harness (Stencil / oh-my-pi)
-# NOTE: https://omp.sh/install is the OFFICIAL installer for the `omp` coding
-#       agent (npm/bun pkg @oh-my-pi/pi-coding-agent). It is NOT the prompt
-#       theme tool Oh My Posh (ohmyposh.dev). `omp` is an AI coding agent
-#       harness, not a prompt engine - it does NOT touch PROMPT.
-#       Two install paths: with bun (>=1.4.4) it runs `bun install -g` and
-#       produces ~/.bun/bin/omp (a `#!/usr/bin/env bun` shim); without bun it
-#       downloads a prebuilt ELF straight to ~/.local/bin/omp. See omp/README.md.
-#       Static config lives in the repo (omp/) and is symlinked into
-#       ~/.omp/agent/ by the link section above — see that block's comments
-#       re: file-lock requirement and secret handling.
-# ---------------------------------------------------------------------------
-# 安装顺序有讲究：bun → omp → omp 插件。
-#
-# bun 不是「可选工具」：omp 的插件安装器 spawn `bun install`，按名字查 PATH。
-# 若 omp 已经存在（本机是发行版 ELF 二进制装在 ~/.local/bin，不是 ~/.bun/bin 的
-# shim），下面的 `command -v omp` 会短路，omp.sh 安装器不跑，bun 就永远装不上，
-# 于是插件安装报 `Executable not found in $PATH: "bun"`。所以 bun 单独判一次。
-#
-# 不用 bun 官方脚本默认行为改 rc：`~/.zshrc` / `~/.bashrc` 都是指向本仓库的软链，
-# 脚本会往里追加 `# bun` + PATH 行，把受版本管理的文件弄脏。`SHELL=/bin/none`
-# 让脚本走 `case` 的 `*` 分支（只打印手动指引，不写文件）；PATH 由
-# oh-my-zsh/zshrc.d/40-runtime.zsh 导出 ~/.bun/bin，脚本自己也会解析该路径。
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "command -v bun >/dev/null || [ -x \"$HOME/.bun/bin/bun\" ] || curl --connect-timeout 30 -fsSL https://bun.sh/install | SHELL=/bin/none bash || true",
-          Installing bun (needed by omp's plugin installer),
-      ]
-    - [
-          "command -v omp >/dev/null || curl --connect-timeout 30 -fsSL https://omp.sh/install | sh || true",
-          Installing omp (Stencil coding agent harness),
-      ]
-    - [
-          "bash scripts/omp-plugins.sh || true",
-          Installing missing omp plugins (needs network + bun),
-      ]
-
-# ---------------------------------------------------------------------------
-# Herdr - agent-aware terminal multiplexer
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "command -v herdr >/dev/null || curl --connect-timeout 10 -fsSL https://herdr.dev/install.sh | sh || true",
-          Installing Herdr (agent-aware terminal multiplexer),
-      ]
-    - [
-          "bash scripts/herdr-plugin-link.sh || true",
-          Linking local Herdr plugins (magic.wechat-notify),
-      ]
-    - [
-          "command -v omp >/dev/null && herdr integration install omp || true",
-          Installing Herdr omp state integration,
-      ]
-
-# ---------------------------------------------------------------------------
-# Herdr app - the desktop app (a separate program from the `herdr` TUI above).
-# It drives herdr-core (`hc`), which keeps terminals alive when the window
-# closes. The script is idempotent: it reuses an existing Herdr.app (including
-# one dragged into /Applications from the dmg) and only downloads when none is
-# found, so re-running ./install never clobbers a signed, running bundle.
-# The app's own config lives in ~/.config/herdr-app/ — see the link: section
-# above (themes/) and scripts/post-install.d/10-seed-configs.sh (settings/keys).
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          "bash scripts/install-herdr-app.sh || true",
-          Installing Herdr app (macOS desktop app + herdr-core),
-      ]
-
-# ---------------------------------------------------------------------------
-# iTerm2 configuration
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          test "$(uname)" = "Darwin" && defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "~/.config/iterm2" && defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true || true,
-          Configuring iTerm2 to load preferences from ~/.config/iterm2,
-      ]
-
-# ---------------------------------------------------------------------------
-# macOS input preferences
-# ---------------------------------------------------------------------------
-- shell:
-    - [
-          test "$(uname)" = "Darwin" && bash mac/mac_config.sh || true,
-          Applying macOS key-repeat and press-and-hold preferences,
-      ]
+    - command: bash scripts/provision.sh
+      description: Provisioning tools (network; every step is idempotent and non-fatal)
+      stdout: true
+      stderr: true

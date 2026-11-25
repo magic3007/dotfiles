@@ -2,7 +2,7 @@
 
 Dual-channel notification tool: WeChat (PushDeer) and Feishu. Used by the Claude
 Code, Codex and Pi end-of-task hooks, and by the Herdr plugin
-`magic.wechat-notify` (see `herdr/README.md`).
+`magic.wechat-notify` (see `herdr-tui/README.md`).
 
 ## Install surface
 
@@ -48,4 +48,4 @@ text.
 
 Both live in the untracked `~/.common_shell_setup_local.sh`. The Herdr plugin
 reads them from its own config dir instead, because the Herdr server often runs
-without that file sourced — see `herdr/README.md`.
+without that file sourced — see `herdr-tui/README.md`.

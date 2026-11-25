@@ -64,8 +64,8 @@ date: 2026-11-13
 
 | # | 纠正 | 形态 | 接线位置 | 检查命令 | 通过判据 | 负控 | 记录日期 |
 |---|---|---|---|---|---|---|---|
-| X1 | 在共享 checkout 里跑整树丢弃命令，抹掉其他会话未暂存的改动 | eliminate | `omp/config.yml` 的 `bash.gitGuard: true`（`omp config set bash.gitGuard true`），由 bash 工具执行前判定 | `bash scripts/verify-agent-guards.sh` | exit=0，输出 `PASS  bash.gitGuard = true` | 用假 `omp` 桩返回 `false` 时脚本 exit=1，输出 `FAIL  bash.gitGuard = 'false'` | 2026-11-13 |
-| X2 | `git clean -fdx` 静默删掉未跟踪文件（`bash.gitGuard` 的缺口） | lint | `omp/config.yml` 的 `bash.patterns`：`[{"match":"git clean -n*","approval":"allow"},{"match":"git clean*","approval":"deny"}]` | `bash scripts/verify-agent-guards.sh` | exit=0，输出 `PASS  bash.patterns 拦截 git clean*` | 用假 `omp` 桩只回 allow 项时脚本 exit=1，输出 `FAIL  bash.patterns 缺 git clean* 的 deny 规则` | 2026-11-13 |
+| X1 | 在共享 checkout 里跑整树丢弃命令，抹掉其他会话未暂存的改动 | eliminate | `omp/config.yml` 的 `bash.gitGuard: true`（`omp config set bash.gitGuard true`），由 bash 工具执行前判定 | `bash scripts/tools/verify-agent-guards.sh` | exit=0，输出 `PASS  bash.gitGuard = true` | 用假 `omp` 桩返回 `false` 时脚本 exit=1，输出 `FAIL  bash.gitGuard = 'false'` | 2026-11-13 |
+| X2 | `git clean -fdx` 静默删掉未跟踪文件（`bash.gitGuard` 的缺口） | lint | `omp/config.yml` 的 `bash.patterns`：`[{"match":"git clean -n*","approval":"allow"},{"match":"git clean*","approval":"deny"}]` | `bash scripts/tools/verify-agent-guards.sh` | exit=0，输出 `PASS  bash.patterns 拦截 git clean*` | 用假 `omp` 桩只回 allow 项时脚本 exit=1，输出 `FAIL  bash.patterns 缺 git clean* 的 deny 规则` | 2026-11-13 |
 
 **无法自动化的纠正**：
 
@@ -76,7 +76,7 @@ date: 2026-11-13
 
 ## Procedure
 
-**前置条件**：在共享 checkout 里，且 `bash scripts/verify-agent-guards.sh` exit=0。
+**前置条件**：在共享 checkout 里，且 `bash scripts/tools/verify-agent-guards.sh` exit=0。
 
 **决策表**：
 

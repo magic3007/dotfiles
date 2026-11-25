@@ -22,8 +22,11 @@
 # carries the keys. The drop-in survives `xmatrix setup daemon`, which rewrites
 # only the main unit. Secrets keep living in exactly one file.
 #
-# Usage: scripts/xmatrix-daemon-secrets.sh [--restart]
-#   --restart  also restart the daemon (needed once, and after key changes)
+# The daemon restarts when the drop-in or the secrets file changed since the
+# last restart, and never while agent runs are live (they would be killed); a
+# deferred restart happens on a later run.
+#
+# Usage: scripts/xmatrix-daemon-secrets.sh  (a local step of scripts/local.sh)
 set -euo pipefail
 
 dropin_dir="$HOME/.config/systemd/user/xmatrix-daemon.service.d"
@@ -52,7 +55,7 @@ cat > "$tmp" <<EOF
 # Sources $secrets before starting the daemon so agent runs inherit the
 # provider credentials that only exist as environment variables.
 ExecStart=
-ExecStart=/bin/bash -c 'set -a; . "\$HOME/.common_shell_setup_local.sh"; set +a; exec ${daemon_bin} daemon'
+ExecStart=/bin/bash -c 'set -a; . "${secrets}"; set +a; exec ${daemon_bin} daemon'
 EOF
 
 if cmp -s "$tmp" "$dropin"; then
@@ -60,12 +63,19 @@ if cmp -s "$tmp" "$dropin"; then
 else
     chmod 0644 "$tmp"
     mv "$tmp" "$dropin"
+    systemctl --user daemon-reload
     echo "wrote $dropin"
 fi
 
-systemctl --user daemon-reload
-
-if [ "${1:-}" = "--restart" ]; then
-    systemctl --user restart xmatrix-daemon
-    echo "restarted xmatrix-daemon"
+stamp="$dropin_dir/.restarted"
+if [ -f "$stamp" ] && [ "$stamp" -nt "$dropin" ] && [ "$stamp" -nt "$secrets" ]; then
+    exit 0
 fi
+runs="$HOME/.config/xmatrix/daemon-run-registry.json"
+if [ -f "$runs" ] && grep -q '"pid"' "$runs" 2>/dev/null; then
+    echo "xmatrix: agent runs are live; daemon restart deferred" >&2
+    exit 0
+fi
+systemctl --user restart xmatrix-daemon
+touch "$stamp"
+echo "restarted xmatrix-daemon"

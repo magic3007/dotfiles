@@ -28,7 +28,8 @@ itself. Choosing link for a self-rewriting tool corrupts the repository and
 breaks every later `./install`. `docs/REPO_GUIDE.md` §2 has the table and the
 list of tools already classified.
 
-A link always goes into **both** `install.conf.yaml` and `sync.conf.yaml`.
+A link always goes into `install.conf.yaml`, once. `./install` and the 15-minute
+`sync.sh` both read that one file.
 
 ## When the user corrects you
 
@@ -59,7 +60,9 @@ python3 scripts/sync-skills.py --dry-run
 ## Things that are not true of other repositories
 
 - There is no dry-run flag; the pinned Dotbot rejects it.
-- `./install` and `sync.sh` read different config files.
+- `./install` and `sync.sh` read the same `install.conf.yaml`, but only
+  `./install` runs the network steps in `scripts/provision.sh`; both run
+  `scripts/apply.sh`.
 - Harness config under `~/` is often generated or merged — editing the live file
   is reverted within 15 minutes. Edit the tracked source.
 - The repository is public; credentials are always a reference, never a literal,

@@ -164,5 +164,5 @@ working example that:
 ## References
 
 - [Claude Code Commands](https://code.claude.com/docs/en/commands)
-- User's `_claude_with_api` function in `common_shell_setup.sh`
+- User's `_claude_with_api` function in `shell/common.d/70-agents.sh`
 - `claude-end-reminder.sh` hook for wechat-reminder integration pattern

@@ -1,7 +1,7 @@
 # OpenAI Codex shared configuration — the only git-tracked Codex config.
 #
 # This file is NOT the live config and is NOT symlinked anywhere. Codex has no
-# include/extends mechanism, so scripts/codex-config-sync.py merges it into
+# include/extends mechanism, so scripts/config-merge.py merges it into
 # ~/.codex/config.toml on every install and every 15-minute sync:
 #
 #   ~/.codex/config_local.toml   untracked per-machine overrides   (wins)

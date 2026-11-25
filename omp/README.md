@@ -42,7 +42,7 @@
 
 ### `~/.local/bin/{bun,omp}`（给 xmatrix 探测用）
 
-`install.conf.yaml` / `sync.conf.yaml` 还把 `~/.bun/bin/{bun,omp}` 软链到 `~/.local/bin/`。
+`install.conf.yaml` 还把 `~/.bun/bin/{bun,omp}` 软链到 `~/.local/bin/`。
 
 xmatrix 的 harness 探测只看 **daemon 进程的 PATH**。daemon 由 systemd 单元
 `~/.config/systemd/user/xmatrix-daemon.service` 启动，单元里写死的 PATH 是
@@ -344,24 +344,25 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
 与 `bun.lock`，omp 会就地重写 `omp-plugins.lock.json`，`node_modules/` 还有上百个包。
 
 仓库只跟踪**清单** `omp/plugins.txt`（每行一个 `omp plugin install` spec，`#` 注释说明每个
-插件的作用）与三份配置种子；缺失项由安装钩子补齐：
+插件的作用）与三份配置种子；缺失项由 `scripts/apply.sh` / `scripts/provision.sh` 里的步骤补齐：
 
 | repo 文件 | 作用 |
 |---|---|
 | `omp/plugins.txt` | 插件清单与逐个说明；`npm:` 前缀、版本后缀、`[features]` 括号、`github:user/repo[#ref]` 这类 git spec 均可 |
-| `omp/pi-fff-features.json` | pi-fff 的 feature 状态种子（关掉 `autocomplete`），由 seed 钩子拷到 `~/.omp/agent/extensions/pi-fff.json` |
+| `omp/pi-fff-features.json` | pi-fff 的 feature 状态种子（关掉 `autocomplete`），由 `scripts/seed-configs.sh` 拷到 `~/.omp/agent/extensions/pi-fff.json` |
 | `pi/herdr-agents/config.json` | pi-herdr-agents（pi 侧）的配置种子，同上拷到 `~/.pi/agent/herdr-agents/config.json` |
 | `omp/herdr-agents/config.json` | omp-herdr-agents 的配置种子，同上拷到 `~/.omp/agent/herdr-agents/config.json` |
-| `scripts/omp-plugins.sh` | `./install` 的 Phase 2 对比 `omp plugin list --json`，只安装缺失的插件 |
+| `scripts/omp-plugins.sh` | `scripts/provision.sh` 里对比 `omp plugin list --json`，只安装缺失的插件 |
 
 要点：
 
-- **只在 `./install` 跑**，不进 15 分钟的 `sync.sh`：安装需要网络和 `bun`。
-- **bun 是硬前置**：omp 的插件安装器 spawn `bun install`（按名字查 PATH）。`./install` 的
-  Phase 2 会先装 bun；脚本自己也按 `PATH` → `$BUN_INSTALL/bin` → `~/.bun/bin` →
+- **只在 `./install` 跑**，不进 15 分钟的 `sync.sh`：安装需要网络和 `bun`，所以放在
+  `scripts/provision.sh`（只由 `./install` 调用）。
+- **bun 是硬前置**：omp 的插件安装器 spawn `bun install`（按名字查 PATH）。
+  `scripts/provision.sh` 会先装 bun；脚本自己也按 `PATH` → `$BUN_INSTALL/bin` → `~/.bun/bin` →
   Homebrew/`/usr/local` 的顺序解析，并把所在目录前置进 `PATH`。都没有时只告警跳过（外部依赖
   缺失不算安装失败）。
-- **不能放 `post-install.d/`**：那批钩子在 Phase 1（纯本地）跑，早于 bun/omp 的网络安装，
+- **不能放 `scripts/apply.sh`**：那批本地步骤不联网，且先于 bun/omp 的安装，
   会以 "omp not on PATH" 跳过，或在 bun 缺失时让 omp 抛
   `Executable not found in $PATH: "bun"`。
 - 已安装的插件**不重装**。重复 `omp plugin install` 不是空操作：它会重新解析包，并把 feature
@@ -382,7 +383,7 @@ omp 的 `task` 工具带一个内建 `task` agent，它的 frontmatter 是 `mode
   默认值在 `omp/herdr-agents/config.json`。
 - feature 状态文件是 `~/.omp/agent/extensions/pi-fff.json`：omp 的 `getAgentDir()` 兼容 shim
   解析到 `~/.omp/agent`（放 `~/.pi/agent/extensions/` 无效）。仓库用
-  `omp/pi-fff-features.json` 做种子，由 `scripts/post-install.d/10-seed-configs.sh` 在目标缺失
+  `omp/pi-fff-features.json` 做种子，由 `scripts/seed-configs.sh` 在目标缺失
   时拷入（已存在则不覆盖，保留你在会话里的选择）。
 
 加插件：把 spec 写进 `omp/plugins.txt`，再跑 `bash scripts/omp-plugins.sh`（或 `./install`）。
@@ -474,5 +475,4 @@ YAML 引号：`tr -d '"'` 处在双引号标量里，必须写成 `tr -d '\""'"`
 若想跟踪 agents / skills / hooks，可用 `omp agents unpack`（默认写到
 `~/.omp/agent/agents`）后软链接对应子目录。当前按需再补。
 
-新增静态配置时记得同步三处：repo 文件、两个 dotbot 配置（`install.conf.yaml` 与
-`sync.conf.yaml`）的 link 段、本 README 的表格。
+新增静态配置时记得同步三处：repo 文件、`install.conf.yaml` 的 link 段、本 README 的表格。

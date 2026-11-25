@@ -81,7 +81,7 @@ The SSH session from the intranet must stay alive throughout.
 - **Pitfall**: if the user unit is a symlink into a dotfiles repo,
   `systemctl --user disable --now mihomo` deletes the symlink
   (`Removed ~/.config/systemd/user/mihomo.service`). Re-create it with
-  `ln -s ~/dotfiles/.../mihomo.service ~/.config/systemd/user/` and run `enable --now`.
+  `ln -s <repo>/proxy/mihomo/mihomo.service ~/.config/systemd/user/` and run `enable --now`.
   Don't test a system-unit migration on a live proxy.
 - `setcap` is lost when the binary is replaced, for example by a mihomo upgrade. Re-run step 1.
 - When a subscription expires, it returns a single dummy node (for example "您的服务已到期").

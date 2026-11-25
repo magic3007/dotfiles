@@ -5,7 +5,7 @@ set -uo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PLUGIN_ID="magic.wechat-notify"
-PLUGIN_SRC="$DOTFILES_DIR/herdr/plugins/wechat-notify"
+PLUGIN_SRC="$DOTFILES_DIR/herdr-tui/plugins/wechat-notify"
 
 if ! command -v herdr >/dev/null 2>&1; then
     echo "herdr not installed; skipping plugin link"

@@ -2,9 +2,8 @@
 
 Grok Bot (the xAI/Cursor desktop agent) starts at graphical login through XDG
 autostart: `grok-bot/grok-bot.desktop` is linked to
-`~/.config/autostart/grok-bot.desktop` from **both** `install.conf.yaml` and
-`sync.conf.yaml` (a link missing from either one is caught by
-`.repo-std/checks/link_parity.py`), guarded by
+`~/.config/autostart/grok-bot.desktop` by `install.conf.yaml` (the same file
+`./install` and the 15-minute `sync.sh` both read), guarded by
 `if: '[ -x /home/magic/.local/bin/grok-bot ]'`.
 
 The launcher itself is an install artifact written by the

@@ -1,0 +1,46 @@
+# ~/.zshrc — zsh entry point: oh-my-zsh, then ~/.zshrc.d/*.zsh in file-name
+# order. The settings shared with bash live in shell/common.sh, reached through
+# the ~/.common_shell_setup.sh symlink; ~/.zshrc_local is sourced last by
+# zshrc.d/99-local.zsh.
+
+# Prevent recursive startup loops (e.g. when ~/.zshrc_local accidentally sources ~/.zshrc).
+typeset -gi DOTFILES_ZSHRC_LOAD_DEPTH=${DOTFILES_ZSHRC_LOAD_DEPTH:-0}
+if (( DOTFILES_ZSHRC_LOAD_DEPTH > 0 )); then
+  return 0
+fi
+(( DOTFILES_ZSHRC_LOAD_DEPTH++ ))
+
+# Powerlevel10k instant prompt. It must stay close to the top; initialization
+# that may need console input has to come before it.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+export ZSH="${HOME}/.oh-my-zsh"
+ZSH_THEME="xiong-chiamiov"
+
+# Too many plugins slow shell startup. Custom plugins live in $ZSH/custom/plugins.
+plugins=(git
+    autojump
+    zsh-syntax-highlighting
+    zsh-autosuggestions
+    colored-man-pages
+    sudo
+    zsh-wakatime
+)
+# zsh-vi-mode stays out: emacs key bindings are preferred.
+
+source $ZSH/oh-my-zsh.sh
+
+# This file is a symlink to shell/zsh/zshrc in the dotfiles repository; this is
+# the repository root.
+DOTFILES_ROOT="${${(%):-%x}:A:h:h:h}"
+
+# Load ~/.zshrc.d in file-name order; 99-local.zsh runs last.
+ZSHRC_MODULE_DIR="${ZDOTDIR:-$HOME}/.zshrc.d"
+for zshrc_module in "$ZSHRC_MODULE_DIR"/*.zsh(N); do
+  source "$zshrc_module"
+done
+unset ZSHRC_MODULE_DIR zshrc_module DOTFILES_ROOT
+
+(( DOTFILES_ZSHRC_LOAD_DEPTH-- ))

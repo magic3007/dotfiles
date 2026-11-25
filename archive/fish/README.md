@@ -10,7 +10,9 @@ should go into this directory.
 
 ## Why it still works
 
-`install.conf.yaml` still creates the symlink, now pointing at this location:
+`install.conf.yaml` still links `~/.config/fish`, guarded by
+`if: 'command -v fish >/dev/null'` so the link exists only where fish is
+installed:
 
 ```
 ~/.config/fish -> <repo>/archive/fish
@@ -31,7 +33,7 @@ nothing useful now that the config is frozen, and its pinned plugin list
 re-downloading state the repo no longer pins.
 
 `fish` itself is still installed as a package by
-`install-scripts/{linux,mac}/install-packages.sh`. That is not fish *config*
+`scripts/packages-{linux,mac}.sh`. That is not fish *config*
 maintenance, so it was left alone.
 
 ## Rules for this directory

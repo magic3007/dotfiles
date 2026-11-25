@@ -19,10 +19,11 @@
 - origin: >-
     Codex, kimi, mcode, the Antigravity CLI and the Herdr app each replaced a
     symlinked config with a regular file by saving via temp file + rename, which
-    pushed machine state into the repository and broke the next dotbot run.
+    pushed machine state into the repository and broke the next dotbot run; Pi
+    writes its runtime state through the link into the repository.
   rule: >-
-    A config its owning tool rewrites in place is never symlinked; it is merged
-    by a scripts/*-sync.py or seeded by post-install.d/10-seed-configs.sh.
+    A config its owning tool rewrites is never symlinked; it is merged by
+    scripts/config-merge.py or seeded by scripts/seed-configs.sh.
   check: no_link_for_self_rewriting_configs
 
 - origin: >-

@@ -7,9 +7,9 @@ regular file; machine-local state then sits in the repository, and the next
 dotbot run aborts the whole link section with "already exists but is a regular
 file or directory".
 
-The repository handles each of these by merging (scripts/*-sync.py) or by
-seeding (scripts/post-install.d/10-seed-configs.sh) instead. Observed for Codex,
-kimi, mcode, the Antigravity CLI and the Herdr app.
+The repository handles each of these by merging (scripts/config-merge.py) or by
+seeding (scripts/seed-configs.sh) instead. Observed for Codex, kimi, mcode, the
+Antigravity CLI, Pi and the Herdr app.
 """
 
 from __future__ import annotations
@@ -30,6 +30,7 @@ SELF_REWRITING = {
     "~/.gemini/antigravity-cli/settings.json": "agy rewrites it on every /config change and permission grant",
     "~/.config/herdr-app/settings.json": "herdr-app writes it via temp file + rename",
     "~/.config/herdr-app/keys.json": "herdr-app writes it via temp file + rename",
+    "~/.pi/agent/settings.json": "pi writes its changelog version and current model through the link",
 }
 
 

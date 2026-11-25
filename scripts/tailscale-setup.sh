@@ -42,7 +42,7 @@ info() { printf '[tailscale] %s\n' "$*"; }
 warn() { printf '[tailscale] WARNING: %s\n' "$*" >&2; }
 
 # ./install does not source the interactive shell config, so pick up the auth
-# key from the same machine-local file that common_shell_setup.sh sources.
+# key from the same machine-local file that shell/common.sh sources.
 # Only when the key is absent: an explicit environment must win.
 if [ -z "${TAILSCALE_AUTHKEY:-}" ] && [ -f "$HOME/.common_shell_setup_local.sh" ]; then
     set +u
@@ -70,7 +70,7 @@ find_cli() {
 }
 
 CLI=$(find_cli) || {
-    warn "tailscale CLI not found; run ./install or install-scripts/{mac,linux}/install-packages.sh"
+    warn "tailscale CLI not found; run ./install or scripts/packages-{linux,mac}.sh"
     exit 0
 }
 

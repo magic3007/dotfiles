@@ -1,0 +1,43 @@
+{
+    "remote.SSH.remotePlatform": {
+        "wxeda": "linux",
+        "vnc": "linux",
+        "lab-server": "linux",
+        "lab": "linux",
+        "mj_pub": "linux",
+        "lab2": "linux",
+        "pkucpu": "linux",
+        "pku140": "linux",
+        "xhscpu": "linux",
+        "xhsgpu": "linux",
+        "qs_b200": "linux",
+        "qs_b200_v2": "linux",
+        "qs_b200_1x4": "linux",
+        "pkucpu_edu": "linux",
+        "pku140_edu": "linux",
+        "pku140_pub": "linux",
+        "qs_b200_1x4_v2": "linux",
+        "qs_b200_16x4": "linux",
+        "magic_dev": "linux",
+        "magic_dev2": "linux",
+        "lyqhd": "linux",
+        "alish": "linux",
+        "alsh": "linux",
+        "dev": "linux",
+        "axe": "linux",
+        "cm": "linux"
+    },
+    "cursor.cpp.enablePartialAccepts": true,
+    "cursor.cpp.disabledLanguages": [
+        "scminput"
+    ],
+    "cursor.terminal.usePreviewBox": true,
+    "cursor.rpcFileLogger.enabled": true,
+    "window.commandCenter": true,
+    "terminal.integrated.macOptionIsMeta": true,
+    "window.autoDetectColorScheme": true,
+    "workbench.preferredLightColorTheme": "Cursor Dark",
+    "workbench.startupEditor": "none",
+    "gitlens.graph.details.location": "auto",
+    "js/ts.experimental.useTsgo": true
+}

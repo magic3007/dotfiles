@@ -23,7 +23,7 @@ Bootstraps everything: SSH keys → Claude Code → repo clone → `./install` �
 git clone --recursive https://github.com/magic3007/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install              # idempotent — safe to re-run
-./install --only link  # phase 1 symlinks only; the closest thing to a preview
+./install --only link  # symlinks only; the closest thing to a preview
 ```
 
 The pinned Dotbot has no `--dry-run`.
@@ -35,12 +35,12 @@ The pinned Dotbot has no `--dry-run`.
 | Tool | Config |
 |------|--------|
 | **zsh** | oh-my-zsh + autosuggestions + syntax-highlighting + vi-mode + autojump + wakatime |
-| **bash** | shared aliases, functions, and env vars via `common_shell_setup.sh` |
+| **bash** | shared aliases, functions, and env vars via `shell/common.sh` |
 | **fish** | archived — frozen config kept at `archive/fish/` for existing logins |
 | **starship** | Cross-shell prompt with custom styling |
 
 Two shells are actively maintained: **zsh** and **bash**. They share
-`common_shell_setup.sh` — aliases, functions, env vars, and the harness
+`shell/common.sh` (modules in `shell/common.d/`) — aliases, functions, env vars, and the harness
 wrappers below. fish is frozen in `archive/fish/`; do not add to it.
 
 Destructive commands are guarded there:
@@ -93,7 +93,7 @@ Docker helpers: `docker-run`, `docker-slave`, `docker-run-gui`.
 | **Claude Code** | `claude/` — settings, hooks, skills, agents | — |
 | **Codex** | `codex/` — shared keys merged into the live config | `codex/README.md` |
 | **mcode** (MiniMax Code) | `mcode/config.yaml`, merged | `mcode/README.md` |
-| **Antigravity CLI** (`agy`) | `antigravity/cli-settings.json`, merged | `antigravity/README.md` |
+| **Antigravity CLI** (`agy`) | `antigravity-cli/cli-settings.json`, merged | `antigravity-cli/README.md` |
 | **Pi** | `pi/` — models, settings, extensions, agents | — |
 | **Opencode** | `opencode/` | — |
 | **Kimi Code** | `kimi-code/config.toml`, seeded | — |
@@ -104,7 +104,7 @@ Docker helpers: `docker-run`, `docker-slave`, `docker-run-gui`.
 
 #### Shell wrappers
 
-Each harness has one wrapper per backend, defined in `common_shell_setup.sh`.
+Each harness has one wrapper per backend, defined in `shell/common.d/70-agents.sh`.
 The names follow a suffix convention, so the file itself is the list:
 
 | Suffix | Harness | Example |
@@ -160,7 +160,7 @@ Plain `cc`, `cx`, `oc` start the default backend (`agyh`/`agyc` select the per-a
 ### Networking (Tailscale mesh)
 
 Every machine installs the Tailscale client and joins the same tailnet.
-`install-scripts/{mac,linux}/install-packages.sh` installs it; `./install` then
+`scripts/packages-{mac,linux}.sh` installs it; `./install` then
 runs `scripts/tailscale-setup.sh`, which is idempotent (a `Running` node is left
 alone).
 
@@ -203,7 +203,7 @@ Machine-specific overrides — gitignored:
 | `~/.config/fish/conf.d/local.fish` | Fish overrides (fish archived) |
 
 Codex uses the default OpenAI account through `cx`. Lightweight provider/model
-switching is defined in `common_shell_setup.sh` without rewriting the shared
+switching is defined in `shell/common.d/70-agents.sh` without rewriting the shared
 config:
 
 ```bash
@@ -220,8 +220,9 @@ and environment variables.
 
 ```
 dotfiles/
-├── install.conf.yaml    ./install            — every symlink, both install phases
-├── sync.conf.yaml       sync.sh              — the subset re-applied every 15 min
+├── install.conf.yaml    every symlink; ./install runs it all, sync.sh its link part every 15 min
+├── scripts/apply.sh     local state after linking (seeds, merges, skill views) — install and sync
+├── scripts/provision.sh packages, CLIs and harnesses — ./install only
 ├── docs/REPO_GUIDE.md   the rules, the process, the change paths
 ├── .repo-std/           the checks that enforce them (gate.sh)
 │
@@ -229,27 +230,28 @@ dotfiles/
 ├── claude/          → ~/.claude/         Claude Code
 ├── codex/           → merged             OpenAI Codex
 ├── mcode/           → merged             MiniMax Code
-├── antigravity/     → merged             Antigravity CLI (agy)
+├── antigravity-cli/ → merged             Antigravity CLI (agy)
 ├── omp/             → ~/.omp/agent/      omp coding agent harness
 ├── pi/              → ~/.pi/agent/       Pi coding agent
 ├── opencode/        → ~/.config/opencode/
 ├── kimi-code/       → seeded             Kimi Code
 │
-├── oh-my-zsh/       → ~/.zshrc + ~/.zshrc.d/
-├── bash/            → ~/.bashrc
-├── common_shell_setup.sh → ~/.common_shell_setup.sh  (shared by bash and zsh)
+├── shell/           → ~/.zshrc, ~/.zshrc.d/, ~/.zshenv, ~/.bashrc, ~/.common_shell_setup.sh
 ├── git/             → ~/.gitconfig       Git aliases + hooks
-├── tmux.conf, ghostty/, cmux/, starship/
-├── herdr/           → ~/.config/herdr/       agent-aware multiplexer + plugins
+├── terminals/       → tmux, Ghostty, cmux, Warp
+├── herdr-tui/       → ~/.config/herdr/       agent-aware multiplexer + plugins
 ├── herdr-app/       → ~/.config/herdr-app/   desktop app themes
 │
 ├── neovim/          → ~/.config/nvim/    nvim-basic-ide
 ├── vim/             → ~/.vim_runtime/
-├── vscode_config/, cursor_config/, antigravity_config/   (macOS IDE settings)
-├── ranger/, joshuto/, yazi/, lsd/, bat/, gdb/
-├── karabiner/, skhd/, iterm2/, yabairc                   (macOS)
-├── obsidian/, docker/, install-scripts/
-├── scripts/         → Install helpers, config merges, skill views
+├── editors/         → VS Code, Cursor, Antigravity (macOS): shared settings + per-app overlay
+├── ranger/, joshuto/, yazi/, lsd/, bat/, starship/, gdb/
+├── macos/           → yabai, skhd, Karabiner, iTerm2
+├── mirrors/         → conda, pip, npm, cargo mirrors
+├── proxy/           → proxy-env (live proxy port), mihomo
+├── sync/            → launchd / systemd units for the 15-minute sync
+├── obsidian/, docker/
+├── scripts/tools/   → standalone helpers (backup, sshfs, yolo sandbox)
 ├── wechat-reminder/ → Dual-channel notification tool
 └── archive/fish/    → ~/.config/fish/    ARCHIVED, frozen
 ```

@@ -38,3 +38,7 @@ end
 
 # Antigravity
 test -d $HOME/.antigravity/antigravity/bin; and fish_add_path $HOME/.antigravity/antigravity/bin
+
+
+# Added by Antigravity CLI installer
+set -gx PATH "/home/magic/.local/bin" $PATH
