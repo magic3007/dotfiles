@@ -90,7 +90,7 @@ Docker helpers: `docker-run`, `docker-slave`, `docker-run-gui`.
 | Tool | Config | Detail |
 |------|--------|--------|
 | **omp** | `omp/` — models, roles, gateways, plugins, rules | `omp/README.md` |
-| **Claude Code** | `claude/` — settings, hooks, skills, agents, commands | — |
+| **Claude Code** | `claude/` — settings, hooks, skills, agents | — |
 | **Codex** | `codex/` — shared keys merged into the live config | `codex/README.md` |
 | **mcode** (MiniMax Code) | `mcode/config.yaml`, merged | `mcode/README.md` |
 | **Antigravity CLI** (`agy`) | `antigravity/cli-settings.json`, merged | `antigravity/README.md` |

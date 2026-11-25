@@ -123,7 +123,6 @@
     # ---- AI tools ----
     ~/.claude/settings.json: claude/settings.json
     ~/.claude/config.json: claude/config.json
-    # ~/.claude/commands: claude/commands  # deprecated, converted to skills
     ~/.claude/hooks: claude/hooks
     ~/.claude/scripts: claude/scripts
     ~/.claude/statusline-command.sh: claude/statusline-command.sh

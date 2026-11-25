@@ -46,16 +46,6 @@ validator = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(validator)
 
 
-def sub(root: Path, *names: str) -> Path:
-    """在两种目录布局里找子目录：/tmp 跑时是 root/out、root/answers；
-    归档进仓库时是 root/results/<case>、root/results/answers。"""
-    for name in names:
-        cand = root / name
-        if cand.is_dir():
-            return cand
-    return root / names[0]
-
-
 def skill_file(case_dir: Path) -> Path | None:
     """测试产物文件名是 extracted-skill.md，不是 SKILL.md。
 
@@ -148,14 +138,14 @@ def main() -> int:
     rows = []
     for scenario in ("S1", "S2", "S3"):
         for arm in ("A", "B"):
-            skill_dir = sub(ROOT, "out", "results") / f"{scenario}-{arm}"
+            skill_dir = ROOT / "out" / f"{scenario}-{arm}"
             artifact = skill_file(skill_dir)
             if artifact is None:
                 continue
             text = artifact.read_text(encoding="utf-8")
             struct = validator.validate(artifact)
-            a1 = sub(ROOT, "answers", "results/answers") / f"{scenario}-{arm}.json"
-            a2 = sub(ROOT, "answers2", "results/answers2") / f"{scenario}-{arm}.json"
+            a1 = ROOT / "answers" / f"{scenario}-{arm}.json"
+            a2 = ROOT / "answers2" / f"{scenario}-{arm}.json"
             row = {
                 "case": f"{scenario}-{arm}",
                 "arm": arm,
