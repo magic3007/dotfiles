@@ -28,6 +28,13 @@ log() {
 }
 
 # ---- 环境准备 ----
+# cron 用 zsh -l 启动，不读 ~/.zshrc；凭据只在未跟踪的本机文件里
+if [[ -f "$HOME/.common_shell_setup_local.sh" ]]; then
+    set +u
+    source "$HOME/.common_shell_setup_local.sh"
+    set -u
+fi
+
 # cron 环境下 PATH 最小，需要显式补充
 # 尝试多种 nvm 路径以覆盖不同安装位置
 for nvm_dir in "$HOME/.nvm" "/usr/local/nvm"; do

@@ -19,7 +19,7 @@
 ## 安装
 
 ```bash
-cd ~/dotfiles/self-reflection
+cd <dotfiles>/self-reflection
 ./install.sh
 ```
 
@@ -52,15 +52,15 @@ tail -f ~/.claude/logs/daily-insights.log
 
 ## 环境变量配置
 
-在 `~/.zshenv` 中添加：
+在 `~/.common_shell_setup_local.sh`（未跟踪，`daily-insights.sh` 启动时 source）中添加：
 
 ```bash
 # 必需：DeepSeek API key
 export DEEPSEEK_API_KEY="sk-xxx"
 
 # 可选：IM 提醒目标（不设置则只创建文档，不发消息）
-export SELF_REFLECTION_LARK_CHAT_ID="ou_b396f13f1f20846b2a2537160c7ac128"  # 发给自己
-# export SELF_REFLECTION_LARK_CHAT_ID="oc_xxx"   # 或发到群里
+export SELF_REFLECTION_LARK_CHAT_ID="ou_xxx"   # 发给自己
+# export SELF_REFLECTION_LARK_CHAT_ID="oc_xxx" # 或发到群里
 ```
 
 ## 跨平台
