@@ -6,8 +6,10 @@
 #
 # What this script does:
 #   1. Set up SSH key for GitHub
-#   2. Install Claude Code CLI + configure API (VolcEngine by default)
-#   3. Launch Claude Code to clone dotfiles & complete setup
+#   2. Install Claude Code CLI
+#   3. Configure its API (VolcEngine by default)
+#   4. Clone dotfiles and run ./install
+#   5. Launch Claude Code to review the install log and fix what failed
 # =============================================================================
 
 set -e
@@ -227,15 +229,7 @@ fi
 info "API configuration complete"
 
 # ===========================================================================
-# Step 4: Launch Claude Code to complete setup
-# ===========================================================================
-title "Step 4/4: Claude Code Dotfiles Setup"
-
-info "Launching Claude Code to clone dotfiles & run installer..."
-echo ""
-
-# ===========================================================================
-# Step 4: Clone & Run dotfiles install directly (faster for long-running install)
+# Step 4: Clone & run the dotfiles install
 # ===========================================================================
 title "Step 4/5: Clone & Install Dotfiles"
 
@@ -268,10 +262,15 @@ mkdir -p "$HOME/.cache"
 info "Running install with output capture to $INSTALL_LOG"
 
 # Capture output to log while also displaying on screen
-./install 2>&1 | tee "$INSTALL_LOG" || true
+./install 2>&1 | tee "$INSTALL_LOG"
+install_status=${PIPESTATUS[0]}
 
 echo ""
-info "Dotfiles install completed (any failed steps can be manually retried later)"
+if [ "$install_status" -eq 0 ]; then
+    info "Dotfiles install completed"
+else
+    warn "Dotfiles install exited with $install_status; Claude Code reviews the log next"
+fi
 
 # Write git local config
 GIT_CONFIG_LOCAL="$HOME/.gitconfig_local"
@@ -299,9 +298,9 @@ EOF
 fi
 
 # ===========================================================================
-# Launch Claude Code for final verification & troubleshooting (interactive)
+# Step 5: Launch Claude Code to review the install log (interactive)
 # ===========================================================================
-info "\nLaunching Claude Code for final check...\n"
+title "Step 5/5: Review the install log"
 
 INSTALL_LOG_PATH="$INSTALL_LOG"
 SETUP_PROMPT="The ./install command just completed. I have captured the full output to a log file.
@@ -313,7 +312,7 @@ Follow these steps:
 1. Read the log file: cat $INSTALL_LOG_PATH
 
 2. Identify failed operations by looking for:
-   - 'git command failed' (plugin clones)
+   - 'warn  step failed' (a step of scripts/apply.sh or scripts/provision.sh)
    - 'Some tasks were not executed successfully' (dotbot summary)
    - 'fatal:' or 'error:' messages
    - 'command not found' (missing packages)
@@ -329,7 +328,7 @@ Follow these steps:
 4. Verify critical components work:
    - ls ~/.oh-my-zsh/custom/plugins/
    - command -v fzf
-   - command -v claude codex gemini opencode lark-cli
+   - command -v claude codex agy opencode lark-cli
    - command -v wechat-reminder
 
 5. Report what you found and what you fixed.
